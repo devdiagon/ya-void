@@ -1,3 +1,4 @@
+export const SCHEMA_SQL = `
 PRAGMA foreign_keys = ON;
 
 --------------------------------------------------
@@ -256,3 +257,4 @@ INSERT INTO area_requester (id, area_id, requester_id) VALUES
 
 (57,49,1),(58,50,2),(59,51,3),(60,52,3),(61,53,4),(62,54,5),
 (63,55,6),(64,56,36),(65,57,37),(66,58,38);
+`

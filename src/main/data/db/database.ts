@@ -2,9 +2,9 @@ import Database from 'better-sqlite3'
 import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
+import { SCHEMA_SQL } from './schema'
 
 const DB_FILE = path.join(app.getPath('userData'), 'app.db')
-const SCHEMA_SRC = path.join(__dirname, 'schema.sql')
 
 let db: Database.Database | null = null
 
@@ -22,9 +22,7 @@ export function getDb(): Database.Database {
   db.pragma('foreign_keys = ON')
 
   if (isNew) {
-    // Load schema.sql from source and execute
-    const schema = fs.readFileSync(SCHEMA_SRC, 'utf-8')
-    db.exec(schema)
+    db.exec(SCHEMA_SQL)
   }
 
   return db
