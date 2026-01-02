@@ -1,6 +1,6 @@
-import { Area } from '../../core/entitites/Area.js'
+import { Area } from '../../core/entities/Area.js'
 
-type AreaRow = {
+export type AreaRow = {
   id: number
   name: string
   farm_id: number

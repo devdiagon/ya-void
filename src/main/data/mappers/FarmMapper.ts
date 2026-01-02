@@ -1,6 +1,6 @@
-import { Farm } from '../../core/entitites/Farm.js'
+import { Farm } from '../../core/entities/Farm.js'
 
-type FarmRow = {
+export type FarmRow = {
   id: number
   name: string
 }
