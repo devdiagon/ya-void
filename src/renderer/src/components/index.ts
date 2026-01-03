@@ -1,3 +1,5 @@
 export * from "./Button"
 export * from "./Sidebar"
 export * from "./Content"
+export * from "./BreadCrumbs"
+export * from "./Table"
