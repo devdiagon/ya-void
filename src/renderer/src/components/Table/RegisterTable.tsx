@@ -27,7 +27,15 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
     );
   }
 
-  return (
+  if(data.length === 0) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {emptyMessage}
+      </div>
+    );
+  }
+
+  return (    
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -82,12 +90,6 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
           </tbody>
         </table>
       </div>
-
-      {data.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          {emptyMessage}
-        </div>
-      )}
     </div>
   );
 }
