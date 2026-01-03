@@ -1,3 +1,3 @@
-export * from "./AppLayout"
 export * from "./Button"
-export * from "./SidebarItems"
+export * from "./Sidebar"
+export * from "./Content"
