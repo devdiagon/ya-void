@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
 import { Menu } from "lucide-react";
 
 import { Content, Sidebar } from "@renderer/components";
-import { Register, Reports } from "@renderer/pages/examples";
+import { AppRoutes } from "@renderer/routes/AppRoutes";
 
 export const RootLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -13,7 +12,6 @@ export const RootLayout = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Header con botón de menú para mobile */}
         <header className="lg:hidden bg-white border-b border-gray-200 p-4">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -24,12 +22,7 @@ export const RootLayout = () => {
         </header>
 
         <Content>
-          <Routes>
-            <Route path="/" element={<Reports />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <AppRoutes />
         </Content>
       </div>
     </div>
