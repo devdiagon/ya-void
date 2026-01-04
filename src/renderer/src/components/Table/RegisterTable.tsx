@@ -1,3 +1,5 @@
+import { TextButton } from "../Button";
+
 export interface TableColumn {
   key: string;
   label: string;
@@ -74,13 +76,13 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex gap-3">
                       {actions.map((action, actionIndex) => (
-                        <button
+                        <TextButton
                           key={actionIndex}
                           onClick={() => action.onClick(row)}
                           className={action.className || 'text-blue-600 hover:text-blue-900'}
                         >
                           {action.label}
-                        </button>
+                        </TextButton>
                       ))}
                     </div>
                   </td>

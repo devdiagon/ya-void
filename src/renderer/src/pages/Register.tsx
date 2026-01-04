@@ -38,7 +38,7 @@ export const Register = () => {
 
       const {label} = crumbs[crumbs.length - 1];
       setTitle(label);
-      
+
       if(crumbs.length === 2) setModalTitle(`Agregar Área`);
       if(crumbs.length === 3) setModalTitle(`Agregar Viaje`);
     } else {
@@ -68,12 +68,12 @@ export const Register = () => {
     {
       label: 'Editar',
       onClick: (row) => console.log('Editar:', row),
-      className: 'text-blue-600 hover:text-blue-900'
+      className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
     },
     {
       label: 'Eliminar',
       onClick: (row) => console.log('Eliminar:', row),
-      className: 'text-gray-600 hover:text-gray-900'
+      className: 'text-red-600 hover:text-red-700 hover:bg-red-50'
     }
   ];
 
