@@ -8,6 +8,7 @@ import {
   TableAction, 
   TableColumn 
 } from "@renderer/components";
+import { buildCrumbsPaths, getPathSegments } from "@renderer/utils";
 import { ArrowLeftIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -17,28 +18,28 @@ export const Register = () => {
   const location = useLocation();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [title, setTitle] = useState('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   // Breadcrumbs setup
   useEffect(() => {
-    const pathSegments = location.pathname
-      .split('/')
-      .filter(segment => segment !== '');
+    const pathSegments = getPathSegments(location.pathname);
 
+    let crumbs: BreadcrumbItem[] = [];
+    
     // Show only if there are more levels of navigation than just /register
     if (pathSegments.length > 1) {
-      const crumbs: BreadcrumbItem[] = pathSegments.map((segment, index) => {
-        const path = '/' + pathSegments.slice(0, index + 1).join('/');
-        const label = segment.charAt(0).toUpperCase() + segment.slice(1);
-        
-        return { label, path };
-      });
+      crumbs = buildCrumbsPaths(pathSegments);
       
       // Ignore base route 'register'
       setBreadcrumbs(crumbs.slice(1));
+
+      const {label} = crumbs[crumbs.length - 1];
+      setTitle(label);
     } else {
       setBreadcrumbs([]);
+      setTitle('Fincas');
     }
   }, [location.pathname]);
 
@@ -53,11 +54,8 @@ export const Register = () => {
         // mockData
         const mockData = Array.from({ length: 5 }, (_, i) => ({
           id: i + 1,
-          name: `Item ${i + 1} para ${location.pathname}`,
-          status: i % 2 === 0 ? 'active' : 'inactive',
-          date: new Date().toLocaleDateString()
+          name: `Item ${i + 1} para ${location.pathname}`
         }));
-
         setData(mockData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -70,6 +68,7 @@ export const Register = () => {
   }, [location.pathname]);
 
   const handleGoBack = () => {
+    
     navigate(-1);
   };
 
@@ -79,24 +78,7 @@ export const Register = () => {
 
   // Table columns configuration
   const columns: TableColumn[] = [
-    { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nombre' },
-    { 
-      key: 'status', 
-      label: 'Estado',
-      render: (value) => (
-        <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-            value === 'active'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {value}
-        </span>
-      )
-    },
-    { key: 'date', label: 'Fecha' }
   ];
 
   // Table actions configuration
@@ -134,7 +116,7 @@ export const Register = () => {
         
         {/* Tittle & Add button */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Registro</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Registrar {title}</h1>
 
           <ActionButton 
             variant="primary" 
