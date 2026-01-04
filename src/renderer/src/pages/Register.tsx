@@ -1,4 +1,13 @@
-import { ActionButton, BreadcrumbItem, Breadcrumbs, IconButton, RegisterTable, TableAction, TableColumn } from "@renderer/components";
+import { 
+  ActionButton, 
+  BreadcrumbItem, 
+  Breadcrumbs, 
+  IconButton, 
+  Modal, 
+  RegisterTable, 
+  TableAction, 
+  TableColumn 
+} from "@renderer/components";
 import { ArrowLeftIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,6 +18,7 @@ export const Register = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   // Breadcrumbs setup
   useEffect(() => {
@@ -64,7 +74,7 @@ export const Register = () => {
   };
 
   const handleAdd = () => {
-    console.log('Click agregar');
+    setIsOpenModal(true);
   };
 
   // Table columns configuration
@@ -105,6 +115,19 @@ export const Register = () => {
 
   return (
     <div className="h-full flex flex-col">
+
+      <Modal
+        isOpen={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+        title="Agregar"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600">
+            Simple modal content
+          </p>
+        </div>
+      </Modal>
       
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
