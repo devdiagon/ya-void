@@ -2,9 +2,10 @@ import {
   ActionButton, 
   BreadcrumbItem, 
   Breadcrumbs, 
-  IconButton, 
-  Modal, 
+  IconButton,  
   RegisterTable, 
+  SelectModal, 
+  SelectOption, 
   TableAction, 
   TableColumn 
 } from "@renderer/components";
@@ -18,9 +19,10 @@ export const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [title, setTitle] = useState('');
-  const [modalTitle, setModalTitle] = useState('Agregar');
+  const [modalTitle, setModalTitle] = useState('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [selectModalOptions, setSelectModalOptions] = useState<SelectOption[]>([]);
   const { farms, loading } = useFarms();
 
   // Breadcrumbs setup
@@ -48,15 +50,37 @@ export const Register = () => {
     }
   }, [location.pathname]);
 
+  // Fetch options for select modal when opened
+  useEffect(() => {
+    if (isOpenModal) {
+      loadOptions();
+    }
+  }, [isOpenModal]);
+
+  const loadOptions = async () => {
+    const options = farms.map(farm => {
+      return { value: farm.id, label: farm.name };
+    });
+    setSelectModalOptions(options);
+  };
+
+  // Navigation by using breadcrumbs
   const handleGoBack = () => {
     const { path } = breadcrumbs[breadcrumbs.length - 1];
     const prevPath = path.split('/').slice(0, -1).join('/');
     navigate(prevPath);
   };
 
+  // Button to open modal
   const handleAdd = () => {
     setIsOpenModal(true);
   };
+
+  // 
+  const handleConfirmAdd = (value: string | number) => {
+   console.log('Selected value:', value);
+   // TODO: send option to be added to the database
+  }
 
   // Table columns configuration
   const columns: TableColumn[] = [
@@ -67,12 +91,12 @@ export const Register = () => {
   const actions: TableAction[] = [
     {
       label: 'Editar',
-      onClick: (row) => console.log('Editar:', row),
+      onClick: (row) => console.log('Editar:', row), // TODO: navigate to "this" row page
       className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
     },
     {
       label: 'Eliminar',
-      onClick: (row) => console.log('Eliminar:', row),
+      onClick: (row) => console.log('Eliminar:', row), // TODO: open delete confirmation modal
       className: 'text-red-600 hover:text-red-700 hover:bg-red-50'
     }
   ];
@@ -80,18 +104,13 @@ export const Register = () => {
   return (
     <div className="h-full flex flex-col">
 
-      <Modal
+      <SelectModal
         isOpen={isOpenModal}
-        onClose={() => setIsOpenModal(false)}
         title={modalTitle}
-        size="md"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-600">
-            Simple modal content
-          </p>
-        </div>
-      </Modal>
+        onClose={() => setIsOpenModal(false)}
+        onConfirm={handleConfirmAdd}
+        options={selectModalOptions}
+      />
       
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
