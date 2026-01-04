@@ -10,6 +10,7 @@ import {
 } from "@renderer/components";
 import { buildCrumbsPaths, getPathSegments } from "@renderer/utils";
 import { ArrowLeftIcon, PlusIcon } from "lucide-react";
+import path from "path";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -68,8 +69,9 @@ export const Register = () => {
   }, [location.pathname]);
 
   const handleGoBack = () => {
-    
-    navigate(-1);
+    const { path } = breadcrumbs[breadcrumbs.length - 1];
+    const prevPath = path.split('/').slice(0, -1).join('/');
+    navigate(prevPath);
   };
 
   const handleAdd = () => {
