@@ -18,6 +18,7 @@ export const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [title, setTitle] = useState('');
+  const [modalTitle, setModalTitle] = useState('Agregar');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { farms, loading } = useFarms();
@@ -37,9 +38,13 @@ export const Register = () => {
 
       const {label} = crumbs[crumbs.length - 1];
       setTitle(label);
+      
+      if(crumbs.length === 2) setModalTitle(`Agregar Área`);
+      if(crumbs.length === 3) setModalTitle(`Agregar Viaje`);
     } else {
       setBreadcrumbs([]);
       setTitle('Fincas');
+      setModalTitle('Agregar Finca');
     }
   }, [location.pathname]);
 
@@ -78,7 +83,7 @@ export const Register = () => {
       <Modal
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
-        title="Agregar"
+        title={modalTitle}
         size="md"
       >
         <div className="space-y-4">
