@@ -46,7 +46,7 @@ export const TextButton = ({
         ${sizeClasses[size]}
         ${variantClasses[variant]}
         ${fullWidth ? 'w-full' : ''}
-        ${loading ? 'cursor-wait' : ''}
+        ${loading ? 'cursor-wait' : 'cursor-pointer'}
         ${className}
       `}
     >

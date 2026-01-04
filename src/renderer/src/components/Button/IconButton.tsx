@@ -66,7 +66,7 @@ export const IconButton = ({
         ${rounded ? 'rounded-full' : 'rounded-lg'}
         ${sizeClasses[size]}
         ${variantClasses[variant]}
-        ${loading ? 'cursor-wait' : ''}
+        ${loading ? 'cursor-wait' : 'cursor-pointer'}
         ${className}
       `}
     >
