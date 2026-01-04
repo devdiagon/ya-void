@@ -8,20 +8,19 @@ import {
   TableAction, 
   TableColumn 
 } from "@renderer/components";
+import { useFarms } from "@renderer/hooks/useFarms";
 import { buildCrumbsPaths, getPathSegments } from "@renderer/utils";
 import { ArrowLeftIcon, PlusIcon } from "lucide-react";
-import path from "path";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const { farms, loading } = useFarms();
 
   // Breadcrumbs setup
   useEffect(() => {
@@ -42,30 +41,6 @@ export const Register = () => {
       setBreadcrumbs([]);
       setTitle('Fincas');
     }
-  }, [location.pathname]);
-
-  // Fetch data from DB
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      
-      try {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // mockData
-        const mockData = Array.from({ length: 5 }, (_, i) => ({
-          id: i + 1,
-          name: `Item ${i + 1} para ${location.pathname}`
-        }));
-        setData(mockData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
   }, [location.pathname]);
 
   const handleGoBack = () => {
@@ -149,7 +124,7 @@ export const Register = () => {
       <div className="flex-1 overflow-auto p-6">
         <RegisterTable
           columns={columns}
-          data={data}
+          data={farms}
           actions={actions}
           loading={loading}
           emptyMessage="No se han hecho registros aún."
