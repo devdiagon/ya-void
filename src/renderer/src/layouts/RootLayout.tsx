@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu } from 'lucide-react'
+import { useState } from 'react'
 
-import { Content, Sidebar } from "@renderer/components";
-import { AppRoutes } from "@renderer/routes/AppRoutes";
+import { Content, Sidebar } from '@renderer/components'
+import { AppRoutes } from '@renderer/routes/AppRoutes'
 
 export const RootLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  return(
+  return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
+
       <div className="flex flex-col flex-1 overflow-hidden">
         <header className="lg:hidden bg-white border-b border-gray-200 p-4">
           <button
@@ -26,5 +26,5 @@ export const RootLayout = () => {
         </Content>
       </div>
     </div>
-  );
+  )
 }
