@@ -8,8 +8,8 @@ export function useFarms() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.api
-      .getFarms()
+    window.api.farms
+      .list()
       .then(setFarms)
       .catch((err) => {
         console.error(err);

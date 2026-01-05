@@ -6,8 +6,10 @@ export interface Farm {
 declare global {
   interface Window {
     api: {
-      getFarms: () => Promise<Farm[]>;
-      createFarm: (name: string) => Promise<void>;
+      farms: {
+        list: () => Promise<Farm[]>;
+        getById: (id: number) => Promise<Farm>;
+      };
     };
   }
 }
