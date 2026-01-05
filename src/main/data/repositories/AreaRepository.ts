@@ -5,10 +5,11 @@ import { AreaRow, mapRowToArea } from '../mappers/AreaMapper.js'
 export class AreaRepository {
   private db = getDb()
 
-  // Buscar todas las áreas (opcionalmente filtradas por granja)
-  findAll(): Area[] {
-    const stmt = this.db.prepare<AreaRow[]>('SELECT id, name, farm_id FROM area ORDER BY name')
-    const rows = stmt.all() as AreaRow[]
+  findAllByFarm(farm_id: number): Area[] {
+    const stmt = this.db.prepare<AreaRow[]>(
+      'SELECT id, name, farm_id FROM area WHERE farm_id = ? ORDER BY name'
+    )
+    const rows = stmt.all(farm_id) as AreaRow[]
     return rows.map(mapRowToArea)
   }
 
