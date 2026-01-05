@@ -1,22 +1,31 @@
 import { Farm } from '../../core/entities/Farm'
-import { CreateFarm } from '../../core/use-cases/CreateFarm'
-import { GetFarms } from '../../core/use-cases/GetFarms'
+import { UseFarm } from '../../core/use-cases/UseFarm'
 import { FarmRepository } from '../../data/repositories/FarmRepository'
 
 export class FarmController {
-  private getFarms: GetFarms
-  private createFarm: CreateFarm
+  private useFarm: UseFarm
 
   constructor(private farmRepository: FarmRepository) {
-    this.getFarms = new GetFarms(this.farmRepository)
-    this.createFarm = new CreateFarm(this.farmRepository)
+    this.useFarm = new UseFarm(this.farmRepository)
   }
 
   async list(): Promise<Farm[]> {
-    return this.getFarms.execute()
+    return this.useFarm.getAll()
+  }
+
+  async getById(id: number): Promise<Farm> {
+    return this.useFarm.getById(id)
   }
 
   async create(payload: { name: string }): Promise<Farm> {
-    return this.createFarm.execute(payload.name)
+    return this.useFarm.create(payload.name)
+  }
+
+  async update(id: number, payload: { name: string }): Promise<void> {
+    return this.useFarm.update(id, payload.name)
+  }
+
+  async delete(id: number): Promise<void> {
+    return this.useFarm.delete(id)
   }
 }
