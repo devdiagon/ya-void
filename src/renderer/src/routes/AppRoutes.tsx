@@ -1,8 +1,8 @@
-import { Reports } from "@renderer/pages/examples";
-import { Register } from "@renderer/pages/Register";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Reports } from '@renderer/pages/examples';
+import { Register } from '@renderer/pages/Register';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-export const AppRoutes = () => {
+export const AppRoutes = (): React.JSX.Element => {
   return (
     <Routes>
       <Route path="/" element={<Reports />} />
@@ -11,4 +11,4 @@ export const AppRoutes = () => {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
-}
+};

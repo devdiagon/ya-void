@@ -1,6 +1,6 @@
-import { X } from "lucide-react";
-import { ReactNode, useEffect, useRef } from "react";
-import { IconButton } from "../Button";
+import { X } from 'lucide-react';
+import { ReactNode, useEffect, useRef } from 'react';
+import { IconButton } from '../Button';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
@@ -25,7 +25,7 @@ export const Modal = ({
   showCloseButton = true,
   className = '',
   overlayClassName = ''
-} : ModalProps) => {
+}: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const sizeClasses = {
@@ -51,9 +51,7 @@ export const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${overlayClassName}`}
-    >
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${overlayClassName}`}>
       {/* Dark background overlay */}
       <div className="absolute inset-0 bg-black opacity-50" />
 
@@ -71,13 +69,9 @@ export const Modal = ({
         {/* Modal header */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            {title && (
-              <h2 className="text-xl font-semibold text-gray-900">
-                {title}
-              </h2>
-            )}
+            {title && <h2 className="text-xl font-semibold text-gray-900">{title}</h2>}
             {!title && <div />}
-            
+
             {showCloseButton && (
               <IconButton
                 icon={<X size={20} />}
@@ -92,10 +86,8 @@ export const Modal = ({
         )}
 
         {/* Modal content with scroll */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
       </div>
     </div>
   );
-}
+};

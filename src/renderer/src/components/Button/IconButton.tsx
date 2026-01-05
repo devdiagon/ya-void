@@ -1,7 +1,14 @@
 import { ReactNode } from 'react';
 
 export type IconButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type IconButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'ghost';
+export type IconButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'info'
+  | 'ghost';
 
 export interface IconButtonProps {
   icon: ReactNode;
@@ -29,8 +36,7 @@ export const IconButton = ({
   type = 'button',
   ariaLabel,
   tooltip
-} : IconButtonProps) => {
-
+}: IconButtonProps) => {
   const sizeClasses = {
     xs: 'w-6 h-6 text-xs',
     sm: 'w-8 h-8 text-sm',
@@ -38,7 +44,7 @@ export const IconButton = ({
     lg: 'w-12 h-12 text-lg',
     xl: 'w-14 h-14 text-xl'
   };
-  
+
   const variantClasses = {
     primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
     secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500',
@@ -71,30 +77,28 @@ export const IconButton = ({
       `}
     >
       {loading ? (
-        <svg 
-          className="animate-spin h-4 w-4" 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
+        <svg
+          className="animate-spin h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
           viewBox="0 0 24 24"
         >
-          <circle 
-            className="opacity-25" 
-            cx="12" 
-            cy="12" 
-            r="10" 
-            stroke="currentColor" 
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
             strokeWidth="4"
           />
-          <path 
-            className="opacity-75" 
-            fill="currentColor" 
+          <path
+            className="opacity-75"
+            fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
       ) : (
-        <span className="flex items-center justify-center">
-          {icon}
-        </span>
+        <span className="flex items-center justify-center">{icon}</span>
       )}
     </button>
   );

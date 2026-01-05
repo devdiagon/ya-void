@@ -1,1 +1,1 @@
-export * from "./managePaths";
+export * from './managePaths';

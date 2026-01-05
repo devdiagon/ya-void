@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export interface BreadcrumbItem {
   label: string;
@@ -17,13 +17,9 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
       <ol className="flex items-center space-x-2">
         {items.map((crumb, index) => (
           <li key={crumb.path} className="flex items-center">
-            {index > 0 && (
-              <span className="mx-2 text-gray-400">/</span>
-            )}
+            {index > 0 && <span className="mx-2 text-gray-400">/</span>}
             {index === items.length - 1 ? (
-              <span className="text-sm font-semibold text-blue-700">
-                {crumb.label}
-              </span>
+              <span className="text-sm font-semibold text-blue-700">{crumb.label}</span>
             ) : (
               <Link
                 to={crumb.path}
@@ -37,4 +33,4 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
       </ol>
     </nav>
   );
-}
+};

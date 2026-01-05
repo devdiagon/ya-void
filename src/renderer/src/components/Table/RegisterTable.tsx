@@ -1,4 +1,4 @@
-import { TextButton } from "../Button";
+import { TextButton } from '../Button';
 
 export interface TableColumn {
   key: string;
@@ -20,7 +20,13 @@ interface RegisterTableProps {
   emptyMessage?: string;
 }
 
-export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }: RegisterTableProps) => {
+export const RegisterTable = ({
+  columns,
+  data,
+  actions,
+  loading,
+  emptyMessage
+}: RegisterTableProps) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -29,15 +35,11 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
     );
   }
 
-  if(data.length === 0) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        {emptyMessage}
-      </div>
-    );
+  if (data.length === 0) {
+    return <div className="p-8 text-center text-gray-500">{emptyMessage}</div>;
   }
 
-  return (    
+  return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -66,10 +68,7 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
                     key={column.key}
                     className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                   >
-                    {column.render 
-                      ? column.render(row[column.key], row)
-                      : row[column.key]
-                    }
+                    {column.render ? column.render(row[column.key], row) : row[column.key]}
                   </td>
                 ))}
                 {actions.length > 0 && (
@@ -94,4 +93,4 @@ export const RegisterTable = ({ columns, data, actions, loading, emptyMessage }:
       </div>
     </div>
   );
-}
+};
