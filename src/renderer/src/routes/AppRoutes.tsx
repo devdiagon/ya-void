@@ -6,8 +6,8 @@ export const AppRoutes = (): React.JSX.Element => {
   return (
     <Routes>
       <Route path="/" element={<Reports />} />
-      <Route path="/reports" element={<Reports />} />
-      <Route path="/register/*" element={<Register />} />
+      <Route path="/administrate" element={<Reports />} />
+      <Route path="/work-zones/*" element={<Register />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
