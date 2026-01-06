@@ -91,6 +91,7 @@ CREATE TABLE trip (
     departure_time TIME,
     arrival_time TIME,
     passenger_count INTEGER CHECK (passenger_count >= 0),
+    cost REAL CHECK (cost >= 0),
     requester_id INTEGER,
     area_id INTEGER,
     work_zone_sheet_id INTEGER,
