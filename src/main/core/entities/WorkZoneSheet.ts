@@ -3,4 +3,5 @@ export interface WorkZoneSheet {
   name: string
   farmWorkZoneId: number
   areaId: number
+  totalSheet: number
 }
