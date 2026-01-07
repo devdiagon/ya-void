@@ -4,7 +4,7 @@ import { useFarms } from '@renderer/hooks/useFarms';
 import { PlusIcon, TractorIcon } from 'lucide-react';
 
 export const FarmAdminPage = () => {
-  const { farms } = useFarms();
+  const { farms, loading } = useFarms();
 
   const handleAdd = () => {
     /*TODO*/
@@ -15,7 +15,7 @@ export const FarmAdminPage = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         {/* Tittle & Add button */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-2">
           <h1 className="text-2xl font-bold text-gray-900">Administrar Fincas</h1>
 
           <ActionButton
@@ -27,7 +27,7 @@ export const FarmAdminPage = () => {
             Agregar
           </ActionButton>
         </div>
-        <div className="flex-1 overflow-auto p-6 gap-2">
+        <div className="flex flex-col gap-4">
           {farms.map((farm) => (
             <ListCard
               key={farm.id}
@@ -35,6 +35,7 @@ export const FarmAdminPage = () => {
               subtitle="Finca"
               icon={<TractorIcon size={24} />}
               iconBgColor="#60c0eaff"
+              loading={loading}
               onNavigate={() => {
                 console.log(`Click en finca con id: ${farm.id}`);
               }}
