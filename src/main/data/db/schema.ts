@@ -59,6 +59,7 @@ CREATE TABLE work_zone_sheet (
     name TEXT NOT NULL,
     farm_work_zone_id INTEGER NOT NULL,
     area_id INTEGER NOT NULL,
+    total_sheet REAL DEFAULT 0,
     UNIQUE (farm_work_zone_id, area_id),
     FOREIGN KEY (farm_work_zone_id) REFERENCES farm_work_zone(id),
     FOREIGN KEY (area_id) REFERENCES area(id)
@@ -91,6 +92,7 @@ CREATE TABLE trip (
     departure_time TIME,
     arrival_time TIME,
     passenger_count INTEGER CHECK (passenger_count >= 0),
+    cost REAL CHECK (cost >= 0),
     requester_id INTEGER,
     area_id INTEGER,
     work_zone_sheet_id INTEGER,
