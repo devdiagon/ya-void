@@ -33,7 +33,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
           <nav className="flex-1 p-4 space-y-2">
             {sidebarItems.map((item) => (
-              <SidebarItem key={item.id} item={item} isActive={location.pathname === item.path} />
+              <SidebarItem
+                key={item.id}
+                item={item}
+                isActive={location.pathname.startsWith(item.path)}
+              />
             ))}
           </nav>
         </div>
