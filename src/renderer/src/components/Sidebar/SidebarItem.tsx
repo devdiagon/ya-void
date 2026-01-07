@@ -20,7 +20,7 @@ export const sidebarItems: SidebarItemConfig[] = [
     id: 'administrate',
     label: 'Administrar',
     icon: <FileSlidersIcon size={20} />,
-    path: '/administrate'
+    path: '/administrate/farms'
   }
 ];
 

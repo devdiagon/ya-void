@@ -2,8 +2,10 @@ import { ActionButton } from '@renderer/components';
 import { ListCard } from '@renderer/components/Card';
 import { useFarms } from '@renderer/hooks/useFarms';
 import { PlusIcon, TractorIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const FarmAdminPage = () => {
+  const navigate = useNavigate();
   const { farms, loading } = useFarms();
 
   const handleAdd = () => {
@@ -37,7 +39,7 @@ export const FarmAdminPage = () => {
               iconBgColor="#60c0eaff"
               loading={loading}
               onNavigate={() => {
-                console.log(`Click en finca con id: ${farm.id}`);
+                navigate(`/administrate/farms/${farm.id}/areas`);
               }}
             />
           ))}
