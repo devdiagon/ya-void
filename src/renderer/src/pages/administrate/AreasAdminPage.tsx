@@ -4,9 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 export const AreasAdminPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { farmId } = useParams();
   const handleAdd = () => {
-    /*TODO*/
+    //temp - hardcoded
+    navigate(`/administrate/farms/${farmId}/areas/1/requesters`);
   };
 
   const handleGoBack = () => {
@@ -25,7 +26,7 @@ export const AreasAdminPage = () => {
               icon={<ArrowLeftIcon size={20} />}
               onClick={handleGoBack}
             />
-            <h1 className="text-2xl font-bold text-gray-900">Administrar Áreas de {id}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Administrar Áreas de {farmId}</h1>
           </div>
 
           <ActionButton
