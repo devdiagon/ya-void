@@ -1,25 +1,25 @@
-import { FarmWorkZone } from '../../core/entities/FarmWorkZone';
-import { FarmWorkZoneRepository } from '../../data/repositories/FarmWorkZoneRespository';
+import { FarmWorkZoneRepository } from '../../data/repositories/FarmWorkZoneRepository'
+import { FarmWorkZone } from '../entities/FarmWorkZone'
 
 export class UseFarmWorkZone {
-  private repository: FarmWorkZoneRepository;
+  private repository: FarmWorkZoneRepository
 
   constructor(repository: FarmWorkZoneRepository) {
-    this.repository = repository;
+    this.repository = repository
   }
 
   /**
    * Obtiene todas las granjas asociadas a una WorkZone específica.
    */
   getFarmsByWorkZone(workZoneId: number): FarmWorkZone[] {
-    return this.repository.findByWorkZoneId(workZoneId);
+    return this.repository.findByWorkZoneId(workZoneId)
   }
 
   /**
    * Obtiene una relación específica por su ID.
    */
   getFarmWorkZoneById(id: number): FarmWorkZone | null {
-    return this.repository.findById(id);
+    return this.repository.findById(id)
   }
 
   /**
@@ -33,35 +33,35 @@ export class UseFarmWorkZone {
       workZoneId,
       farmId,
       name
-    });
+    })
 
     return {
       id: newId,
       workZoneId,
       farmId,
       name
-    };
+    }
   }
 
   /**
    * Actualiza los datos de la relación (ej. cambiar el nombre descriptivo).
    */
   updateFarmWorkZone(data: FarmWorkZone): boolean {
-    const existing = this.repository.findById(data.id);
+    const existing = this.repository.findById(data.id)
     if (!existing) {
-      throw new Error(`La relación FarmWorkZone con ID ${data.id} no existe.`);
+      throw new Error(`La relación FarmWorkZone con ID ${data.id} no existe.`)
     }
-    return this.repository.update(data);
+    return this.repository.update(data)
   }
 
   /**
    * Elimina la vinculación de la granja con la zona de trabajo.
    */
   deleteFarmWorkZone(id: number): void {
-    const existing = this.repository.findById(id);
+    const existing = this.repository.findById(id)
     if (!existing) {
-      throw new Error(`No se encontró la relación con ID ${id} para eliminar.`);
+      throw new Error(`No se encontró la relación con ID ${id} para eliminar.`)
     }
-    this.repository.delete(id);
+    this.repository.delete(id)
   }
 }
