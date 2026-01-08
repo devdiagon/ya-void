@@ -60,7 +60,6 @@ CREATE TABLE work_zone_sheet (
     farm_work_zone_id INTEGER NOT NULL,
     area_id INTEGER NOT NULL,
     total_sheet REAL DEFAULT 0,
-    UNIQUE (farm_work_zone_id, area_id),
     FOREIGN KEY (farm_work_zone_id) REFERENCES farm_work_zone(id),
     FOREIGN KEY (area_id) REFERENCES area(id)
 );

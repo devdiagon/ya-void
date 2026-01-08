@@ -1,59 +1,67 @@
 import { WorkZone } from '../../core/entities/WorkZone'
-import { getDb } from '../db/database'
-import { WorkZoneRow, mapRowToWorkZone } from '../mappers/WorkZoneMapper'
+import { WorkZoneRepository } from '../repositories/WorkZoneRepository'
 
-export class WorkZoneRepository {
-  private db = getDb()
+export class UseWorkZone {
+  private repository: WorkZoneRepository
 
-  /**
-   * Obtiene todas las zonas de trabajo ordenadas por nombre.
-   */
-  findAll(): WorkZone[] {
-    const stmt = this.db.prepare<WorkZoneRow>(
-      'SELECT id, name, start_date, end_date FROM work_zone ORDER BY start_date DESC'
-    )
-    const rows = stmt.all()
-    return rows.map(mapRowToWorkZone)
+  constructor(repository: WorkZoneRepository) {
+    this.repository = repository
   }
 
   /**
-   * Busca una zona de trabajo específica por su ID.
+   * Obtiene la lista completa de zonas de trabajo.
    */
-  findById(id: number): WorkZone | null {
-    const stmt = this.db.prepare<WorkZoneRow>(
-      'SELECT id, name, start_date, end_date FROM work_zone WHERE id = ?'
-    )
-    const row = stmt.get(id)
-    return row ? mapRowToWorkZone(row) : null
+  getAllWorkZones(): WorkZone[] {
+    return this.repository.findAll()
   }
 
   /**
-   * Crea una nueva zona de trabajo.
+   * Obtiene una zona de trabajo por su identificador.
    */
-  create(workZone: Omit<WorkZone, 'id'>): number {
-    const stmt = this.db.prepare(
-      'INSERT INTO work_zone (name, start_date, end_date) VALUES (?, ?, ?)'
-    )
-    const result = stmt.run(workZone.name, workZone.startDate, workZone.endDate)
-    return result.lastInsertRowid as number
+  getWorkZoneById(id: number): WorkZone | null {
+    return this.repository.findById(id)
   }
 
   /**
-   * Actualiza los datos de una zona de trabajo existente.
+   * Registra una nueva zona de trabajo.
+   * @param name Nombre de la zona
+   * @param startDate Fecha de inicio
+   * @param endDate Fecha de fin (opcional)
    */
-  update(workZone: WorkZone): void {
-    const stmt = this.db.prepare(
-      'UPDATE work_zone SET name = ?, start_date = ?, end_date = ? WHERE id = ?'
-    )
-    stmt.run(workZone.name, workZone.startDate, workZone.endDate, workZone.id)
+  createWorkZone(name: string, startDate: string, endDate?: string): WorkZone {
+    const newId = this.repository.create({
+      name,
+      startDate,
+      endDate: endDate || null
+    })
+
+    return {
+      id: newId,
+      name,
+      startDate,
+      endDate: endDate || null
+    }
   }
 
   /**
-   * Elimina una zona de trabajo por su ID.
-   * Nota: Debido a las claves foráneas, esto podría fallar si hay registros en 'farm_work_zone'.
+   * Actualiza la información de una zona existente.
    */
-  delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM work_zone WHERE id = ?')
-    stmt.run(id)
+  updateWorkZone(workZone: WorkZone): boolean {
+    const existing = this.repository.findById(workZone.id)
+    if (!existing) {
+      throw new Error(`WorkZone con ID ${workZone.id} no encontrada.`)
+    }
+    return this.repository.update(workZone)
+  }
+
+  /**
+   * Elimina una zona de trabajo.
+   */
+  deleteWorkZone(id: number): void {
+    const existing = this.repository.findById(id)
+    if (!existing) {
+      throw new Error(`No se puede eliminar: WorkZone con ID ${id} no existe.`)
+    }
+    this.repository.delete(id)
   }
 }
