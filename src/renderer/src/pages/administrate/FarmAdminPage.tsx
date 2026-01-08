@@ -1,12 +1,12 @@
 import { ActionButton } from '@renderer/components';
-import { ListCard } from '@renderer/components/Card';
+import { ErrorCard, ListCard } from '@renderer/components/Card';
 import { useFarms } from '@renderer/hooks/useFarms';
 import { PlusIcon, TractorIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
-  const { farms, loading } = useFarms();
+  const { farms, loading, error } = useFarms();
 
   const handleAdd = () => {
     /*TODO*/
@@ -15,10 +15,10 @@ export const FarmAdminPage = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="px-6 py-4">
         {/* Tittle & Add button */}
         <div className="flex items-center justify-between py-2">
-          <h1 className="text-2xl font-bold text-gray-900">Administrar Fincas</h1>
+          <h1 className="text-2xl font-black text-gray-900">Administrar Fincas</h1>
 
           <ActionButton
             variant="primary"
@@ -29,21 +29,33 @@ export const FarmAdminPage = () => {
             Agregar
           </ActionButton>
         </div>
-        <div className="flex flex-col gap-4">
-          {farms.map((farm) => (
-            <ListCard
-              key={farm.id}
-              title={farm.name}
-              subtitle="Finca"
-              icon={<TractorIcon size={24} />}
-              iconBgColor="#60c0eaff"
-              loading={loading}
-              onNavigate={() => {
-                navigate(`/administrate/farms/${farm.id}/areas`);
-              }}
+      </div>
+      <div className="flex-1 px-6 py-4 overflow-auto">
+        {error ? (
+          <div className="h-full flex items-center justify-center">
+            <ErrorCard
+              message={error}
+              onRetry={() => window.location.reload()}
+              retryText="Reintentar"
             />
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {farms.map((farm) => (
+              <ListCard
+                key={farm.id}
+                title={farm.name}
+                subtitle="Finca"
+                icon={<TractorIcon size={24} />}
+                iconBgColor="#60c0eaff"
+                loading={loading}
+                onNavigate={() => {
+                  navigate(`/administrate/farms/${farm.id}/areas`);
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

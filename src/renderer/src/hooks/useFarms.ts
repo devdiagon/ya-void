@@ -12,7 +12,7 @@ export function useFarms() {
       .then(setFarms)
       .catch((err) => {
         console.error(err);
-        setError('Error cargando fincas');
+        setError('No se ha podido obtener las fincas');
       })
       .finally(() => setLoading(false));
   }, []);
