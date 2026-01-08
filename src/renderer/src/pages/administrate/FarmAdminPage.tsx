@@ -1,5 +1,6 @@
 import { ActionButton } from '@renderer/components';
 import { ErrorCard, ListCard } from '@renderer/components/Card';
+import { AdminFarmForm } from '@renderer/components/Form';
 import { Modal } from '@renderer/components/Modal/Modal';
 import { useFarms } from '@renderer/hooks/useFarms';
 import { PlusIcon, TractorIcon } from 'lucide-react';
@@ -19,14 +20,11 @@ export const FarmAdminPage = () => {
     <div className="h-full flex flex-col">
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="md">
         <div className="space-y-4">
-          <p className="text-gray-700">Test</p>
-          <p className="text-gray-700">Test</p>
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full"
-          >
-            Cerrar
-          </button>
+          <AdminFarmForm
+            title="Agregar Finca"
+            handleCancel={() => setIsModalOpen(false)}
+            onConfirm={() => setIsModalOpen(false)}
+          />
         </div>
       </Modal>
 
