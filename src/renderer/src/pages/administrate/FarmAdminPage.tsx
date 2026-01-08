@@ -1,19 +1,35 @@
 import { ActionButton } from '@renderer/components';
 import { ErrorCard, ListCard } from '@renderer/components/Card';
+import { Modal } from '@renderer/components/Modal/Modal';
 import { useFarms } from '@renderer/hooks/useFarms';
 import { PlusIcon, TractorIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { farms, loading, error } = useFarms();
 
   const handleAdd = () => {
-    /*TODO*/
+    setIsModalOpen(true);
   };
 
   return (
     <div className="h-full flex flex-col">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="md">
+        <div className="space-y-4">
+          <p className="text-gray-700">Test</p>
+          <p className="text-gray-700">Test</p>
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full"
+          >
+            Cerrar
+          </button>
+        </div>
+      </Modal>
+
       {/* Header */}
       <div className="px-6 py-4">
         {/* Tittle & Add button */}

@@ -1,93 +1,109 @@
 import { X } from 'lucide-react';
-import { ReactNode, useEffect, useRef } from 'react';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { IconButton } from '../Button';
+import './modal.css';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
-export interface ModalProps {
+const sizeClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  full: 'max-w-4xl'
+};
+
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
-  title?: string;
   size?: ModalSize;
-  showCloseButton?: boolean;
-  closeOnOverlayClick?: boolean;
-  className?: string;
-  overlayClassName?: string;
+  closeOnOutsideClick?: boolean;
 }
 
 export const Modal = ({
   isOpen,
   onClose,
   children,
-  title,
   size = 'md',
-  showCloseButton = true,
-  className = '',
-  overlayClassName = ''
+  closeOnOutsideClick = true
 }: ModalProps) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    full: 'max-w-full mx-4'
-  };
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    const dialog = dialogRef.current;
+    if (!dialog) return;
 
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    if (isOpen) {
+      dialog.showModal();
+      dialog.focus();
+      requestAnimationFrame(() => {
+        dialog.classList.add('modal-open');
+      });
+    } else {
+      dialog.classList.remove('modal-open');
+      const timer = setTimeout(() => {
+        dialog.close();
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const handleBackdropClick = (e: MouseEvent<HTMLDialogElement>) => {
+    if (!closeOnOutsideClick) return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const rect = dialog.getBoundingClientRect();
+    const isInDialog =
+      rect.top <= e.clientY &&
+      e.clientY <= rect.top + rect.height &&
+      rect.left <= e.clientX &&
+      e.clientX <= rect.left + rect.width;
+
+    if (!isInDialog) {
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${overlayClassName}`}>
-      {/* Dark background overlay */}
-      <div className="absolute inset-0 bg-black opacity-50" />
-
-      {/* Modal container */}
+    <dialog
+      ref={dialogRef}
+      onClick={handleBackdropClick}
+      onClose={handleClose}
+      className="
+        backdrop:bg-black bg-transparent p-0 rounded-lg shadow-xl 
+        fixed top-1/2 left-1/2 m-0
+        opacity-0 backdrop:opacity-0
+        transition-all duration-200
+      "
+      style={{
+        transform: 'translate(-50%, -50%) scale(0.95)'
+      }}
+    >
       <div
-        ref={modalRef}
-        className={`
-          relative bg-white rounded-lg shadow-xl 
-          w-full ${sizeClasses[size]}
-          transform transition-all duration-300
-          max-h-[90vh] flex flex-col
-          ${className}
-        `}
+        className={`bg-white rounded-lg ${sizeClasses[size]} w-full max-h-[85vh] flex flex-col relative`}
       >
-        {/* Modal header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            {title && <h2 className="text-xl font-semibold text-gray-900">{title}</h2>}
-            {!title && <div />}
+        {/* Close button */}
+        <IconButton
+          icon={<X size={20} />}
+          variant="ghost"
+          size="sm"
+          rounded
+          ariaLabel="Cerrar"
+          onClick={handleClose}
+          className="absolute top-3 right-3 z-10"
+        />
 
-            {showCloseButton && (
-              <IconButton
-                icon={<X size={20} />}
-                variant="ghost"
-                size="sm"
-                rounded
-                ariaLabel="Cerrar"
-                onClick={onClose}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Modal content with scroll */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
+        {/* Content - scrollable */}
+        <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
       </div>
-    </div>
+    </dialog>
   );
 };
