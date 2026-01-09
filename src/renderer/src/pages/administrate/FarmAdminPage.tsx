@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { farms, loading, errors, createFarm, clearError } = useFarms();
+  const { farms, loading, errors, refetch, createFarm, deleteFarm, clearError } = useFarms();
 
   const handleAdd = () => {
     setIsModalOpen(true);
@@ -20,14 +20,15 @@ export const FarmAdminPage = () => {
   const handleConfirm = async (data: FarmFormData) => {
     await createFarm(data);
     setIsModalOpen(false);
+    refetch();
   };
 
   const handleEdit = (farmId: number) => {
     console.log('Edit farm', farmId);
   };
 
-  const handleDelete = (farmId: number) => {
-    console.log('Delete farm', farmId);
+  const handleDelete = async (farmId: number) => {
+    await deleteFarm(farmId);
   };
 
   return (

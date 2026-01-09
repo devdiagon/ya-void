@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 interface FarmErrors {
   fetch: string | null;
   create: string | null;
+  delete: string | null;
 }
 
 export function useFarms() {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState<FarmErrors>({ fetch: null, create: null });
+  const [errors, setErrors] = useState<FarmErrors>({ fetch: null, create: null, delete: null });
 
   const updateError = (operation: keyof FarmErrors, error: string | null) => {
     setErrors((prev) => ({ ...prev, [operation]: error }));
@@ -45,9 +46,21 @@ export function useFarms() {
     }
   };
 
+  const deleteFarm = async (farmId: number) => {
+    updateError('delete', null);
+
+    try {
+      await window.api.farms.delete(farmId);
+      setFarms((prevFarms) => prevFarms.filter((farm) => farm.id !== farmId));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'No se ha podido eliminar la finca';
+      updateError('delete', errorMessage);
+    }
+  };
+
   useEffect(() => {
     fetchFarms();
   }, [fetchFarms]);
 
-  return { farms, loading, errors, refetch: fetchFarms, createFarm, clearError };
+  return { farms, loading, errors, refetch: fetchFarms, createFarm, deleteFarm, clearError };
 }
