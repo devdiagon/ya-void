@@ -22,6 +22,14 @@ export const FarmAdminPage = () => {
     setIsModalOpen(false);
   };
 
+  const handleEdit = (farmId: number) => {
+    console.log('Edit farm', farmId);
+  };
+
+  const handleDelete = (farmId: number) => {
+    console.log('Delete farm', farmId);
+  };
+
   return (
     <div className="h-full flex flex-col">
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="lg">
@@ -75,6 +83,8 @@ export const FarmAdminPage = () => {
                 onNavigate={() => {
                   navigate(`/administrate/farms/${farm.id}/areas`);
                 }}
+                onEdit={() => handleEdit(farm.id)}
+                onDelete={() => handleDelete(farm.id)}
               />
             ))}
           </div>
