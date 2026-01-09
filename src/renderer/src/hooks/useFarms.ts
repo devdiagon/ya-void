@@ -25,10 +25,9 @@ export function useFarms() {
       const newFarm = await window.api.farms.create(farmData);
       setFarms((prevFarms) => [...prevFarms, newFarm]);
     } catch (err) {
-      console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'No se ha podido crear la finca';
+      console.warn(errorMessage);
       setError(errorMessage);
-      throw err;
     }
   };
 

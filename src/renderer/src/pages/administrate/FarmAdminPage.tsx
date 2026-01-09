@@ -3,6 +3,7 @@ import { ErrorCard, ListCard } from '@renderer/components/Card';
 import { AdminFarmForm } from '@renderer/components/Form';
 import { Modal } from '@renderer/components/Modal/Modal';
 import { useFarms } from '@renderer/hooks/useFarms';
+import { FarmFormData } from '@renderer/schemas/farm.schema';
 import { PlusIcon, TractorIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +11,15 @@ import { useNavigate } from 'react-router-dom';
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { farms, loading, error } = useFarms();
+  const { farms, loading, error, createFarm } = useFarms();
 
   const handleAdd = () => {
     setIsModalOpen(true);
+  };
+
+  const handleConfirm = async (data: FarmFormData) => {
+    await createFarm(data);
+    setIsModalOpen(false);
   };
 
   return (
@@ -23,7 +29,7 @@ export const FarmAdminPage = () => {
           <AdminFarmForm
             title="Agregar Finca"
             handleCancel={() => setIsModalOpen(false)}
-            onConfirm={() => setIsModalOpen(false)}
+            onConfirm={handleConfirm}
           />
         </div>
       </Modal>
