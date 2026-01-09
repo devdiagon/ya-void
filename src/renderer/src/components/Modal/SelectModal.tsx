@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-import { Modal } from "./Modal";
-import { ActionButton, OutlineButton } from "../Button";
+import { useEffect, useState } from 'react';
+import { Modal } from './Modal';
+import { ActionButton, OutlineButton } from '../Button';
 
 export interface SelectOption {
   value: string | number;
@@ -18,14 +18,14 @@ interface SelectModalProps {
   onClose: () => void;
 }
 
-export const SelectModal = ({ 
+export const SelectModal = ({
   isOpen,
-  title, 
-  defaultValue, 
-  required = true, 
+  title,
+  defaultValue,
+  required = true,
   options,
-  onConfirm, 
-  onClose 
+  onConfirm,
+  onClose
 }: SelectModalProps) => {
   const [selectedValue, setSelectedValue] = useState<string | number>('');
 
@@ -70,10 +70,7 @@ export const SelectModal = ({
               Seleccione una opción
             </option>
             {options.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-              >
+              <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
@@ -81,22 +78,14 @@ export const SelectModal = ({
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <OutlineButton 
-            type="button"
-            variant="primary"
-            onClick={handleClose}
-          >
+          <OutlineButton type="button" variant="primary" onClick={handleClose}>
             Cancelar
           </OutlineButton>
-          <ActionButton 
-            type="submit" 
-            variant="primary" 
-            disabled={required && !selectedValue}
-          >
+          <ActionButton type="submit" variant="primary" disabled={required && !selectedValue}>
             Guardar
           </ActionButton>
         </div>
       </form>
     </Modal>
   );
-}
+};

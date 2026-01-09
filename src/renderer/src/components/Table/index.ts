@@ -1,1 +1,1 @@
-export * from "./RegisterTable"
+export * from './RegisterTable';

@@ -40,7 +40,11 @@ export class UseFarm {
       throw new Error('Farm name cannot be empty')
     }
 
-    const success = this.farmRepository.update(id, name.trim())
+    const success = this.farmRepository.update({
+      id,
+      name: name.trim()
+    })
+
     if (!success) {
       throw new Error(`Could not update farm: Farm with ID ${id} not found`)
     }

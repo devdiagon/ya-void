@@ -1,1 +1,2 @@
-export * from "./managePaths";
+export * from './pathUtils';
+export * from './colorUtils';

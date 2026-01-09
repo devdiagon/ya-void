@@ -1,11 +1,11 @@
-import { Menu } from 'lucide-react'
-import { useState } from 'react'
+import { useState } from 'react';
+import { Menu } from 'lucide-react';
 
-import { Content, Sidebar } from '@renderer/components'
-import { AppRoutes } from '@renderer/routes/AppRoutes'
+import { Content, Sidebar } from '@renderer/components';
+import { AppRoutes } from '@renderer/routes/AppRoutes';
 
-export const RootLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+export const RootLayout = (): React.JSX.Element => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -26,5 +26,5 @@ export const RootLayout = () => {
         </Content>
       </div>
     </div>
-  )
-}
+  );
+};

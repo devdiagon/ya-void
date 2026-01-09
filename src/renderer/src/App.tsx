@@ -1,5 +1,5 @@
-import { BrowserRouter } from 'react-router-dom'
-import { RootLayout } from './layouts/RootLayout'
+import { BrowserRouter } from 'react-router-dom';
+import { RootLayout } from './layouts/RootLayout';
 
 function App(): React.JSX.Element {
   return (
@@ -9,4 +9,4 @@ function App(): React.JSX.Element {
   );
 }
 
-export default App
+export default App;

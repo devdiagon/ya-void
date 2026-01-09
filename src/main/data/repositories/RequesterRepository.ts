@@ -36,7 +36,7 @@ export class RequesterRepository {
   findById(id: number): Requester | null {
     try {
       const stmt = this.db.prepare<RequesterRow>('SELECT id, name FROM requester WHERE id = ?')
-      const row = stmt.get(id) as RequesterRow | undefined
+      const row = stmt.get(id)
       return row ? mapRowToRequester(row) : null
     } catch (error) {
       console.error(`Error in findById for ID ${id}:`, error)
@@ -45,34 +45,18 @@ export class RequesterRepository {
   }
 
   create(name: string): Requester {
+    const normalizedName = name.trim()
+    if (!normalizedName) throw new Error('Requester name cannot be empty')
+
     try {
-      if (!name || name.trim() === '') {
-        throw new Error('Requester name cannot be empty')
-      }
-
-      const normalizedName = name.trim()
-
-      // Check if already exists
-      const existingStmt = this.db.prepare<{ count: number }>(
-        'SELECT COUNT(*) as count FROM requester WHERE name = ?'
-      )
-      const existing = existingStmt.get(normalizedName) as { count: number }
-
-      if (existing.count > 0) {
-        throw new Error('A requester with that name already exists')
-      }
-
       const insert = this.db.prepare('INSERT INTO requester (name) VALUES (?)')
       const info = insert.run(normalizedName)
-
-      const id = Number(info.lastInsertRowid)
-      return { id, name: normalizedName }
+      return { id: Number(info.lastInsertRowid), name: normalizedName }
     } catch (error) {
-      if (error instanceof Error && error.message.includes('already exists')) {
-        throw error
+      if (error instanceof Error && 'code' in error && error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        throw new Error('A requester with that name already exists')
       }
-      console.error('Error in create:', error)
-      throw new Error('Could not create requester')
+      throw error
     }
   }
 
@@ -189,10 +173,9 @@ export class RequesterRepository {
          WHERE a.farm_id = ?
          ORDER BY r.name`
       )
-      const rows = stmt.all(farmId)
-      return rows.map(mapRowToRequester)
+      return stmt.all(farmId).map(mapRowToRequester)
     } catch (error) {
-      console.error(`Error in getRequestersByFarm for farm ${farmId}:`, error)
+      console.error(`Error in getRequestersByFarm:`, error)
       throw new Error(`Could not retrieve requesters for farm ${farmId}`)
     }
   }
