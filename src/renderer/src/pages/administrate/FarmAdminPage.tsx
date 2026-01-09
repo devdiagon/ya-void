@@ -120,17 +120,19 @@ export const FarmAdminPage = () => {
 
       {/* Update Modal */}
       <Modal isOpen={updateModal.isOpen} onClose={updateModal.close} size="lg">
-        <div className="space-y-4">
-          <AdminFarmForm
-            title="Editar Finca"
-            initialData={{ name: updateModal.data?.name || '' }}
-            handleCancel={() => {
-              updateModal.close();
-              clearError('update');
-            }}
-            onConfirm={handleEdit}
-          />
-        </div>
+        {updateModal.data && (
+          <div className="space-y-4">
+            <AdminFarmForm
+              title="Editar Finca"
+              initialData={{ name: updateModal.data.name || '' }}
+              handleCancel={() => {
+                updateModal.close();
+                clearError('update');
+              }}
+              onConfirm={handleEdit}
+            />
+          </div>
+        )}
       </Modal>
 
       {/* Delete Modal */}
