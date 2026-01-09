@@ -5,7 +5,7 @@ export interface ElectronAPI {
     list: () => Promise<Farm[]>;
     getById: (id: string) => Promise<Farm>;
     create: (payload: CreateFarmDTO) => Promise<Farm>;
-    update: (payload: UpdateFarmDTO) => Promise<Farm>;
+    update: (id: number, payload: { name: string }) => Promise<Farm>;
     delete: (id: number) => Promise<void>;
   };
 }

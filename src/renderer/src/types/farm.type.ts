@@ -3,10 +3,6 @@ export interface Farm {
   name: string;
 }
 
-export interface CreateFarmDTO {
+export interface FormFarmDTO {
   name: string;
-}
-
-export interface UpdateFarmDTO extends Partial<CreateFarmDTO> {
-  id: string;
 }

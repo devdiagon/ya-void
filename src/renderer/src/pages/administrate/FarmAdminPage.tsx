@@ -11,10 +11,15 @@ import { useNavigate } from 'react-router-dom';
 
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
-  const { farms, loading, errors, refetch, createFarm, deleteFarm, clearError } = useFarms();
+  const { farms, loading, errors, refetch, createFarm, updateFarm, deleteFarm, clearError } =
+    useFarms();
 
   const createModal = useModal<void>({
     onClose: () => clearError('create')
+  });
+
+  const updateModal = useModal<Farm>({
+    onClose: () => clearError('update')
   });
 
   const deleteModal = useModal<Farm>({
@@ -27,16 +32,24 @@ export const FarmAdminPage = () => {
     refetch();
   };
 
-  const handleEdit = (farmId: number) => {
-    console.log('Edit farm', farmId);
+  const handleEdit = async (data: FarmFormData) => {
+    if (!updateModal.data) return;
+
+    const updateData: Farm = {
+      id: updateModal.data.id,
+      name: data.name
+    };
+
+    await updateFarm(updateData);
+    updateModal.close();
+    refetch();
   };
 
   const handleDelete = () => {
-    const farmId = deleteModal.data?.id;
-    if (farmId !== undefined) {
-      deleteFarm(farmId);
-      deleteModal.close();
-    }
+    if (!deleteModal.data) return;
+
+    deleteFarm(deleteModal.data.id);
+    deleteModal.close();
   };
 
   return (
@@ -57,6 +70,8 @@ export const FarmAdminPage = () => {
           </ActionButton>
         </div>
       </div>
+
+      {/*Display error if no items where fetched */}
       <div className="flex-1 px-6 py-4 overflow-auto">
         {errors.fetch ? (
           <div className="h-full flex items-center justify-center">
@@ -67,6 +82,7 @@ export const FarmAdminPage = () => {
             />
           </div>
         ) : (
+          // Display list of items
           <div className="flex flex-col gap-4">
             {farms.map((farm) => (
               <ListCard
@@ -79,7 +95,7 @@ export const FarmAdminPage = () => {
                 onNavigate={() => {
                   navigate(`/administrate/farms/${farm.id}/areas`);
                 }}
-                onEdit={() => handleEdit(farm.id)}
+                onEdit={() => updateModal.open(farm)}
                 onDelete={() => deleteModal.open(farm)}
               />
             ))}
@@ -98,6 +114,21 @@ export const FarmAdminPage = () => {
               clearError('create');
             }}
             onConfirm={handleCreate}
+          />
+        </div>
+      </Modal>
+
+      {/* Update Modal */}
+      <Modal isOpen={updateModal.isOpen} onClose={updateModal.close} size="lg">
+        <div className="space-y-4">
+          <AdminFarmForm
+            title="Editar Finca"
+            initialData={{ name: updateModal.data?.name || '' }}
+            handleCancel={() => {
+              updateModal.close();
+              clearError('update');
+            }}
+            onConfirm={handleEdit}
           />
         </div>
       </Modal>
