@@ -35,16 +35,20 @@ export const AdminFarmForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <h3 className="text-lg font-bold">{title}</h3>
-      <TextField
-        fullWidth
-        label="Nombre"
-        {...register('name')}
-        error={!!errors.name}
-        helperText={errors.name ? errors.name.message : ''}
-        disabled={isSubmitting}
-      />
+
+      <div className="pt-4">
+        <TextField
+          fullWidth
+          label="Nombre"
+          {...register('name')}
+          error={!!errors.name}
+          helperText={errors.name ? errors.name.message : ''}
+          disabled={isSubmitting}
+        />
+      </div>
+
       <div className="flex justify-end gap-3 pt-4">
         <OutlineButton type="button" variant="primary" onClick={handleCancel}>
           Cancelar
