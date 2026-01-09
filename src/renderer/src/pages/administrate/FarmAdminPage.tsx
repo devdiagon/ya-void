@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export const FarmAdminPage = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { farms, loading, error, createFarm } = useFarms();
+  const { farms, loading, errors, createFarm, clearError } = useFarms();
 
   const handleAdd = () => {
     setIsModalOpen(true);
@@ -24,11 +24,14 @@ export const FarmAdminPage = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="md">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="lg">
         <div className="space-y-4">
           <AdminFarmForm
             title="Agregar Finca"
-            handleCancel={() => setIsModalOpen(false)}
+            handleCancel={() => {
+              setIsModalOpen(false);
+              clearError('create');
+            }}
             onConfirm={handleConfirm}
           />
         </div>
@@ -51,10 +54,10 @@ export const FarmAdminPage = () => {
         </div>
       </div>
       <div className="flex-1 px-6 py-4 overflow-auto">
-        {error ? (
+        {errors.fetch ? (
           <div className="h-full flex items-center justify-center">
             <ErrorCard
-              message={error}
+              message={errors.fetch}
               onRetry={() => window.location.reload()}
               retryText="Reintentar"
             />
