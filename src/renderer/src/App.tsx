@@ -1,12 +1,14 @@
-import { BrowserRouter } from 'react-router-dom'
-import { RootLayout } from './layouts/RootLayout'
+import { Content, RootLayout, Sidebar, SidebarItems } from './components'
 
 function App(): React.JSX.Element {
   return (
-    <BrowserRouter>
-      <RootLayout />
-    </BrowserRouter>
-  );
+    <RootLayout>
+      <Sidebar className='p-2 border-4 border-red-500'>
+        <SidebarItems className="mt-4 space-y-1" />
+      </Sidebar>
+      <Content className='border-4 border-blue-500'>Contet</Content>
+    </RootLayout>
+  )
 }
 
 export default App
