@@ -1,6 +1,6 @@
 import { BaseButtonProps } from './types';
 
-export const ActionButton = ({
+export const OutlineButton = ({
   children,
   onClick,
   disabled = false,
@@ -22,12 +22,12 @@ export const ActionButton = ({
   };
 
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white',
-    success: 'bg-green-600 hover:bg-green-700 text-white',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 text-white',
-    info: 'bg-cyan-600 hover:bg-cyan-700 text-white'
+    primary: 'border-blue-600 text-blue-600 hover:bg-blue-50',
+    secondary: 'border-gray-600 text-gray-600 hover:bg-gray-50',
+    success: 'border-green-600 text-green-600 hover:bg-green-50',
+    danger: 'border-red-600 text-red-600 hover:bg-red-50',
+    warning: 'border-yellow-500 text-yellow-600 hover:bg-yellow-50',
+    info: 'border-cyan-600 text-cyan-600 hover:bg-cyan-50'
   };
 
   return (
@@ -39,6 +39,7 @@ export const ActionButton = ({
       className={`
         inline-flex items-center justify-center gap-2 
         font-medium rounded-lg 
+        border-2 bg-transparent
         transition-all duration-200 
         focus:outline-none focus:ring-2 focus:ring-offset-2
         disabled:opacity-50 disabled:cursor-not-allowed
