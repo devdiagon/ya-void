@@ -1,4 +1,4 @@
-import { AreasAdminPage, FarmAdminPage, RequestersAdminPage } from '@renderer/pages/administrate';
+import { AreasAdminPage, FarmAdminPage } from '@renderer/pages/administrate';
 import { Reports } from '@renderer/pages/examples';
 import { Register } from '@renderer/pages/Register';
 import { WorkZonesPage } from '@renderer/pages/work-zones';
@@ -10,10 +10,6 @@ export const AppRoutes = (): React.JSX.Element => {
       <Route path="/" element={<Reports />} />
       <Route path="/administrate/farms" element={<FarmAdminPage />} />
       <Route path="/administrate/farms/:farmId/areas" element={<AreasAdminPage />} />
-      <Route
-        path="/administrate/farms/:farmId/areas/:areaId/requesters"
-        element={<RequestersAdminPage />}
-      />
       <Route path="/work-zones" element={<WorkZonesPage />} />
       <Route path="/work-zones/:workZoneId/farms" element={<Register />} />
       <Route path="*" element={<Navigate to="/" replace />} />
