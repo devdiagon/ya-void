@@ -43,28 +43,28 @@ export const WorkZoneForm = ({ title, initialData, onCancel, onConfirm }: WorkZo
           disabled={isSubmitting}
         />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <TextField
-            fullWidth
-            label="Fecha inicio"
-            type="date"
-            {...register('startDate')}
-            error={!!errors.startDate}
-            helperText={errors.startDate?.message ?? ''}
-            disabled={isSubmitting}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Fecha inicio</label>
+            <input
+              type="date"
+              {...register('startDate')}
+              disabled={isSubmitting}
+              className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            />
+            {errors.startDate && <p className="text-xs text-red-600">{errors.startDate.message}</p>}
+          </div>
 
-          <TextField
-            fullWidth
-            label="Fecha fin"
-            type="date"
-            {...register('endDate')}
-            error={!!errors.endDate}
-            helperText={errors.endDate?.message ?? ''}
-            disabled={isSubmitting}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Fecha fin</label>
+            <input
+              type="date"
+              {...register('endDate')}
+              disabled={isSubmitting}
+              className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            />
+            {errors.endDate && <p className="text-xs text-red-600">{errors.endDate.message}</p>}
+          </div>
         </div>
       </div>
 
