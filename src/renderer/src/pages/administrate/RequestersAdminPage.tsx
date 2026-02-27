@@ -1,4 +1,5 @@
 import { ActionButton, IconButton } from '@renderer/components';
+import { PAGE_TITLE_CLASS } from '@renderer/utils';
 import { ArrowLeftIcon, PlusIcon } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -26,9 +27,7 @@ export const RequestersAdminPage = () => {
                 icon={<ArrowLeftIcon size={20} />}
                 onClick={handleGoBack}
               />
-              <h1 className="text-2xl font-bold text-gray-900">
-                Administrar Solicitantes de {areaId}
-              </h1>
+              <h1 className={PAGE_TITLE_CLASS}>Administrar Solicitantes de {areaId}</h1>
             </div>
 
             <ActionButton

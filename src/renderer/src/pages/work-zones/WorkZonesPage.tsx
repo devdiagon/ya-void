@@ -5,6 +5,7 @@ import { WorkZoneForm } from '@renderer/components/Form';
 import { Modal } from '@renderer/components/Modal';
 import { useModal, useWorkZones } from '@renderer/hooks';
 import { FormWorkZoneDTO, WorkZone } from '@renderer/types';
+import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
 import { CalendarDaysIcon, PlusIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -95,8 +96,8 @@ export const WorkZonesPage = () => {
       <div className="px-6 py-6 border-b border-gray-200 bg-white">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-black text-gray-900">Zonas de Trabajo</h1>
-            <p className="mt-2 text-xl text-gray-600">
+            <h1 className={PAGE_TITLE_CLASS}>Zonas de Trabajo</h1>
+            <p className={PAGE_SUBTITLE_CLASS}>
               Seleccione una zona de trabajo para ver las fincas asociadas
             </p>
           </div>

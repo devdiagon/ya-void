@@ -6,6 +6,7 @@ import { Modal } from '@renderer/components/Modal/Modal';
 import { useAreas, useModal, useRequesters } from '@renderer/hooks';
 import { FarmFormData } from '@renderer/schemas/farm.schema';
 import { Area, Requester } from '@renderer/types';
+import { PAGE_TITLE_CLASS } from '@renderer/utils';
 import {
   ArrowLeftIcon,
   ChevronDownIcon,
@@ -231,7 +232,7 @@ export const AreasAdminPage = () => {
               icon={<ArrowLeftIcon size={20} />}
               onClick={handleGoBack}
             />
-            <h1 className="text-2xl font-black text-gray-900">
+            <h1 className={PAGE_TITLE_CLASS}>
               Administrar Áreas de <span className="text-blue-600">{farmName || farmId}</span>
             </h1>
           </div>

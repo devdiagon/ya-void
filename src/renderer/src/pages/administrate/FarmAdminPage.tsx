@@ -6,6 +6,7 @@ import { Modal } from '@renderer/components/Modal/Modal';
 import { useFarms, useModal } from '@renderer/hooks';
 import { FarmFormData } from '@renderer/schemas/farm.schema';
 import { Farm } from '@renderer/types/farm.type';
+import { PAGE_TITLE_CLASS } from '@renderer/utils';
 import { PlusIcon, TractorIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,7 +59,7 @@ export const FarmAdminPage = () => {
       <div className="px-6 py-4">
         {/* Tittle & Add button */}
         <div className="flex items-center justify-between py-2">
-          <h1 className="text-2xl font-black text-gray-900">Administrar Fincas</h1>
+          <h1 className={PAGE_TITLE_CLASS}>Administrar Fincas</h1>
 
           <ActionButton
             variant="primary"
