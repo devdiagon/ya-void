@@ -5,6 +5,10 @@ import { WorkZoneRow, mapRowToWorkZone } from '../mappers/WorkZoneMapper'
 export class WorkZoneRepository {
   private db = getDb()
 
+  private toDateString(value: Date): string {
+    return value.toISOString().slice(0, 10)
+  }
+
   /**
    * Obtiene todas las zonas de trabajo ordenadas por nombre.
    */
@@ -34,7 +38,11 @@ export class WorkZoneRepository {
     const stmt = this.db.prepare(
       'INSERT INTO work_zone (name, start_date, end_date) VALUES (?, ?, ?)'
     )
-    const result = stmt.run(workZone.name, workZone.startDate, workZone.endDate)
+    const result = stmt.run(
+      workZone.name,
+      this.toDateString(workZone.startDate),
+      this.toDateString(workZone.endDate)
+    )
     return result.lastInsertRowid as number
   }
 
@@ -45,7 +53,12 @@ export class WorkZoneRepository {
     const stmt = this.db.prepare(
       'UPDATE work_zone SET name = ?, start_date = ?, end_date = ? WHERE id = ?'
     )
-    stmt.run(workZone.name, workZone.startDate, workZone.endDate, workZone.id)
+    stmt.run(
+      workZone.name,
+      this.toDateString(workZone.startDate),
+      this.toDateString(workZone.endDate),
+      workZone.id
+    )
   }
 
   /**
