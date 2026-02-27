@@ -4,7 +4,8 @@ import { DeleteConfirmation } from '@renderer/components/DeleteConfirmation';
 import { WorkZoneForm } from '@renderer/components/Form';
 import { Modal } from '@renderer/components/Modal';
 import { useModal, useWorkZones } from '@renderer/hooks';
-import { FormWorkZoneDTO, WorkZone } from '@renderer/types';
+import { WorkZoneFormData } from '@renderer/schemas/workZone.schema';
+import { WorkZone } from '@renderer/types';
 import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
 import { CalendarDaysIcon, PlusIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +49,7 @@ export const WorkZonesPage = () => {
     onClose: () => clearError('delete')
   });
 
-  const handleCreate = async (data: FormWorkZoneDTO) => {
+  const handleCreate = async (data: WorkZoneFormData) => {
     await createWorkZone(data);
     createModal.close();
     refetch();
@@ -70,7 +71,7 @@ export const WorkZonesPage = () => {
     return `${parsedDate.getFullYear()}-${month}-${day}`;
   };
 
-  const handleEdit = async (data: FormWorkZoneDTO) => {
+  const handleEdit = async (data: WorkZoneFormData) => {
     if (!updateModal.data) return;
 
     await updateWorkZone({
