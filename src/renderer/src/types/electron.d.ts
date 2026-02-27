@@ -1,6 +1,7 @@
 import { Area, FormAreaDTO } from './area.type';
 import { Farm, FormFarmDTO } from './farm.type';
 import { FormRequesterDTO, Requester } from './requester.type';
+import { FormWorkZoneDTO, WorkZone } from './workZone.type';
 
 export interface ElectronAPI {
   farms: {
@@ -26,6 +27,13 @@ export interface ElectronAPI {
     delete: (id: number) => Promise<void>;
     assignToArea: (payload: { requesterId: number; areaId: number }) => Promise<void>;
     removeFromArea: (payload: { requesterId: number; areaId: number }) => Promise<void>;
+  };
+  workZones: {
+    list: () => Promise<WorkZone[]>;
+    getById: (id: number) => Promise<WorkZone>;
+    create: (payload: FormWorkZoneDTO) => Promise<WorkZone>;
+    update: (id: number, payload: FormWorkZoneDTO) => Promise<void>;
+    delete: (id: number) => Promise<void>;
   };
 }
 

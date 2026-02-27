@@ -232,7 +232,7 @@ export const AreasAdminPage = () => {
               onClick={handleGoBack}
             />
             <h1 className="text-2xl font-black text-gray-900">
-              Administrar Áreas de {farmName || farmId}
+              Administrar Áreas de <span className="text-blue-600">{farmName || farmId}</span>
             </h1>
           </div>
 
