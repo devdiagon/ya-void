@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Modal } from './Modal';
+import { useState } from 'react';
 import { ActionButton, OutlineButton } from '../Button';
+import { Modal } from './Modal';
 
 export interface SelectOption {
   value: string | number;
@@ -29,20 +29,16 @@ export const SelectModal = ({
 }: SelectModalProps) => {
   const [selectedValue, setSelectedValue] = useState<string | number>('');
 
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedValue(defaultValue || '');
-    }
-  }, [isOpen, defaultValue]);
+  const currentValue = selectedValue || defaultValue || '';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (required && !selectedValue) {
+    if (required && !currentValue) {
       return;
     }
 
-    onConfirm(selectedValue);
+    onConfirm(currentValue);
     handleClose();
   };
 
@@ -56,12 +52,13 @@ export const SelectModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={title}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         <div>
           <select
             id="select-option"
-            value={selectedValue}
+            value={currentValue}
             onChange={handleSelectChange}
             required={required}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
@@ -81,7 +78,7 @@ export const SelectModal = ({
           <OutlineButton type="button" variant="primary" onClick={handleClose}>
             Cancelar
           </OutlineButton>
-          <ActionButton type="submit" variant="primary" disabled={required && !selectedValue}>
+          <ActionButton type="submit" variant="primary" disabled={required && !currentValue}>
             Guardar
           </ActionButton>
         </div>
