@@ -102,7 +102,7 @@ export const Modal = ({
         />
 
         {/* Content - scrollable */}
-        <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
+        <div className="px-8 py-6 overflow-y-auto flex-1">{children}</div>
       </div>
     </dialog>
   );

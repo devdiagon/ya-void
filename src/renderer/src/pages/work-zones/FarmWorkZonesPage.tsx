@@ -116,7 +116,7 @@ export const FarmWorkZonesPage = () => {
       {/* Content */}
       <div className="flex-1 px-6 py-6 overflow-auto bg-gray-50">
         {/* Section header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl font-bold text-gray-800">Fincas</h2>
           <ActionButton
             variant="success"

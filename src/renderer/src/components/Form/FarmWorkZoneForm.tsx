@@ -39,13 +39,13 @@ export const FarmWorkZoneForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
-      <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+      <h3 className="text-3xl font-bold text-gray-900">{title}</h3>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {/* Farm select */}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-700">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-lg font-semibold text-gray-700">
             Finca <span className="text-red-500">*</span>
           </label>
           <Controller
@@ -57,7 +57,7 @@ export const FarmWorkZoneForm = ({
                 value={field.value}
                 onChange={(e) => field.onChange(Number(e.target.value))}
                 disabled={isSubmitting}
-                className={`w-full rounded-md border px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                className={`w-full rounded-md border px-3 py-3 text-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
                   errors.farmId ? 'border-red-400' : 'border-gray-300'
                 }`}
               >
@@ -73,27 +73,27 @@ export const FarmWorkZoneForm = ({
             )}
           />
           {errors.farmId ? (
-            <p className="text-xs text-red-500">{errors.farmId.message}</p>
+            <p className="text-base text-red-500">{errors.farmId.message}</p>
           ) : (
-            <p className="text-xs text-gray-500">
+            <p className="text-base text-gray-500">
               Seleccione la finca que desea añadir a esta zona de trabajo
             </p>
           )}
         </div>
 
         {/* Name field (optional) */}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-700">
-            Nombre para esta relación <span className="font-normal text-gray-400">(opcional)</span>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-lg font-semibold text-gray-700">
+            Nombre para esta finca <span className="font-normal text-gray-400">(opcional)</span>
           </label>
           <input
             type="text"
             {...register('name')}
-            placeholder="Ej: Cosecha Principal, Zona Norte, etc."
+            placeholder="Ej: R1 Valentin, etc."
             disabled={isSubmitting}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full rounded-md border border-gray-300 px-3 py-3 text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-base text-gray-500">
             Por defecto se usará el nombre de la finca seleccionada
           </p>
         </div>
@@ -103,13 +103,14 @@ export const FarmWorkZoneForm = ({
         <ActionButton
           type="submit"
           variant="primary"
+          size="lg"
           fullWidth
-          icon={<LayoutDashboardIcon size={16} />}
+          icon={<LayoutDashboardIcon size={18} />}
           disabled={isSubmitting}
         >
           Añadir Finca
         </ActionButton>
-        <OutlineButton type="button" variant="primary" onClick={onCancel}>
+        <OutlineButton type="button" size="lg" variant="primary" onClick={onCancel}>
           Cancelar
         </OutlineButton>
       </div>
