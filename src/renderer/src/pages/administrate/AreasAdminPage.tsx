@@ -1,4 +1,5 @@
-import { ActionButton, IconButton } from '@renderer/components';
+import { ActionButton } from '@renderer/components';
+import { Breadcrumbs } from '@renderer/components/Breadcrumbs';
 import { ErrorCard } from '@renderer/components/Card';
 import { DeleteConfirmation } from '@renderer/components/DeleteConfirmation';
 import { AdminAreaForm } from '@renderer/components/Form';
@@ -7,13 +8,12 @@ import { useAreas, useModal } from '@renderer/hooks';
 import { AreaFormData } from '@renderer/schemas/area.schema';
 import { Area } from '@renderer/types';
 import { PAGE_TITLE_CLASS } from '@renderer/utils';
-import { ArrowLeftIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AreaRow } from './AreaRow';
 
 export const AreasAdminPage = () => {
-  const navigate = useNavigate();
   const { farmId } = useParams();
   const [farmName, setFarmName] = useState('');
 
@@ -69,10 +69,6 @@ export const AreasAdminPage = () => {
     createModal.open();
   };
 
-  const handleGoBack = () => {
-    navigate(`/administrate/farms`);
-  };
-
   useEffect(() => {
     if (!parsedFarmId) {
       return;
@@ -87,19 +83,18 @@ export const AreasAdminPage = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-6 py-4">
+      <div className="px-6 py-6 border-b border-gray-200 bg-white">
+        <Breadcrumbs
+          items={[
+            { label: 'Administración', path: '/administrate/farms' },
+            { label: farmName || farmId || '', path: '#' }
+          ]}
+        />
         {/* Tittle & Add button */}
-        <div className="flex items-center justify-between py-2">
-          <div className="flex items-center gap-2">
-            <IconButton
-              ariaLabel="Regresar"
-              icon={<ArrowLeftIcon size={20} />}
-              onClick={handleGoBack}
-            />
-            <h1 className={PAGE_TITLE_CLASS}>
-              Administrar Áreas de <span className="text-blue-600">{farmName || farmId}</span>
-            </h1>
-          </div>
+        <div className="flex items-center justify-between mt-4">
+          <h1 className={PAGE_TITLE_CLASS}>
+            Áreas de <span className="text-blue-600">{farmName || farmId}</span>
+          </h1>
 
           <ActionButton
             variant="primary"
