@@ -56,9 +56,9 @@ export const FarmAdminPage = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-6 py-4">
+      <div className="px-6 py-6 border-b border-gray-200 bg-white">
         {/* Tittle & Add button */}
-        <div className="flex items-center justify-between py-2">
+        <div className="flex items-center justify-between">
           <h1 className={PAGE_TITLE_CLASS}>Administrar Fincas</h1>
 
           <ActionButton
