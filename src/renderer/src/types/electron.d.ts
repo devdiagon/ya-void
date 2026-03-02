@@ -3,6 +3,7 @@ import { Farm, FormFarmDTO } from './farm.type';
 import { FarmWorkZone, FormFarmWorkZoneDTO } from './farmWorkZone.type';
 import { FormRequesterDTO, Requester } from './requester.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
+import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
 
 export interface ElectronAPI {
   farms: {
@@ -41,6 +42,13 @@ export interface ElectronAPI {
     getById: (id: number) => Promise<FarmWorkZone>;
     create: (payload: FormFarmWorkZoneDTO) => Promise<FarmWorkZone>;
     update: (payload: { id: number } & FormFarmWorkZoneDTO) => Promise<FarmWorkZone>;
+    delete: (id: number) => Promise<void>;
+  };
+  workZoneSheets: {
+    listByFarmWorkZone: (farmWorkZoneId: number) => Promise<WorkZoneSheet[]>;
+    getById: (id: number) => Promise<WorkZoneSheet>;
+    create: (payload: FormWorkZoneSheetDTO) => Promise<WorkZoneSheet>;
+    update: (payload: { id: number } & FormWorkZoneSheetDTO) => Promise<WorkZoneSheet>;
     delete: (id: number) => Promise<void>;
   };
 }

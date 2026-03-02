@@ -96,7 +96,7 @@ export const FarmWorkZonesPage = () => {
       <div className="px-6 py-6 border-b border-gray-200 bg-white">
         <Breadcrumbs
           items={[
-            { label: 'Zonas de Trabajo', path: '/work-zones' },
+            { label: 'Reportes', path: '/work-zones' },
             { label: workZone?.name ?? workZoneId ?? '', path: '#' }
           ]}
         />
