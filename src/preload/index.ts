@@ -80,5 +80,74 @@ contextBridge.exposeInMainWorld('api', {
       totalSheet: number
     }) => ipcRenderer.invoke('workZoneSheets:update', payload),
     delete: (id: number) => ipcRenderer.invoke('workZoneSheets:delete', id)
+  },
+
+  // --- ROUTES ---
+  routes: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('routes:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('routes:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('routes:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('routes:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('routes:delete', id)
+  },
+
+  // --- REASONS ---
+  reasons: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('reasons:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('reasons:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('reasons:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('reasons:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('reasons:delete', id)
+  },
+
+  // --- TRIPS ---
+  trips: {
+    listByWorkZoneSheet: (workZoneSheetId: number) =>
+      ipcRenderer.invoke('trips:listByWorkZoneSheet', workZoneSheetId),
+    listByWorkZoneSheetAndStatus: (
+      workZoneSheetId: number,
+      status: 'pending' | 'ready'
+    ) => ipcRenderer.invoke('trips:listByWorkZoneSheetAndStatus', workZoneSheetId, status),
+    listByArea: (areaId: number) => ipcRenderer.invoke('trips:listByArea', areaId),
+    listByDateRange: (payload: { from: string; to: string }) =>
+      ipcRenderer.invoke('trips:listByDateRange', payload),
+    getById: (id: number) => ipcRenderer.invoke('trips:getById', id),
+    create: (payload: {
+      vehicleType: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus' | null
+      tripDate: string | null
+      departureTime: string | null
+      arrivalTime: string | null
+      passengerCount: number | null
+      cost: number | null
+      requesterId: number | null
+      areaId: number | null
+      workZoneSheetId: number | null
+      routeId: number | null
+      reasonId: number | null
+    }) => ipcRenderer.invoke('trips:create', payload),
+    update: (payload: {
+      id: number
+      vehicleType: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus' | null
+      status: 'pending' | 'ready'
+      tripDate: string | null
+      departureTime: string | null
+      arrivalTime: string | null
+      passengerCount: number | null
+      cost: number | null
+      requesterId: number | null
+      areaId: number | null
+      workZoneSheetId: number | null
+      routeId: number | null
+      reasonId: number | null
+      routeSnapshot: string | null
+      reasonSnapshot: string | null
+    }) => ipcRenderer.invoke('trips:update', payload),
+    confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),
+    reopen: (id: number) => ipcRenderer.invoke('trips:reopen', id),
+    delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
   }
 })
