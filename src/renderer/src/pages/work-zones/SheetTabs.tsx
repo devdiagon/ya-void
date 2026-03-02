@@ -41,14 +41,14 @@ export const SheetTabs = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleTabClick = (sheet: WorkZoneSheet, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleTabClick = (sheet: WorkZoneSheet) => {
     onSelect(sheet.id);
-    if (menu?.sheetId === sheet.id) {
-      setMenu(null);
-      return;
-    }
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMenu({ sheetId: sheet.id, top: rect.bottom + 4, left: rect.left });
+    setMenu(null);
+  };
+
+  const handleTabContextMenu = (sheet: WorkZoneSheet, e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setMenu({ sheetId: sheet.id, top: e.clientY + 4, left: e.clientX });
   };
 
   return (
@@ -66,7 +66,8 @@ export const SheetTabs = ({
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
-            onClick={(e) => handleTabClick(sheet, e)}
+            onClick={() => handleTabClick(sheet)}
+            onContextMenu={(e) => handleTabContextMenu(sheet, e)}
           >
             {sheet.name}
           </div>
