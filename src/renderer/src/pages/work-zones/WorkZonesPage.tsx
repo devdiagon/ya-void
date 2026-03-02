@@ -97,9 +97,9 @@ export const WorkZonesPage = () => {
       <div className="px-6 py-6 border-b border-gray-200 bg-white">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className={PAGE_TITLE_CLASS}>Zonas de Trabajo</h1>
+            <h1 className={PAGE_TITLE_CLASS}>Reportes</h1>
             <p className={PAGE_SUBTITLE_CLASS}>
-              Seleccione una zona de trabajo para ver las fincas asociadas
+              Seleccione un reporte para ver las fincas asociadas
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export const WorkZonesPage = () => {
             icon={<PlusIcon size={18} />}
             onClick={() => createModal.open()}
           >
-            Nueva Zona
+            Nuevo Reporte
           </ActionButton>
         </div>
       </div>
