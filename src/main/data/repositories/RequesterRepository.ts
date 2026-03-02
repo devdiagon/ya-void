@@ -192,4 +192,34 @@ export class RequesterRepository {
       throw new Error('Error checking if requester exists')
     }
   }
+
+  /**
+   * Busca un solicitante por nombre exacto (case-sensitive).
+   */
+  findByName(name: string): Requester | null {
+    const stmt = this.db.prepare<RequesterRow>('SELECT id, name FROM requester WHERE name = ?')
+    const row = stmt.get(name)
+    return row ? mapRowToRequester(row) : null
+  }
+
+  /**
+   * Devuelve el solicitante con ese nombre si existe, o lo crea y lo asigna al área.
+   * Si ya existe pero no está asignado al área, lo asigna.
+   * Garantiza que el solicitante quedará disponible para autocompletar en esa área.
+   */
+  findOrCreateForArea(name: string, areaId: number): Requester {
+    const normalizedName = name.trim()
+    if (!normalizedName) throw new Error('El nombre del solicitante no puede estar vacío')
+
+    let requester = this.findByName(normalizedName)
+
+    if (!requester) {
+      requester = this.create(normalizedName)
+    }
+
+    // Idempotente: createInArea ignora si la relación ya existe
+    this.createInArea(requester.id, areaId)
+
+    return requester
+  }
 }

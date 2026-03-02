@@ -35,7 +35,9 @@ contextBridge.exposeInMainWorld('api', {
     assignToArea: (payload: { requesterId: number; areaId: number }) =>
       ipcRenderer.invoke('requesters:assignToArea', payload),
     removeFromArea: (payload: { requesterId: number; areaId: number }) =>
-      ipcRenderer.invoke('requesters:removeFromArea', payload)
+      ipcRenderer.invoke('requesters:removeFromArea', payload),
+    findOrCreateForArea: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('requesters:findOrCreateForArea', payload)
   },
 
   // --- WORK ZONES ---
@@ -90,7 +92,9 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('routes:create', payload),
     update: (id: number, payload: { name: string }) =>
       ipcRenderer.invoke('routes:update', id, payload),
-    delete: (id: number) => ipcRenderer.invoke('routes:delete', id)
+    delete: (id: number) => ipcRenderer.invoke('routes:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('routes:findOrCreate', payload)
   },
 
   // --- REASONS ---
@@ -101,7 +105,9 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('reasons:create', payload),
     update: (id: number, payload: { name: string }) =>
       ipcRenderer.invoke('reasons:update', id, payload),
-    delete: (id: number) => ipcRenderer.invoke('reasons:delete', id)
+    delete: (id: number) => ipcRenderer.invoke('reasons:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('reasons:findOrCreate', payload)
   },
 
   // --- TRIPS ---

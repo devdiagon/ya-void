@@ -28,4 +28,8 @@ export class RouteController {
   async delete(id: number): Promise<void> {
     return this.useRoute.delete(id)
   }
+
+  async findOrCreate(payload: { name: string; areaId: number }): Promise<Route> {
+    return this.useRoute.findOrCreate(payload.name, payload.areaId)
+  }
 }

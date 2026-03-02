@@ -46,4 +46,12 @@ export class UseRoute {
     if (!existing) throw new Error(`La ruta con ID ${id} no existe.`)
     this.routeRepository.delete(id)
   }
+
+  /**
+   * Devuelve la ruta con ese nombre en el área, o la crea si no existe.
+   * Usar desde el formulario de viaje para autocompletar con creación automática.
+   */
+  findOrCreate(name: string, areaId: number): Route {
+    return this.routeRepository.findOrCreate(name, areaId)
+  }
 }

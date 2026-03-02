@@ -46,4 +46,12 @@ export class UseReason {
     if (!existing) throw new Error(`El motivo con ID ${id} no existe.`)
     this.reasonRepository.delete(id)
   }
+
+  /**
+   * Devuelve el motivo con ese nombre en el área, o lo crea si no existe.
+   * Usar desde el formulario de viaje para autocompletar con creación automática.
+   */
+  findOrCreate(name: string, areaId: number): Reason {
+    return this.reasonRepository.findOrCreate(name, areaId)
+  }
 }

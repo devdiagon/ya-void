@@ -61,4 +61,23 @@ export class RouteRepository {
     const stmt = this.db.prepare('DELETE FROM route WHERE id = ?')
     stmt.run(id)
   }
+
+  /**
+   * Devuelve la ruta existente con ese nombre en el área, o la crea si no existe.
+   * Usa INSERT OR IGNORE para ser idempotente.
+   */
+  findOrCreate(name: string, areaId: number): Route {
+    const normalizedName = name.trim()
+    if (!normalizedName) throw new Error('El nombre de la ruta no puede estar vacío')
+
+    this.db
+      .prepare('INSERT OR IGNORE INTO route (name, area_id) VALUES (?, ?)')
+      .run(normalizedName, areaId)
+
+    const row = this.db
+      .prepare<RouteRow>('SELECT id, name, area_id FROM route WHERE name = ? AND area_id = ?')
+      .get(normalizedName, areaId)
+
+    return mapRowToRoute(row!)
+  }
 }

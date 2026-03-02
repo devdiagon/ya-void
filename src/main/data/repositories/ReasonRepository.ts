@@ -61,4 +61,23 @@ export class ReasonRepository {
     const stmt = this.db.prepare('DELETE FROM reason WHERE id = ?')
     stmt.run(id)
   }
+
+  /**
+   * Devuelve el motivo existente con ese nombre en el área, o lo crea si no existe.
+   * Usa INSERT OR IGNORE para ser idempotente.
+   */
+  findOrCreate(name: string, areaId: number): Reason {
+    const normalizedName = name.trim()
+    if (!normalizedName) throw new Error('El nombre del motivo no puede estar vacío')
+
+    this.db
+      .prepare('INSERT OR IGNORE INTO reason (name, area_id) VALUES (?, ?)')
+      .run(normalizedName, areaId)
+
+    const row = this.db
+      .prepare<ReasonRow>('SELECT id, name, area_id FROM reason WHERE name = ? AND area_id = ?')
+      .get(normalizedName, areaId)
+
+    return mapRowToReason(row!)
+  }
 }

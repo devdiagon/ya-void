@@ -88,6 +88,9 @@ export function registerIpcHandlers(): void {
     'requesters:removeFromArea',
     (_, payload: { requesterId: number; areaId: number }) => requesterCtrl.removeFromArea(payload)
   )
+  ipcMain.handle('requesters:findOrCreateForArea', (_, payload: { name: string; areaId: number }) =>
+    requesterCtrl.findOrCreateForArea(payload)
+  )
 
   // --- WORK ZONES HANDLERS ---
   ipcMain.handle('workZones:list', () => workZoneCtrl.listWorkZones())
@@ -142,6 +145,9 @@ export function registerIpcHandlers(): void {
     routeCtrl.update(id, payload)
   )
   ipcMain.handle('routes:delete', (_, id: number) => routeCtrl.delete(id))
+  ipcMain.handle('routes:findOrCreate', (_, payload: { name: string; areaId: number }) =>
+    routeCtrl.findOrCreate(payload)
+  )
 
   // --- REASONS HANDLERS ---
   ipcMain.handle('reasons:listByArea', (_, areaId: number) => reasonCtrl.listByArea(areaId))
@@ -153,6 +159,9 @@ export function registerIpcHandlers(): void {
     reasonCtrl.update(id, payload)
   )
   ipcMain.handle('reasons:delete', (_, id: number) => reasonCtrl.delete(id))
+  ipcMain.handle('reasons:findOrCreate', (_, payload: { name: string; areaId: number }) =>
+    reasonCtrl.findOrCreate(payload)
+  )
 
   // --- TRIPS HANDLERS ---
   ipcMain.handle('trips:listByWorkZoneSheet', (_, workZoneSheetId: number) =>

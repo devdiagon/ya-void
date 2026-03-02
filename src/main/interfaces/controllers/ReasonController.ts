@@ -28,4 +28,8 @@ export class ReasonController {
   async delete(id: number): Promise<void> {
     return this.useReason.delete(id)
   }
+
+  async findOrCreate(payload: { name: string; areaId: number }): Promise<Reason> {
+    return this.useReason.findOrCreate(payload.name, payload.areaId)
+  }
 }
