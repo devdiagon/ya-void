@@ -1,18 +1,23 @@
-import { Trip, TripStatus } from '@renderer/types';
+import { Requester, Trip, TripStatus, TripVehicleType } from '@renderer/types';
 import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const VEHICLE_LABELS: Record<string, string> = {
-  Camioneta: 'Camioneta',
-  Furgoneta: 'Furgoneta',
-  Microbus: 'Microbús',
-  Bus: 'Bus'
-};
+const VEHICLE_OPTIONS: { value: TripVehicleType; label: string }[] = [
+  { value: 'Camioneta', label: 'Camioneta' },
+  { value: 'Furgoneta', label: 'Furgoneta' },
+  { value: 'Microbus', label: 'Microbús' },
+  { value: 'Bus', label: 'Bus' }
+];
+
+const VEHICLE_LABELS: Record<string, string> = Object.fromEntries(
+  VEHICLE_OPTIONS.map((v) => [v.value, v.label])
+);
 
 type StatusFilter = 'all' | TripStatus;
 
 export function SearchTripPage() {
   const [allTrips, setAllTrips] = useState<Trip[]>([]);
+  const [requesters, setRequesters] = useState<Requester[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -20,12 +25,18 @@ export function SearchTripPage() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [vehicleFilter, setVehicleFilter] = useState<TripVehicleType | 'all'>('all');
+  const [requesterFilter, setRequesterFilter] = useState<number | 'all'>('all');
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const trips = await window.api.trips.listAll();
+      const [trips, reqs] = await Promise.all([
+        window.api.trips.listAll(),
+        window.api.requesters.listAll()
+      ]);
       setAllTrips(trips);
+      setRequesters(reqs);
     } catch (err) {
       console.error('Error al obtener viajes:', err);
     } finally {
@@ -37,12 +48,21 @@ export function SearchTripPage() {
     fetchAll();
   }, [fetchAll]);
 
+  // Only show requesters that appear in at least one trip
+  const usedRequesters = useMemo(() => {
+    const ids = new Set(allTrips.map((t) => t.requesterId).filter(Boolean));
+    return requesters.filter((r) => ids.has(r.id));
+  }, [allTrips, requesters]);
+
+  const requesterMap = useMemo(() => new Map(requesters.map((r) => [r.id, r.name])), [requesters]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return allTrips.filter((t) => {
       // Text search
       if (q) {
-        const haystack = [t.routeSnapshot, t.reasonSnapshot, t.vehicleType]
+        const requesterName = t.requesterId != null ? (requesterMap.get(t.requesterId) ?? '') : '';
+        const haystack = [t.routeSnapshot, t.reasonSnapshot, t.vehicleType, requesterName]
           .filter(Boolean)
           .join(' ')
           .toLowerCase();
@@ -53,11 +73,32 @@ export function SearchTripPage() {
       if (toDate && t.tripDate && t.tripDate > toDate) return false;
       // Status
       if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+      // Vehicle type
+      if (vehicleFilter !== 'all' && t.vehicleType !== vehicleFilter) return false;
+      // Requester
+      if (requesterFilter !== 'all' && t.requesterId !== requesterFilter) return false;
       return true;
     });
-  }, [allTrips, query, fromDate, toDate, statusFilter]);
+  }, [
+    allTrips,
+    query,
+    fromDate,
+    toDate,
+    statusFilter,
+    vehicleFilter,
+    requesterFilter,
+    requesterMap
+  ]);
 
   const totalCost = useMemo(() => filtered.reduce((sum, t) => sum + (t.cost ?? 0), 0), [filtered]);
+
+  const hasActiveFilters =
+    !!query ||
+    !!fromDate ||
+    !!toDate ||
+    statusFilter !== 'all' ||
+    vehicleFilter !== 'all' ||
+    requesterFilter !== 'all';
 
   const statusBtn = (label: string, value: StatusFilter) => (
     <button
@@ -79,8 +120,8 @@ export function SearchTripPage() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-xl font-semibold text-gray-800 mb-4">Buscar Viaje</h1>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-end gap-3">
+        {/* Filters row 1 */}
+        <div className="flex flex-wrap items-end gap-3 mb-3">
           {/* Text search */}
           <div className="relative flex-1 min-w-[220px]">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -93,6 +134,45 @@ export function SearchTripPage() {
             />
           </div>
 
+          {/* Vehicle type */}
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-500">Vehículo</label>
+            <select
+              value={vehicleFilter}
+              onChange={(e) => setVehicleFilter(e.target.value as TripVehicleType | 'all')}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+            >
+              <option value="all">Todos</option>
+              {VEHICLE_OPTIONS.map((v) => (
+                <option key={v.value} value={v.value}>
+                  {v.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Requester */}
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-500">Solicitante</label>
+            <select
+              value={requesterFilter}
+              onChange={(e) =>
+                setRequesterFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))
+              }
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 bg-white min-w-[160px]"
+            >
+              <option value="all">Todos</option>
+              {usedRequesters.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Filters row 2 */}
+        <div className="flex flex-wrap items-end gap-3">
           {/* From date */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-500">Desde</label>
@@ -123,7 +203,7 @@ export function SearchTripPage() {
           </div>
 
           {/* Clear button */}
-          {(query || fromDate || toDate || statusFilter !== 'all') && (
+          {hasActiveFilters && (
             <button
               type="button"
               onClick={() => {
@@ -131,6 +211,8 @@ export function SearchTripPage() {
                 setFromDate('');
                 setToDate('');
                 setStatusFilter('all');
+                setVehicleFilter('all');
+                setRequesterFilter('all');
               }}
               className="px-3 py-2 text-xs text-gray-500 hover:text-gray-700 underline"
             >
@@ -162,6 +244,9 @@ export function SearchTripPage() {
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Fecha</th>
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">
                     Vehículo
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium border border-blue-700">
+                    Solicitante
                   </th>
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Ruta</th>
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Motivo</th>
@@ -195,6 +280,11 @@ export function SearchTripPage() {
                     </td>
                     <td className="px-3 py-1.5 border border-gray-200 whitespace-nowrap">
                       {trip.vehicleType ? VEHICLE_LABELS[trip.vehicleType] : '—'}
+                    </td>
+                    <td className="px-3 py-1.5 border border-gray-200 whitespace-nowrap">
+                      {trip.requesterId != null
+                        ? (requesterMap.get(trip.requesterId) ?? `#${trip.requesterId}`)
+                        : '—'}
                     </td>
                     <td className="px-3 py-1.5 border border-gray-200">
                       {trip.routeSnapshot ?? '—'}
@@ -231,7 +321,7 @@ export function SearchTripPage() {
               <tfoot>
                 <tr className="bg-gray-50 font-medium text-sm">
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-3 py-2 border border-gray-200 text-right text-gray-600"
                   >
                     Total de Costos:
