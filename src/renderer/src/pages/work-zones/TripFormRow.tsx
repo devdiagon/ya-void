@@ -1,6 +1,19 @@
 import { TripVehicleType } from '@renderer/types';
 import { Save, X } from 'lucide-react';
+import { useState } from 'react';
 import { AutocompleteOption, CellAutocomplete } from './CellAutocomplete';
+
+/** Valida formato HH:MM con horas 00-23 y minutos 00-59. Acepta vacío. */
+function validateTime(value: string): string | null {
+  if (!value) return null;
+  const match = value.match(/^([0-9]{2}):([0-9]{2})$/);
+  if (!match) return 'Formato inválido (HH:MM)';
+  const h = Number(match[1]);
+  const m = Number(match[2]);
+  if (h > 23) return 'Hora debe ser 00–23';
+  if (m > 59) return 'Minutos deben ser 00–59';
+  return null;
+}
 
 export const VEHICLE_TYPES: TripVehicleType[] = ['Camioneta', 'Furgoneta', 'Microbus', 'Bus'];
 
@@ -60,6 +73,23 @@ export function TripFormRow({
 
   const inputCls = 'w-full bg-transparent border-0 outline-none text-sm py-0';
 
+  const [timeErrors, setTimeErrors] = useState({
+    departure: null as string | null,
+    arrival: null as string | null
+  });
+
+  const handleTimeChange = (
+    field: 'departureTime' | 'arrivalTime',
+    errorKey: 'departure' | 'arrival',
+    raw: string
+  ) => {
+    let v = raw.replace(/[^0-9:]/g, '');
+    const prev = field === 'departureTime' ? form.departureTime : form.arrivalTime;
+    if (v.length === 2 && !v.includes(':') && prev.length < 2) v += ':';
+    set(field, v);
+    setTimeErrors((e) => ({ ...e, [errorKey]: validateTime(v) }));
+  };
+
   return (
     <tr className="bg-white ring-1 ring-inset ring-blue-400">
       {/* Fecha */}
@@ -100,37 +130,33 @@ export function TripFormRow({
       </td>
 
       {/* Salida */}
-      <td className={`${cell} min-w-[100px]`}>
+      <td className={`${cell} min-w-[100px] ${timeErrors.departure ? 'bg-red-50' : ''}`}>
         <input
           type="text"
-          className={inputCls}
+          className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
           value={form.departureTime}
           placeholder="HH:MM"
           maxLength={5}
-          pattern="[0-9]{2}:[0-9]{2}"
-          onChange={(e) => {
-            let v = e.target.value.replace(/[^0-9:]/g, '');
-            if (v.length === 2 && !v.includes(':') && form.departureTime.length < 2) v += ':';
-            set('departureTime', v);
-          }}
+          onChange={(e) => handleTimeChange('departureTime', 'departure', e.target.value)}
         />
+        {timeErrors.departure && (
+          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.departure}</p>
+        )}
       </td>
 
       {/* Llegada */}
-      <td className={`${cell} min-w-[100px]`}>
+      <td className={`${cell} min-w-[100px] ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
         <input
           type="text"
-          className={inputCls}
+          className={`${inputCls} ${timeErrors.arrival ? 'text-red-600' : ''}`}
           value={form.arrivalTime}
           placeholder="HH:MM"
           maxLength={5}
-          pattern="[0-9]{2}:[0-9]{2}"
-          onChange={(e) => {
-            let v = e.target.value.replace(/[^0-9:]/g, '');
-            if (v.length === 2 && !v.includes(':') && form.arrivalTime.length < 2) v += ':';
-            set('arrivalTime', v);
-          }}
+          onChange={(e) => handleTimeChange('arrivalTime', 'arrival', e.target.value)}
         />
+        {timeErrors.arrival && (
+          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.arrival}</p>
+        )}
       </td>
 
       {/* Pasajeros */}
@@ -187,7 +213,8 @@ export function TripFormRow({
           <button
             type="button"
             onClick={onSave}
-            className="p-1 rounded text-green-600 hover:bg-green-50"
+            disabled={!!(timeErrors.departure || timeErrors.arrival)}
+            className="p-1 rounded text-green-600 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed"
             title="Guardar"
           >
             <Save size={15} />
