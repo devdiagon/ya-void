@@ -1,4 +1,4 @@
-import { TripRepository } from '../../data/repositories/TripRepository';
+import { TripPage, TripRepository, TripSearchParams } from '../../data/repositories/TripRepository';
 import { Trip, TripStatus } from '../entities/Trip';
 
 const REQUIRED_FIELDS: { key: keyof Trip; label: string }[] = [
@@ -31,10 +31,10 @@ export class UseTrip {
   }
 
   /**
-   * Obtiene todos los viajes sin filtro.
+   * Obtiene viajes paginados con filtros opcionales.
    */
-  getAll(): Trip[] {
-    return this.tripRepository.findAll()
+  getPaginated(params: TripSearchParams): TripPage {
+    return this.tripRepository.findPaginated(params)
   }
 
   /**
