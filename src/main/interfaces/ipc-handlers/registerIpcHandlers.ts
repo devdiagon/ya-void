@@ -4,7 +4,10 @@ import { ipcMain } from 'electron'
 import { AreaRepository } from '../../data/repositories/AreaRepository'
 import { FarmRepository } from '../../data/repositories/FarmRepository'
 import { FarmWorkZoneRepository } from '../../data/repositories/FarmWorkZoneRepository'
+import { ReasonRepository } from '../../data/repositories/ReasonRepository'
 import { RequesterRepository } from '../../data/repositories/RequesterRepository'
+import { RouteRepository } from '../../data/repositories/RouteRepository'
+import { TripRepository } from '../../data/repositories/TripRepository'
 import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
 import { WorkZoneSheetRepository } from '../../data/repositories/WorkZoneSheetRepository'
 
@@ -12,12 +15,16 @@ import { WorkZoneSheetRepository } from '../../data/repositories/WorkZoneSheetRe
 import { AreaController } from '../../interfaces/controllers/AreaController'
 import { FarmController } from '../../interfaces/controllers/FarmController'
 import { FarmWorkZoneController } from '../../interfaces/controllers/FarmWorkZoneController'
+import { ReasonController } from '../../interfaces/controllers/ReasonController'
 import { RequesterController } from '../../interfaces/controllers/RequesterController'
+import { RouteController } from '../../interfaces/controllers/RouteController'
+import { TripController } from '../../interfaces/controllers/TripController'
 import { WorkZoneController } from '../../interfaces/controllers/WorkZoneController'
 import { WorkZoneSheetController } from '../../interfaces/controllers/WorkZoneSheetController'
 
 // --- Entities (para tipado en handlers si es necesario) ---
 import { FarmWorkZone } from '../../core/entities/FarmWorkZone'
+import { Trip, TripStatus } from '../../core/entities/Trip'
 import { WorkZoneSheet } from '../../core/entities/WorkZoneSheet'
 
 export function registerIpcHandlers(): void {
@@ -28,6 +35,9 @@ export function registerIpcHandlers(): void {
   const workZoneRepo = new WorkZoneRepository()
   const farmWorkZoneRepo = new FarmWorkZoneRepository()
   const workZoneSheetRepo = new WorkZoneSheetRepository()
+  const routeRepo = new RouteRepository()
+  const reasonRepo = new ReasonRepository()
+  const tripRepo = new TripRepository()
 
   // 2. Instanciar Controladores
   const farmCtrl = new FarmController(farmRepo)
@@ -36,6 +46,9 @@ export function registerIpcHandlers(): void {
   const workZoneCtrl = new WorkZoneController(workZoneRepo)
   const farmWorkZoneCtrl = new FarmWorkZoneController(farmWorkZoneRepo)
   const workZoneSheetCtrl = new WorkZoneSheetController(workZoneSheetRepo)
+  const routeCtrl = new RouteController(routeRepo)
+  const reasonCtrl = new ReasonController(reasonRepo)
+  const tripCtrl = new TripController(tripRepo)
 
   // --- FARMS HANDLERS ---
   ipcMain.handle('farms:list', () => farmCtrl.list())
@@ -74,6 +87,9 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(
     'requesters:removeFromArea',
     (_, payload: { requesterId: number; areaId: number }) => requesterCtrl.removeFromArea(payload)
+  )
+  ipcMain.handle('requesters:findOrCreateForArea', (_, payload: { name: string; areaId: number }) =>
+    requesterCtrl.findOrCreateForArea(payload)
   )
 
   // --- WORK ZONES HANDLERS ---
@@ -118,4 +134,56 @@ export function registerIpcHandlers(): void {
     workZoneSheetCtrl.update(payload)
   )
   ipcMain.handle('workZoneSheets:delete', (_, id: number) => workZoneSheetCtrl.delete(id))
+
+  // --- ROUTES HANDLERS ---
+  ipcMain.handle('routes:listByArea', (_, areaId: number) => routeCtrl.listByArea(areaId))
+  ipcMain.handle('routes:getById', (_, id: number) => routeCtrl.getById(id))
+  ipcMain.handle('routes:create', (_, payload: { name: string; areaId: number }) =>
+    routeCtrl.create(payload)
+  )
+  ipcMain.handle('routes:update', (_, id: number, payload: { name: string }) =>
+    routeCtrl.update(id, payload)
+  )
+  ipcMain.handle('routes:delete', (_, id: number) => routeCtrl.delete(id))
+  ipcMain.handle('routes:findOrCreate', (_, payload: { name: string; areaId: number }) =>
+    routeCtrl.findOrCreate(payload)
+  )
+
+  // --- REASONS HANDLERS ---
+  ipcMain.handle('reasons:listByArea', (_, areaId: number) => reasonCtrl.listByArea(areaId))
+  ipcMain.handle('reasons:getById', (_, id: number) => reasonCtrl.getById(id))
+  ipcMain.handle('reasons:create', (_, payload: { name: string; areaId: number }) =>
+    reasonCtrl.create(payload)
+  )
+  ipcMain.handle('reasons:update', (_, id: number, payload: { name: string }) =>
+    reasonCtrl.update(id, payload)
+  )
+  ipcMain.handle('reasons:delete', (_, id: number) => reasonCtrl.delete(id))
+  ipcMain.handle('reasons:findOrCreate', (_, payload: { name: string; areaId: number }) =>
+    reasonCtrl.findOrCreate(payload)
+  )
+
+  // --- TRIPS HANDLERS ---
+  ipcMain.handle('trips:listByWorkZoneSheet', (_, workZoneSheetId: number) =>
+    tripCtrl.listByWorkZoneSheet(workZoneSheetId)
+  )
+  ipcMain.handle(
+    'trips:listByWorkZoneSheetAndStatus',
+    (_, workZoneSheetId: number, status: TripStatus) =>
+      tripCtrl.listByWorkZoneSheetAndStatus(workZoneSheetId, status)
+  )
+  ipcMain.handle('trips:listByArea', (_, areaId: number) => tripCtrl.listByArea(areaId))
+  ipcMain.handle('trips:listByDateRange', (_, payload: { from: string; to: string }) =>
+    tripCtrl.listByDateRange(payload)
+  )
+  ipcMain.handle('trips:getById', (_, id: number) => tripCtrl.getById(id))
+  ipcMain.handle(
+    'trips:create',
+    (_, payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>) =>
+      tripCtrl.create(payload)
+  )
+  ipcMain.handle('trips:update', (_, payload: Trip) => tripCtrl.update(payload))
+  ipcMain.handle('trips:confirm', (_, id: number) => tripCtrl.confirm(id))
+  ipcMain.handle('trips:reopen', (_, id: number) => tripCtrl.reopen(id))
+  ipcMain.handle('trips:delete', (_, id: number) => tripCtrl.delete(id))
 }

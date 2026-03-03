@@ -11,6 +11,7 @@ import { PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
+import { TripTable } from './TripTable';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -56,10 +57,13 @@ export const WorkZoneSheetsPage = () => {
       .catch(() => setFarmWorkZone(null));
   }, [parsedFarmWorkZoneId]);
 
-  // Auto-select first tab when sheets load
-  // Derived: use activeSheetId if valid, otherwise fall back to first sheet
-  const activeSheet =
-    workZoneSheets.find((s) => s.id === activeSheetId) ?? workZoneSheets[0] ?? null;
+  // Derive the effective active id: keep selection if still valid, else default to first sheet
+  const effectiveActiveSheetId =
+    activeSheetId !== null && workZoneSheets.some((s) => s.id === activeSheetId)
+      ? activeSheetId
+      : (workZoneSheets[0]?.id ?? null);
+
+  const activeSheet = workZoneSheets.find((s) => s.id === effectiveActiveSheetId) ?? null;
 
   const resolveName = (data: WorkZoneSheetFormData) => {
     const trimmed = data.name?.trim();
@@ -93,11 +97,7 @@ export const WorkZoneSheetsPage = () => {
 
   const handleDelete = async () => {
     if (!deleteModal.data) return;
-    const deletedId = deleteModal.data.id;
-    await deleteWorkZoneSheet(deletedId);
-    if (activeSheetId === deletedId) {
-      setActiveSheetId(null);
-    }
+    await deleteWorkZoneSheet(deleteModal.data.id);
     deleteModal.close();
   };
 
@@ -107,7 +107,7 @@ export const WorkZoneSheetsPage = () => {
       <div className="px-6 py-6 border-b border-gray-200 bg-white">
         <Breadcrumbs
           items={[
-            { label: 'Zonas de Trabajo', path: '/work-zones' },
+            { label: 'Reportes', path: '/work-zones' },
             {
               label: workZone?.name ?? workZoneId ?? '',
               path: `/work-zones/${parsedWorkZoneId}/farms`
@@ -144,7 +144,7 @@ export const WorkZoneSheetsPage = () => {
           <div className="px-6 pt-4">
             <SheetTabs
               sheets={workZoneSheets}
-              activeSheetId={activeSheetId}
+              activeSheetId={effectiveActiveSheetId}
               onSelect={setActiveSheetId}
               onEdit={(sheet) => updateModal.open(sheet)}
               onDelete={(sheet) => deleteModal.open(sheet)}
@@ -171,9 +171,11 @@ export const WorkZoneSheetsPage = () => {
               </ActionButton>
             </div>
           ) : activeSheet ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 min-h-48 flex items-center justify-center">
-              <p className="text-2xl font-semibold text-gray-400">{activeSheet.name}</p>
-            </div>
+            <TripTable
+              workZoneSheetId={activeSheet.id}
+              sheetName={activeSheet.name}
+              areaId={activeSheet.areaId}
+            />
           ) : null}
         </div>
       </div>
