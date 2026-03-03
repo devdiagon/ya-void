@@ -58,8 +58,10 @@ export class RouteRepository {
   }
 
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM route WHERE id = ?')
-    stmt.run(id)
+    // Unlink any trips referencing this route before deleting
+    // (ready trips already have route_snapshot; pending trips lose the reference)
+    this.db.prepare('UPDATE trip SET route_id = NULL WHERE route_id = ?').run(id)
+    this.db.prepare('DELETE FROM route WHERE id = ?').run(id)
   }
 
   /**

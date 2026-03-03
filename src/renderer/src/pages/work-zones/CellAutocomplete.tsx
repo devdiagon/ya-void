@@ -1,9 +1,16 @@
+import { Check, Pencil, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface AutocompleteOption {
   id: number;
   name: string;
+}
+
+interface ContextMenu {
+  opt: AutocompleteOption;
+  top: number;
+  left: number;
 }
 
 interface CellAutocompleteProps {
@@ -13,6 +20,10 @@ interface CellAutocompleteProps {
   onChange: (id: number, name: string) => void;
   /** When provided, shows a "Crear: …" option for unmatched text */
   onFindOrCreate?: (name: string) => Promise<AutocompleteOption | null>;
+  /** When provided, shows "Editar" on right-click of an option */
+  onEditOption?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  /** When provided, shows "Eliminar" on right-click of an option */
+  onDeleteOption?: (opt: AutocompleteOption) => Promise<void>;
   disabled?: boolean;
 }
 
@@ -22,12 +33,17 @@ export function CellAutocomplete({
   placeholder,
   onChange,
   onFindOrCreate,
+  onEditOption,
+  onDeleteOption,
   disabled
 }: CellAutocompleteProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingName, setEditingName] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -79,7 +95,7 @@ export function CellAutocomplete({
     setOpen(false);
   };
 
-  // Close on outside click
+  // Close dropdown on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -91,6 +107,30 @@ export function CellAutocomplete({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handler = () => setContextMenu(null);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [contextMenu]);
+
+  const handleOptionContextMenu = (opt: AutocompleteOption, e: React.MouseEvent) => {
+    if (!onEditOption && !onDeleteOption) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ opt, top: e.clientY + 4, left: e.clientX });
+  };
+
+  const handleEditConfirm = async () => {
+    if (!onEditOption || editingId === null || !editingName.trim()) return;
+    const opt = options.find((o) => o.id === editingId);
+    if (opt) await onEditOption(opt, editingName.trim());
+    setEditingId(null);
+    setEditingName('');
+    setContextMenu(null);
+  };
 
   return (
     <div ref={containerRef} className="w-full">
@@ -124,23 +164,71 @@ export function CellAutocomplete({
           <div
             style={dropdownStyle}
             className="bg-white border border-gray-200 shadow-lg rounded overflow-hidden max-h-52 overflow-y-auto"
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {filtered.length === 0 && !showCreate && (
               <div className="px-3 py-2 text-xs text-gray-400">Sin resultados</div>
             )}
-            {filtered.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 truncate"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSelect(opt);
-                }}
-              >
-                {opt.name}
-              </button>
-            ))}
+            {filtered.map((opt) =>
+              editingId === opt.id ? (
+                /* Inline rename input */
+                <div
+                  key={opt.id}
+                  className="flex items-center gap-1 px-2 py-1"
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  <input
+                    autoFocus
+                    type="text"
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleEditConfirm();
+                      if (e.key === 'Escape') {
+                        setEditingId(null);
+                        setEditingName('');
+                      }
+                    }}
+                    className="flex-1 text-sm border border-blue-400 rounded px-1.5 py-0.5 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleEditConfirm();
+                    }}
+                    className="p-0.5 text-green-600 hover:bg-green-50 rounded"
+                  >
+                    <Check size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setEditingId(null);
+                      setEditingName('');
+                    }}
+                    className="p-0.5 text-gray-400 hover:bg-gray-50 rounded"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 truncate"
+                  onMouseDown={(e) => {
+                    if (e.button !== 0) return; // ignore right-click
+                    e.preventDefault();
+                    handleSelect(opt);
+                  }}
+                  onContextMenu={(e) => handleOptionContextMenu(opt, e)}
+                >
+                  {opt.name}
+                </button>
+              )
+            )}
             {showCreate && (
               <button
                 type="button"
@@ -152,6 +240,45 @@ export function CellAutocomplete({
                 }}
               >
                 {busy ? 'Creando...' : `Crear: "${query.trim()}"`}
+              </button>
+            )}
+          </div>,
+          document.body
+        )}
+
+      {/* Right-click context menu portal */}
+      {contextMenu &&
+        createPortal(
+          <div
+            style={{ top: contextMenu.top, left: contextMenu.left }}
+            className="fixed z-[10000] bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[130px]"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {onEditOption && (
+              <button
+                type="button"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  setEditingId(contextMenu.opt.id);
+                  setEditingName(contextMenu.opt.name);
+                  setContextMenu(null);
+                }}
+              >
+                <Pencil size={13} />
+                Editar
+              </button>
+            )}
+            {onDeleteOption && (
+              <button
+                type="button"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                onClick={async () => {
+                  await onDeleteOption(contextMenu.opt);
+                  setContextMenu(null);
+                }}
+              >
+                <Trash2 size={13} />
+                Eliminar
               </button>
             )}
           </div>,

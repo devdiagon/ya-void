@@ -58,8 +58,10 @@ export class ReasonRepository {
   }
 
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM reason WHERE id = ?')
-    stmt.run(id)
+    // Unlink any trips referencing this reason before deleting
+    // (ready trips already have reason_snapshot; pending trips lose the reference)
+    this.db.prepare('UPDATE trip SET reason_id = NULL WHERE reason_id = ?').run(id)
+    this.db.prepare('DELETE FROM reason WHERE id = ?').run(id)
   }
 
   /**

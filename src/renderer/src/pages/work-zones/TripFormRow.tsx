@@ -52,6 +52,10 @@ interface TripFormRowProps {
   onFindOrCreateRoute: (name: string) => Promise<AutocompleteOption | null>;
   onFindOrCreateReason: (name: string) => Promise<AutocompleteOption | null>;
   onFindOrCreateRequester: (name: string) => Promise<AutocompleteOption | null>;
+  onEditRoute?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteRoute?: (opt: AutocompleteOption) => Promise<void>;
+  onEditReason?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteReason?: (opt: AutocompleteOption) => Promise<void>;
 }
 
 const cell = 'border border-gray-200 px-2 py-1 align-top';
@@ -66,7 +70,11 @@ export function TripFormRow({
   requesters,
   onFindOrCreateRoute,
   onFindOrCreateReason,
-  onFindOrCreateRequester
+  onFindOrCreateRequester,
+  onEditRoute,
+  onDeleteRoute,
+  onEditReason,
+  onDeleteReason
 }: TripFormRowProps) {
   const set = <K extends keyof TripFormData>(key: K, val: TripFormData[K]) =>
     setForm({ ...form, [key]: val });
@@ -178,6 +186,8 @@ export function TripFormRow({
           placeholder="Buscar ruta..."
           onChange={(id) => set('routeId', id)}
           onFindOrCreate={onFindOrCreateRoute}
+          onEditOption={onEditRoute}
+          onDeleteOption={onDeleteRoute}
         />
       </td>
 
@@ -189,6 +199,8 @@ export function TripFormRow({
           placeholder="Buscar motivo..."
           onChange={(id) => set('reasonId', id)}
           onFindOrCreate={onFindOrCreateReason}
+          onEditOption={onEditReason}
+          onDeleteOption={onDeleteReason}
         />
       </td>
 

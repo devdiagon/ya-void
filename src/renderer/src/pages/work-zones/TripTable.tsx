@@ -39,8 +39,13 @@ const hdr =
 export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
     useTrips(workZoneSheetId);
-  const { routes, findOrCreate: findOrCreateRoute } = useRoutes(areaId);
-  const { reasons, findOrCreate: findOrCreateReason } = useReasons(areaId);
+  const { routes, findOrCreate: findOrCreateRoute, updateRoute, deleteRoute } = useRoutes(areaId);
+  const {
+    reasons,
+    findOrCreate: findOrCreateReason,
+    updateReason,
+    deleteReason
+  } = useReasons(areaId);
   const { requesters, findOrCreateForArea } = useRequesters(areaId);
 
   const [newForm, setNewForm] = useState<TripFormData>(emptyTripForm());
@@ -94,7 +99,19 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     requesters,
     onFindOrCreateRoute: findOrCreateRoute,
     onFindOrCreateReason: findOrCreateReason,
-    onFindOrCreateRequester: (name: string) => findOrCreateForArea(name)
+    onFindOrCreateRequester: (name: string) => findOrCreateForArea(name),
+    onEditRoute: async (opt: { id: number; name: string }, newName: string) => {
+      await updateRoute(opt.id, newName);
+    },
+    onDeleteRoute: async (opt: { id: number }) => {
+      await deleteRoute(opt.id);
+    },
+    onEditReason: async (opt: { id: number; name: string }, newName: string) => {
+      await updateReason(opt.id, newName);
+    },
+    onDeleteReason: async (opt: { id: number }) => {
+      await deleteReason(opt.id);
+    }
   };
 
   if (loading) {
