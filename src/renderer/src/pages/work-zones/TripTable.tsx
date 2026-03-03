@@ -37,7 +37,8 @@ const hdr =
   'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-600 whitespace-nowrap';
 
 export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
-  const { trips, loading, createTrip, updateTrip, deleteTrip } = useTrips(workZoneSheetId);
+  const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
+    useTrips(workZoneSheetId);
   const { routes, findOrCreate: findOrCreateRoute } = useRoutes(areaId);
   const { reasons, findOrCreate: findOrCreateReason } = useReasons(areaId);
   const { requesters, findOrCreateForArea } = useRequesters(areaId);
@@ -51,7 +52,8 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
   const totalCost = trips.reduce((sum, t) => sum + (t.cost ?? 0), 0);
 
   const handleCreate = async () => {
-    await createTrip(toDTO(newForm, workZoneSheetId, areaId));
+    const created = await createTrip(toDTO(newForm, workZoneSheetId, areaId));
+    if (created) await confirmTrip(created.id);
     setNewForm(emptyTripForm());
   };
 
@@ -72,7 +74,10 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
 
   const handleEditSave = async () => {
     if (!editId) return;
+    // Reopen first so confirmed trips can be edited, then re-confirm
+    await reopenTrip(editId);
     await updateTrip(editId, toDTO(editForm, workZoneSheetId, areaId));
+    await confirmTrip(editId);
     setEditId(null);
   };
 

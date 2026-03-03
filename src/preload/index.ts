@@ -135,23 +135,22 @@ contextBridge.exposeInMainWorld('api', {
       routeId: number | null
       reasonId: number | null
     }) => ipcRenderer.invoke('trips:create', payload),
-    update: (payload: {
-      id: number
-      vehicleType: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus' | null
-      status: 'pending' | 'ready'
-      tripDate: string | null
-      departureTime: string | null
-      arrivalTime: string | null
-      passengerCount: number | null
-      cost: number | null
-      requesterId: number | null
-      areaId: number | null
-      workZoneSheetId: number | null
-      routeId: number | null
-      reasonId: number | null
-      routeSnapshot: string | null
-      reasonSnapshot: string | null
-    }) => ipcRenderer.invoke('trips:update', payload),
+    update: (
+      id: number,
+      payload: {
+        vehicleType?: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus'
+        tripDate?: string
+        departureTime?: string
+        arrivalTime?: string
+        passengerCount?: number
+        cost?: number
+        requesterId?: number
+        areaId?: number
+        workZoneSheetId?: number
+        routeId?: number
+        reasonId?: number
+      }
+    ) => ipcRenderer.invoke('trips:update', { id, ...payload }),
     confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),
     reopen: (id: number) => ipcRenderer.invoke('trips:reopen', id),
     delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
