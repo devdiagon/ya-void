@@ -24,6 +24,16 @@ export class TripRepository {
   }
 
   /**
+   * Obtiene todos los viajes sin filtro, ordenados por fecha y hora de salida.
+   */
+  findAll(): Trip[] {
+    const stmt = this.db.prepare<TripRow>(
+      `${SELECT_TRIP} ORDER BY trip_date DESC, departure_time`
+    )
+    return stmt.all().map(mapRowToTrip)
+  }
+
+  /**
    * Obtiene todos los viajes de un área, aprovechando idx_trip_area_id.
    */
   findByAreaId(areaId: number): Trip[] {

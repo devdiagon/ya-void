@@ -9,6 +9,10 @@ export class TripController {
     this.useTrip = new UseTrip(this.tripRepository)
   }
 
+  async listAll(): Promise<Trip[]> {
+    return this.useTrip.getAll()
+  }
+
   async listByWorkZoneSheet(workZoneSheetId: number): Promise<Trip[]> {
     return this.useTrip.getByWorkZoneSheet(workZoneSheetId)
   }

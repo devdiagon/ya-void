@@ -31,6 +31,13 @@ export class UseTrip {
   }
 
   /**
+   * Obtiene todos los viajes sin filtro.
+   */
+  getAll(): Trip[] {
+    return this.tripRepository.findAll()
+  }
+
+  /**
    * Obtiene todos los viajes de un área.
    */
   getByArea(areaId: number): Trip[] {

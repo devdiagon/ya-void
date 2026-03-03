@@ -1,4 +1,5 @@
 import { AreasAdminPage, FarmAdminPage } from '@renderer/pages/administrate';
+import { SearchTripPage } from '@renderer/pages/search';
 import { FarmWorkZonesPage, WorkZoneSheetsPage, WorkZonesPage } from '@renderer/pages/work-zones';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ export const AppRoutes = (): React.JSX.Element => {
         path="/work-zones/:workZoneId/farms/:farmWorkZoneId"
         element={<WorkZoneSheetsPage />}
       />
+      <Route path="/search-trip" element={<SearchTripPage />} />
       <Route path="*" element={<Navigate to="/work-zones" replace />} />
     </Routes>
   );

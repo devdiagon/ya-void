@@ -164,6 +164,7 @@ export function registerIpcHandlers(): void {
   )
 
   // --- TRIPS HANDLERS ---
+  ipcMain.handle('trips:listAll', () => tripCtrl.listAll())
   ipcMain.handle('trips:listByWorkZoneSheet', (_, workZoneSheetId: number) =>
     tripCtrl.listByWorkZoneSheet(workZoneSheetId)
   )

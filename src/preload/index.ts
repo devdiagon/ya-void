@@ -112,6 +112,7 @@ contextBridge.exposeInMainWorld('api', {
 
   // --- TRIPS ---
   trips: {
+    listAll: () => ipcRenderer.invoke('trips:listAll'),
     listByWorkZoneSheet: (workZoneSheetId: number) =>
       ipcRenderer.invoke('trips:listByWorkZoneSheet', workZoneSheetId),
     listByWorkZoneSheetAndStatus: (
