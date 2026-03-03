@@ -29,6 +29,7 @@ export function CellAutocomplete({
   const [busy, setBusy] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const selectedName = value != null ? (options.find((o) => o.id === value)?.name ?? '') : '';
 
@@ -38,6 +39,16 @@ export function CellAutocomplete({
 
   const hasExactMatch = options.some((o) => o.name.toLowerCase() === query.toLowerCase().trim());
   const showCreate = !!onFindOrCreate && query.trim().length > 0 && !hasExactMatch;
+
+  const displayValue = open ? query : selectedName;
+
+  // Auto-resize textarea height to fit content
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [displayValue]);
 
   const openDropdown = () => {
     if (!containerRef.current) return;
@@ -81,16 +92,15 @@ export function CellAutocomplete({
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const displayValue = open ? query : selectedName;
-
   return (
     <div ref={containerRef} className="w-full">
-      <input
-        type="text"
+      <textarea
+        ref={textareaRef}
+        rows={1}
         disabled={disabled}
         placeholder={placeholder}
         value={displayValue}
-        className="w-full bg-transparent border-0 outline-none text-sm py-0 placeholder:text-gray-400 disabled:opacity-40"
+        className="w-full bg-transparent border-0 outline-none text-sm py-0 placeholder:text-gray-400 disabled:opacity-40 resize-none overflow-hidden leading-snug"
         onFocus={() => {
           setQuery('');
           openDropdown();
@@ -104,6 +114,8 @@ export function CellAutocomplete({
             setOpen(false);
             setQuery('');
           }
+          // Prevent newline on Enter
+          if (e.key === 'Enter') e.preventDefault();
         }}
       />
 
