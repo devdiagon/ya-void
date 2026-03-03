@@ -109,6 +109,23 @@ export function useRequesters(areaId: number) {
     }
   };
 
+  /**
+   * Busca un solicitante por nombre, o lo crea globalmente y lo asigna al área.
+   * Actualiza el estado local si fue creado o aún no estaba en la lista.
+   */
+  const findOrCreateForArea = async (name: string) => {
+    try {
+      const requester = await window.api.requesters.findOrCreateForArea({ name, areaId });
+      setRequesters((prev) =>
+        prev.some((r) => r.id === requester.id) ? prev : [...prev, requester]
+      );
+      return requester;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     fetchRequesters();
   }, [fetchRequesters]);
@@ -122,6 +139,7 @@ export function useRequesters(areaId: number) {
     updateRequester,
     deleteRequester,
     removeRequesterFromArea,
+    findOrCreateForArea,
     clearError
   };
 }

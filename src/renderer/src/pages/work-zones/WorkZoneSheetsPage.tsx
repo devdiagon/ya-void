@@ -11,6 +11,7 @@ import { PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
+import { TripTable } from './TripTable';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -170,9 +171,11 @@ export const WorkZoneSheetsPage = () => {
               </ActionButton>
             </div>
           ) : activeSheet ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 min-h-48 flex items-center justify-center">
-              <p className="text-2xl font-semibold text-gray-400">{activeSheet.name}</p>
-            </div>
+            <TripTable
+              workZoneSheetId={activeSheet.id}
+              sheetName={activeSheet.name}
+              areaId={activeSheet.areaId}
+            />
           ) : null}
         </div>
       </div>
