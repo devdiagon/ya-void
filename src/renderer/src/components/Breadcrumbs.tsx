@@ -1,3 +1,4 @@
+import { ChevronRightIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface BreadcrumbItem {
@@ -13,17 +14,17 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   if (items.length === 0) return null;
 
   return (
-    <nav className="flex items-center">
-      <ol className="flex items-center space-x-2">
+    <nav aria-label="breadcrumb" className="flex items-center">
+      <ol className="flex items-center gap-1">
         {items.map((crumb, index) => (
-          <li key={crumb.path} className="flex items-center">
-            {index > 0 && <span className="mx-2 text-gray-400">/</span>}
+          <li key={`${crumb.path}-${index}`} className="flex items-center gap-1">
+            {index > 0 && <ChevronRightIcon size={16} className="text-gray-400 shrink-0" />}
             {index === items.length - 1 ? (
-              <span className="text-sm font-semibold text-blue-700">{crumb.label}</span>
+              <span className="text-base font-semibold text-blue-700">{crumb.label}</span>
             ) : (
               <Link
                 to={crumb.path}
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-base font-medium text-gray-500 hover:text-gray-900 transition-colors"
               >
                 {crumb.label}
               </Link>

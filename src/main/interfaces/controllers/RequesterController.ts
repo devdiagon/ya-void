@@ -45,4 +45,8 @@ export class RequesterController {
   async removeFromArea(payload: { requesterId: number; areaId: number }): Promise<void> {
     return this.useRequester.removeFromArea(payload.requesterId, payload.areaId)
   }
+
+  async findOrCreateForArea(payload: { name: string; areaId: number }): Promise<Requester> {
+    return this.useRequester.findOrCreateForArea(payload.name, payload.areaId)
+  }
 }

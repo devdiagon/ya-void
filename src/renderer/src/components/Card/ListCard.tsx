@@ -1,7 +1,7 @@
-import { Card, CardActionArea, CardContent, IconButton, Skeleton } from '@mui/material';
+import { Card, CardContent, IconButton, Skeleton } from '@mui/material';
 import { hexToGlow, hexToRgba } from '@renderer/utils';
 import { ChevronRightIcon, LucideProps, PencilIcon, Trash2Icon } from 'lucide-react';
-import { cloneElement, ReactElement } from 'react';
+import { cloneElement, KeyboardEvent, ReactElement } from 'react';
 import { OutlineButton } from '../Button';
 
 interface ListCardProps {
@@ -25,6 +25,19 @@ export const ListCard = ({
   onEdit,
   onDelete
 }: ListCardProps) => {
+  const isClickable = Boolean(onNavigate) && !loading;
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onNavigate || loading) {
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onNavigate();
+    }
+  };
+
   const coloredIcon = cloneElement(icon, {
     color: iconBgColor ?? 'currentColor'
   });
@@ -42,7 +55,13 @@ export const ListCard = ({
           : undefined
       }}
     >
-      <CardActionArea disabled={loading} onClick={onNavigate} className="rounded-2xl" disableRipple>
+      <div
+        onClick={isClickable ? onNavigate : undefined}
+        onKeyDown={handleCardKeyDown}
+        role={isClickable ? 'button' : undefined}
+        tabIndex={isClickable ? 0 : undefined}
+        className="rounded-2xl"
+      >
         <CardContent className="flex items-center gap-4 p-4">
           {/*Icon Section*/}
           {loading ? (
@@ -120,7 +139,7 @@ export const ListCard = ({
             )}
           </div>
         </CardContent>
-      </CardActionArea>
+      </div>
     </Card>
   );
 };

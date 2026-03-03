@@ -84,4 +84,12 @@ export class UseRequester {
       throw new Error(`Could not delete requester: ID ${id} not found`)
     }
   }
+
+  /**
+   * Devuelve el solicitante con ese nombre, o lo crea globalmente.
+   * También lo asigna al área de forma idempotente.
+   */
+  findOrCreateForArea(name: string, areaId: number): Requester {
+    return this.requesterRepository.findOrCreateForArea(name, areaId)
+  }
 }

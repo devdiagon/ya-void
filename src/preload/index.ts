@@ -35,7 +35,9 @@ contextBridge.exposeInMainWorld('api', {
     assignToArea: (payload: { requesterId: number; areaId: number }) =>
       ipcRenderer.invoke('requesters:assignToArea', payload),
     removeFromArea: (payload: { requesterId: number; areaId: number }) =>
-      ipcRenderer.invoke('requesters:removeFromArea', payload)
+      ipcRenderer.invoke('requesters:removeFromArea', payload),
+    findOrCreateForArea: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('requesters:findOrCreateForArea', payload)
   },
 
   // --- WORK ZONES ---
@@ -80,5 +82,89 @@ contextBridge.exposeInMainWorld('api', {
       totalSheet: number
     }) => ipcRenderer.invoke('workZoneSheets:update', payload),
     delete: (id: number) => ipcRenderer.invoke('workZoneSheets:delete', id)
+  },
+
+  // --- ROUTES ---
+  routes: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('routes:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('routes:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('routes:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('routes:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('routes:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('routes:findOrCreate', payload)
+  },
+
+  // --- REASONS ---
+  reasons: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('reasons:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('reasons:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('reasons:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('reasons:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('reasons:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('reasons:findOrCreate', payload)
+  },
+
+  // --- TRIPS ---
+  trips: {
+    listAll: (payload: {
+      page: number
+      pageSize: number
+      query?: string
+      fromDate?: string
+      toDate?: string
+      status?: 'pending' | 'ready'
+      vehicleType?: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus'
+      requesterId?: number
+      areaId?: number
+      farmId?: number
+    }) => ipcRenderer.invoke('trips:listAll', payload),
+    listByWorkZoneSheet: (workZoneSheetId: number) =>
+      ipcRenderer.invoke('trips:listByWorkZoneSheet', workZoneSheetId),
+    listByWorkZoneSheetAndStatus: (
+      workZoneSheetId: number,
+      status: 'pending' | 'ready'
+    ) => ipcRenderer.invoke('trips:listByWorkZoneSheetAndStatus', workZoneSheetId, status),
+    listByArea: (areaId: number) => ipcRenderer.invoke('trips:listByArea', areaId),
+    listByDateRange: (payload: { from: string; to: string }) =>
+      ipcRenderer.invoke('trips:listByDateRange', payload),
+    getById: (id: number) => ipcRenderer.invoke('trips:getById', id),
+    create: (payload: {
+      vehicleType: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus' | null
+      tripDate: string | null
+      departureTime: string | null
+      arrivalTime: string | null
+      passengerCount: number | null
+      cost: number | null
+      requesterId: number | null
+      areaId: number | null
+      workZoneSheetId: number | null
+      routeId: number | null
+      reasonId: number | null
+    }) => ipcRenderer.invoke('trips:create', payload),
+    update: (
+      id: number,
+      payload: {
+        vehicleType?: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus'
+        tripDate?: string
+        departureTime?: string
+        arrivalTime?: string
+        passengerCount?: number
+        cost?: number
+        requesterId?: number
+        areaId?: number
+        workZoneSheetId?: number
+        routeId?: number
+        reasonId?: number
+      }
+    ) => ipcRenderer.invoke('trips:update', { id, ...payload }),
+    confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),
+    reopen: (id: number) => ipcRenderer.invoke('trips:reopen', id),
+    delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
   }
 })
