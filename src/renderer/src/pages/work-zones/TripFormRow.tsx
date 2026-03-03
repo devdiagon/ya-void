@@ -102,20 +102,34 @@ export function TripFormRow({
       {/* Salida */}
       <td className={`${cell} min-w-[100px]`}>
         <input
-          type="time"
+          type="text"
           className={inputCls}
           value={form.departureTime}
-          onChange={(e) => set('departureTime', e.target.value)}
+          placeholder="HH:MM"
+          maxLength={5}
+          pattern="[0-9]{2}:[0-9]{2}"
+          onChange={(e) => {
+            let v = e.target.value.replace(/[^0-9:]/g, '');
+            if (v.length === 2 && !v.includes(':') && form.departureTime.length < 2) v += ':';
+            set('departureTime', v);
+          }}
         />
       </td>
 
       {/* Llegada */}
       <td className={`${cell} min-w-[100px]`}>
         <input
-          type="time"
+          type="text"
           className={inputCls}
           value={form.arrivalTime}
-          onChange={(e) => set('arrivalTime', e.target.value)}
+          placeholder="HH:MM"
+          maxLength={5}
+          pattern="[0-9]{2}:[0-9]{2}"
+          onChange={(e) => {
+            let v = e.target.value.replace(/[^0-9:]/g, '');
+            if (v.length === 2 && !v.includes(':') && form.arrivalTime.length < 2) v += ':';
+            set('arrivalTime', v);
+          }}
         />
       </td>
 
