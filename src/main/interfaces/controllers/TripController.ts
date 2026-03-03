@@ -1,12 +1,16 @@
 import { Trip, TripStatus } from '../../core/entities/Trip'
 import { UseTrip } from '../../core/use-cases/UseTrip'
-import { TripRepository } from '../../data/repositories/TripRepository'
+import { TripPage, TripRepository, TripSearchParams } from '../../data/repositories/TripRepository'
 
 export class TripController {
   private useTrip: UseTrip
 
   constructor(private tripRepository: TripRepository) {
     this.useTrip = new UseTrip(this.tripRepository)
+  }
+
+  async listAll(payload: TripSearchParams): Promise<TripPage> {
+    return this.useTrip.getPaginated(payload)
   }
 
   async listByWorkZoneSheet(workZoneSheetId: number): Promise<Trip[]> {

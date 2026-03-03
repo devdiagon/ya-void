@@ -1,4 +1,4 @@
-import { Trip, TripStatus } from '../../core/entities/Trip'
+import { Trip, TripStatus, TripVehicleType } from '../../core/entities/Trip'
 import { getDb } from '../db/database'
 import { mapRowToTrip, TripRow } from '../mappers/TripMapper'
 
@@ -8,6 +8,24 @@ const SELECT_TRIP = `
          route_id, reason_id, route_snapshot, reason_snapshot
   FROM trip
 `
+
+export interface TripSearchParams {
+  page: number
+  pageSize: number
+  query?: string
+  fromDate?: string
+  toDate?: string
+  status?: TripStatus
+  vehicleType?: TripVehicleType
+  requesterId?: number
+  areaId?: number
+  farmId?: number
+}
+
+export interface TripPage {
+  trips: Trip[]
+  total: number
+}
 
 export class TripRepository {
   private db = getDb()
@@ -21,6 +39,65 @@ export class TripRepository {
       `${SELECT_TRIP} WHERE work_zone_sheet_id = ? ORDER BY trip_date, departure_time`
     )
     return stmt.all(workZoneSheetId).map(mapRowToTrip)
+  }
+
+  /**
+   * Obtiene viajes paginados con filtros opcionales.
+   * Construye el WHERE dinámicamente según los parámetros recibidos.
+   */
+  findPaginated(params: TripSearchParams): TripPage {
+    const conditions: string[] = []
+    const args: unknown[] = []
+
+    if (params.query) {
+      conditions.push('(route_snapshot LIKE ? OR reason_snapshot LIKE ? OR vehicle_type LIKE ?)')
+      const like = `%${params.query}%`
+      args.push(like, like, like)
+    }
+    if (params.fromDate) {
+      conditions.push('trip_date >= ?')
+      args.push(params.fromDate)
+    }
+    if (params.toDate) {
+      conditions.push('trip_date <= ?')
+      args.push(params.toDate)
+    }
+    if (params.status) {
+      conditions.push('status = ?')
+      args.push(params.status)
+    }
+    if (params.vehicleType) {
+      conditions.push('vehicle_type = ?')
+      args.push(params.vehicleType)
+    }
+    if (params.requesterId != null) {
+      conditions.push('requester_id = ?')
+      args.push(params.requesterId)
+    }
+    if (params.areaId != null) {
+      conditions.push('area_id = ?')
+      args.push(params.areaId)
+    }
+    if (params.farmId != null) {
+      conditions.push('area_id IN (SELECT id FROM area WHERE farm_id = ?)')
+      args.push(params.farmId)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    const offset = (params.page - 1) * params.pageSize
+
+    const trips = this.db
+      .prepare<TripRow>(
+        `${SELECT_TRIP} ${where} ORDER BY trip_date DESC, departure_time LIMIT ? OFFSET ?`
+      )
+      .all(...[...args, params.pageSize, offset])
+      .map(mapRowToTrip)
+
+    const { total } = this.db
+      .prepare<{ total: number }>(`SELECT COUNT(*) AS total FROM trip ${where}`)
+      .get(...args) as { total: number }
+
+    return { trips, total }
   }
 
   /**

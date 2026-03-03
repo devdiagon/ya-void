@@ -1,4 +1,4 @@
-import { TripRepository } from '../../data/repositories/TripRepository';
+import { TripPage, TripRepository, TripSearchParams } from '../../data/repositories/TripRepository';
 import { Trip, TripStatus } from '../entities/Trip';
 
 const REQUIRED_FIELDS: { key: keyof Trip; label: string }[] = [
@@ -28,6 +28,13 @@ export class UseTrip {
    */
   getByWorkZoneSheetAndStatus(workZoneSheetId: number, status: TripStatus): Trip[] {
     return this.tripRepository.findByWorkZoneSheetIdAndStatus(workZoneSheetId, status)
+  }
+
+  /**
+   * Obtiene viajes paginados con filtros opcionales.
+   */
+  getPaginated(params: TripSearchParams): TripPage {
+    return this.tripRepository.findPaginated(params)
   }
 
   /**

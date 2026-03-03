@@ -24,7 +24,7 @@ import { WorkZoneSheetController } from '../../interfaces/controllers/WorkZoneSh
 
 // --- Entities (para tipado en handlers si es necesario) ---
 import { FarmWorkZone } from '../../core/entities/FarmWorkZone'
-import { Trip, TripStatus } from '../../core/entities/Trip'
+import { Trip, TripStatus, TripVehicleType } from '../../core/entities/Trip'
 import { WorkZoneSheet } from '../../core/entities/WorkZoneSheet'
 
 export function registerIpcHandlers(): void {
@@ -164,6 +164,24 @@ export function registerIpcHandlers(): void {
   )
 
   // --- TRIPS HANDLERS ---
+  ipcMain.handle(
+    'trips:listAll',
+    (
+      _,
+      payload: {
+        page: number
+        pageSize: number
+        query?: string
+        fromDate?: string
+        toDate?: string
+        status?: TripStatus
+        vehicleType?: TripVehicleType
+        requesterId?: number
+        areaId?: number
+        farmId?: number
+      }
+    ) => tripCtrl.listAll(payload)
+  )
   ipcMain.handle('trips:listByWorkZoneSheet', (_, workZoneSheetId: number) =>
     tripCtrl.listByWorkZoneSheet(workZoneSheetId)
   )

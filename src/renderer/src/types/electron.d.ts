@@ -72,6 +72,18 @@ export interface ElectronAPI {
     findOrCreate: (payload: { name: string; areaId: number }) => Promise<Reason>;
   };
   trips: {
+    listAll: (payload: {
+      page: number;
+      pageSize: number;
+      query?: string;
+      fromDate?: string;
+      toDate?: string;
+      status?: TripStatus;
+      vehicleType?: TripVehicleType;
+      requesterId?: number;
+      areaId?: number;
+      farmId?: number;
+    }) => Promise<{ trips: Trip[]; total: number }>;
     listByWorkZoneSheet: (workZoneSheetId: number) => Promise<Trip[]>;
     listByWorkZoneSheetAndStatus: (workZoneSheetId: number, status: TripStatus) => Promise<Trip[]>;
     listByArea: (areaId: number) => Promise<Trip[]>;

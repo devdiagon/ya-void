@@ -112,6 +112,18 @@ contextBridge.exposeInMainWorld('api', {
 
   // --- TRIPS ---
   trips: {
+    listAll: (payload: {
+      page: number
+      pageSize: number
+      query?: string
+      fromDate?: string
+      toDate?: string
+      status?: 'pending' | 'ready'
+      vehicleType?: 'Camioneta' | 'Furgoneta' | 'Microbus' | 'Bus'
+      requesterId?: number
+      areaId?: number
+      farmId?: number
+    }) => ipcRenderer.invoke('trips:listAll', payload),
     listByWorkZoneSheet: (workZoneSheetId: number) =>
       ipcRenderer.invoke('trips:listByWorkZoneSheet', workZoneSheetId),
     listByWorkZoneSheetAndStatus: (
