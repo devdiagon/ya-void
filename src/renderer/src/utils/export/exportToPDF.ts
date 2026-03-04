@@ -65,27 +65,26 @@ export const exportTripsToPDF = (data: ExportTripWorkSheet) => {
   doc.setFont(HFONT, 'normal');
   doc.text('Lugarxy', marginX + labelMaxWidth + 4, valueY);
 
-  // ── Tabla ────────────────────────────────────────────────
+  // ============== Tabla ============== \\
   autoTable(doc, {
     startY: 44,
     head: [
       [
-        'ID',
-        'Fecha',
-        'Salida',
-        'Llegada',
-        'Espera',
-        'Pasajeros',
-        'Motivo',
-        'Solicitante',
-        'Área',
-        'Ruta',
-        'Vehículo',
-        'Costo'
+        'Fecha de\nEjecución del\nTransporte',
+        'Hora de ingreso a\nfinca\n(transportista)',
+        'Hora de salida de\nla Finca\n(transportista)',
+        'Tiempo de\nespera',
+        '# Personas',
+        'Motivo de contratación de la\nruta extra',
+        'Persona que\nsolicita la ruta\nextra',
+        'Área de trabajo del\nsolicitante',
+        'Ruta extra ejecutada (desde-hasta)\nespecificar si la ruta es de ida y vuelta',
+        'Costo',
+        'Tipo de\ntransporte',
+        'Firma Usuario\nSolicitante'
       ]
     ],
     body: data.rows.map((row) => [
-      row.id,
       row.tripDate,
       row.departureTime,
       row.arrivalTime,
@@ -95,14 +94,54 @@ export const exportTripsToPDF = (data: ExportTripWorkSheet) => {
       row.requester.name,
       row.requester.area,
       row.route,
+      `$${row.cost.toFixed(2)}`,
       row.vehicleType,
-      `$${row.cost.toFixed(2)}`
+      ''
     ]),
-    foot: [['', '', '', '', '', '', '', '', '', '', 'Total:', `$${data.totalCost.toFixed(2)}`]],
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
-    footStyles: { fillColor: [220, 220, 220], fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [245, 245, 245] }
+    foot: [
+      [
+        {
+          content: 'Total',
+          colSpan: 9
+        },
+        {
+          content: `$${data.totalCost.toFixed(2)}`
+        },
+        { content: '' },
+        { content: '' }
+      ]
+    ],
+    styles: {
+      font: 'times',
+      fontSize: 6.92,
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+      halign: 'center',
+      valign: 'middle',
+      cellPadding: 2
+    },
+    headStyles: {
+      fillColor: [0, 32, 96],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      halign: 'center',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2
+    },
+    footStyles: {
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0],
+      fontStyle: 'normal',
+      halign: 'center',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2
+    },
+    alternateRowStyles: {
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0]
+    }
   });
 
   // ============== Descarga ============== \\
