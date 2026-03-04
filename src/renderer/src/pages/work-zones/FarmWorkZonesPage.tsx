@@ -7,16 +7,10 @@ import { Modal } from '@renderer/components/Modal';
 import { useFarmWorkZones, useFarms, useModal } from '@renderer/hooks';
 import { FarmWorkZoneFormData } from '@renderer/schemas/farmWorkZone.schema';
 import { FarmWorkZone, WorkZone } from '@renderer/types';
-import { PAGE_SUBTITLE_CLASS } from '@renderer/utils';
+import { formatDate, PAGE_SUBTITLE_CLASS } from '@renderer/utils';
 import { LayoutDashboardIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const formatDate = (value: string | Date) => {
-  const parsed = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(parsed.getTime())) return String(value);
-  return parsed.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-};
 
 export const FarmWorkZonesPage = () => {
   const navigate = useNavigate();

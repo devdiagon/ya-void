@@ -6,23 +6,9 @@ import { Modal } from '@renderer/components/Modal';
 import { useModal, useWorkZones } from '@renderer/hooks';
 import { WorkZoneFormData } from '@renderer/schemas/workZone.schema';
 import { WorkZone } from '@renderer/types';
-import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
+import { formatDate, PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS, toInputDate } from '@renderer/utils';
 import { CalendarDaysIcon, PlusIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const formatDate = (value: string | Date) => {
-  const parsedDate = value instanceof Date ? value : new Date(value);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return String(value);
-  }
-
-  return parsedDate.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-};
 
 export const WorkZonesPage = () => {
   const navigate = useNavigate();
@@ -57,18 +43,6 @@ export const WorkZonesPage = () => {
 
   const handleNavigate = (workZone: WorkZone) => {
     navigate(`/work-zones/${workZone.id}/farms`);
-  };
-
-  const toInputDate = (value: string | Date) => {
-    const parsedDate = value instanceof Date ? value : new Date(value);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-      return '';
-    }
-
-    const month = `${parsedDate.getMonth() + 1}`.padStart(2, '0');
-    const day = `${parsedDate.getDate()}`.padStart(2, '0');
-    return `${parsedDate.getFullYear()}-${month}-${day}`;
   };
 
   const handleEdit = async (data: WorkZoneFormData) => {
