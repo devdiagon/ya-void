@@ -5,13 +5,13 @@ import { useModal, useRequesters } from '@renderer/hooks';
 import { FarmFormData } from '@renderer/schemas/farm.schema';
 import { Area, Requester } from '@renderer/types';
 import {
-    ChevronDownIcon,
-    ChevronRightIcon,
-    MapPinIcon,
-    PencilIcon,
-    Trash2Icon,
-    UserMinusIcon,
-    UsersIcon
+  ChevronDownIcon,
+  ChevronRightIcon,
+  MapPinIcon,
+  PencilIcon,
+  Trash2Icon,
+  UserMinusIcon,
+  UsersIcon
 } from 'lucide-react';
 import { useState } from 'react';
 
