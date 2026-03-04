@@ -4,11 +4,16 @@ import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
 import { ExportButton, IconButton } from '@renderer/components';
+import { buildExportPayload } from '@renderer/utils';
 
 interface TripTableProps {
   workZoneSheetId: number;
   sheetName: string;
   areaId: number;
+  parentAreaName: string;
+  parentFarmName: string;
+  sheetStartDate: string;
+  sheetEndDate: string;
 }
 
 function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): FormTripDTO {
@@ -37,7 +42,15 @@ const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
   'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
 
-export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
+export function TripTable({
+  workZoneSheetId,
+  sheetName,
+  areaId,
+  parentAreaName,
+  parentFarmName,
+  sheetStartDate,
+  sheetEndDate
+}: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
     useTrips(workZoneSheetId);
   const { routes, findOrCreate: findOrCreateRoute, updateRoute, deleteRoute } = useRoutes(areaId);
@@ -115,6 +128,50 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     }
   };
 
+  const handlePDFDownloadClick = () => {
+    const validTrips = trips.filter((trip) => trip.status === 'ready');
+
+    if (validTrips.length === 0) {
+      return;
+    }
+
+    // At this point every attribute MUST be non null due to the "ready" status validation
+    const payload = buildExportPayload({
+      trips: validTrips,
+      farmName: parentFarmName,
+      areaName: parentAreaName,
+      startDate: sheetStartDate,
+      endDate: sheetEndDate,
+      workSheetName: sheetName,
+      totalCost,
+      getRequesterName: requesterLabel
+    });
+
+    //exportTripsToPDF(payload);
+  };
+
+  const handleExelDownloadClick = () => {
+    const validTrips = trips.filter((trip) => trip.status === 'ready');
+
+    if (validTrips.length === 0) {
+      return;
+    }
+
+    // At this point every attribute MUST be non null due to the "ready" status validation
+    const payload = buildExportPayload({
+      trips: validTrips,
+      farmName: parentFarmName,
+      areaName: parentAreaName,
+      startDate: sheetStartDate,
+      endDate: sheetEndDate,
+      workSheetName: sheetName,
+      totalCost,
+      getRequesterName: requesterLabel
+    });
+
+    //exportTripsToExcel(payload);
+  };
+
   if (loading) {
     return <p className="text-sm text-gray-400 py-4">Cargando viajes…</p>;
   }
@@ -139,7 +196,10 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
         </div>
 
         {/* Download Button */}
-        <ExportButton onPDFDownload={() => {}} onExcelDownload={() => {}} />
+        <ExportButton
+          onPDFDownload={handlePDFDownloadClick}
+          onExcelDownload={handleExelDownloadClick}
+        />
       </div>
 
       {/* Table */}
