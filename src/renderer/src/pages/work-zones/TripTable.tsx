@@ -34,7 +34,7 @@ function formatDate(d: string | null) {
 
 const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
-  'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-600 whitespace-nowrap';
+  'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
 
 export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
@@ -120,7 +120,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Section header */}
+      {/* Section: Progress */}
       <div className="flex items-center gap-2 flex-wrap">
         <h2 className="text-base font-semibold text-gray-800">Viajes — {sheetName}</h2>
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
