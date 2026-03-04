@@ -4,7 +4,7 @@ import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
 import { ExportButton, IconButton } from '@renderer/components';
-import { buildExportPayload } from '@renderer/utils';
+import { buildExportPayload, exportTripsToPDF } from '@renderer/utils';
 
 interface TripTableProps {
   workZoneSheetId: number;
@@ -147,7 +147,7 @@ export function TripTable({
       getRequesterName: requesterLabel
     });
 
-    //exportTripsToPDF(payload);
+    exportTripsToPDF(payload);
   };
 
   const handleExelDownloadClick = () => {
