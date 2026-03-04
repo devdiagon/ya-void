@@ -1,6 +1,6 @@
 import { Card, CardContent, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
 import { hexToGlow, hexToRgba } from '@renderer/utils';
-import { EllipsisVerticalIcon, LucideProps, PencilIcon, Trash2Icon } from 'lucide-react';
+import { EllipsisVerticalIcon, LucideProps, SquarePenIcon, Trash2Icon } from 'lucide-react';
 import { cloneElement, KeyboardEvent, ReactElement, useState } from 'react';
 
 interface ListCardProps {
@@ -143,9 +143,17 @@ export const ListCard = ({
                         handleMenuClose();
                         onEdit();
                       }}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: hexToRgba('#50a2ff', 0.1)
+                        }
+                      }}
                     >
-                      <PencilIcon size={16} />
-                      Editar
+                      <MenuItemSlot
+                        icon={<SquarePenIcon size={16} />}
+                        label="Editar"
+                        color="#50a2ff"
+                      />
                     </MenuItem>
                   )}
                   {onDelete && (
@@ -155,9 +163,17 @@ export const ListCard = ({
                         handleMenuClose();
                         onDelete();
                       }}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: hexToRgba('#ef4444', 0.1)
+                        }
+                      }}
                     >
-                      <Trash2Icon size={16} />
-                      Eliminar
+                      <MenuItemSlot
+                        icon={<Trash2Icon size={16} />}
+                        label="Eliminar"
+                        color="#ef4444"
+                      />
                     </MenuItem>
                   )}
                 </Menu>
@@ -169,3 +185,19 @@ export const ListCard = ({
     </Card>
   );
 };
+
+// Helper component for menu item
+const MenuItemSlot = ({
+  icon,
+  label,
+  color
+}: {
+  icon: ReactElement<LucideProps>;
+  label: string;
+  color?: string;
+}) => (
+  <span className="flex items-center gap-2" style={{ color }}>
+    {cloneElement(icon, { size: 16, color: color ?? 'currentColor' })}
+    <span>{label}</span>
+  </span>
+);
