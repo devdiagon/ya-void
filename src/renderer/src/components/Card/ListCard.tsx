@@ -1,8 +1,7 @@
-import { Card, CardContent, IconButton, Skeleton } from '@mui/material';
+import { Card, CardContent, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
 import { hexToGlow, hexToRgba } from '@renderer/utils';
-import { ChevronRightIcon, LucideProps, PencilIcon, Trash2Icon } from 'lucide-react';
-import { cloneElement, KeyboardEvent, ReactElement } from 'react';
-import { OutlineButton } from '../Button';
+import { EllipsisVerticalIcon, LucideProps, PencilIcon, Trash2Icon } from 'lucide-react';
+import { cloneElement, KeyboardEvent, ReactElement, useState } from 'react';
 
 interface ListCardProps {
   title: string;
@@ -25,6 +24,18 @@ export const ListCard = ({
   onEdit,
   onDelete
 }: ListCardProps) => {
+  // Menu dropdown state
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Container click event
   const isClickable = Boolean(onNavigate) && !loading;
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -38,6 +49,10 @@ export const ListCard = ({
     }
   };
 
+  // Clickable container with pointer class
+  const cardClass = isClickable ? 'rounded-2xl cursor-pointer' : 'rounded-2xl';
+
+  // Prepare the icon with the desired color
   const coloredIcon = cloneElement(icon, {
     color: iconBgColor ?? 'currentColor'
   });
@@ -60,7 +75,7 @@ export const ListCard = ({
         onKeyDown={handleCardKeyDown}
         role={isClickable ? 'button' : undefined}
         tabIndex={isClickable ? 0 : undefined}
-        className="rounded-2xl"
+        className={cardClass}
       >
         <CardContent className="flex items-center gap-4 p-4">
           {/*Icon Section*/}
@@ -83,47 +98,11 @@ export const ListCard = ({
               <>
                 <Skeleton variant="text" width="60%" height={18} />
                 <Skeleton variant="text" width="40%" height={14} />
-                <div className="flex items-center gap-4 pt-2">
-                  <Skeleton variant="rectangular" width={60} height={28} className="rounded" />
-                  <Skeleton variant="rectangular" width={60} height={28} className="rounded" />
-                </div>
               </>
             ) : (
               <>
                 <span className="text-md font-semibold text-gray-900">{title}</span>
                 <span className="text-sm text-gray-500">{subtitle}</span>
-                <div className="flex items-center gap-4 pt-2">
-                  {onEdit && (
-                    <OutlineButton
-                      ariaLabel="Editar"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit();
-                      }}
-                      size="sm"
-                      icon={<PencilIcon size={16} />}
-                      className="border-none"
-                    >
-                      Editar
-                    </OutlineButton>
-                  )}
-
-                  {onDelete && (
-                    <OutlineButton
-                      ariaLabel="Eliminar"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                      }}
-                      size="sm"
-                      icon={<Trash2Icon size={16} />}
-                      className="border-none"
-                      variant="danger"
-                    >
-                      Eliminar
-                    </OutlineButton>
-                  )}
-                </div>
               </>
             )}
           </div>
@@ -133,9 +112,56 @@ export const ListCard = ({
             {loading ? (
               <Skeleton variant="circular" width={32} height={32} />
             ) : (
-              <IconButton onClick={onNavigate} size="small">
-                <ChevronRightIcon size={24} />
-              </IconButton>
+              <>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMenuClick(e);
+                  }}
+                  size="small"
+                >
+                  <EllipsisVerticalIcon size={24} />
+                </IconButton>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleMenuClose}
+                  slotProps={{
+                    list: {
+                      'aria-labelledby': 'basic-button'
+                    },
+                    root: {
+                      onClick: (e: React.MouseEvent) => e.stopPropagation()
+                    }
+                  }}
+                >
+                  {onEdit && (
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClose();
+                        onEdit();
+                      }}
+                    >
+                      <PencilIcon size={16} />
+                      Editar
+                    </MenuItem>
+                  )}
+                  {onDelete && (
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClose();
+                        onDelete();
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                      Eliminar
+                    </MenuItem>
+                  )}
+                </Menu>
+              </>
             )}
           </div>
         </CardContent>
