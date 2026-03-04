@@ -1,4 +1,4 @@
-import { FileSlidersIcon, PencilRulerIcon, SearchIcon } from 'lucide-react';
+import { ClipboardIcon, FileSlidersIcon, SearchIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -12,8 +12,8 @@ interface SidebarItemConfig {
 export const sidebarItems: SidebarItemConfig[] = [
   {
     id: 'work-zones',
-    label: 'Zonas de Trabajo',
-    icon: <PencilRulerIcon size={20} />,
+    label: 'Reportes',
+    icon: <ClipboardIcon size={20} />,
     path: '/work-zones'
   },
   {
