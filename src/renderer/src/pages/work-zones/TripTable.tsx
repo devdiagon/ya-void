@@ -1,9 +1,9 @@
 import { useReasons, useRequesters, useRoutes, useTrips } from '@renderer/hooks';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
-import { Pencil, Trash2 } from 'lucide-react';
+import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
-import { ExportButton } from '@renderer/components';
+import { ExportButton, IconButton } from '@renderer/components';
 
 interface TripTableProps {
   workZoneSheetId: number;
@@ -147,16 +147,16 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
+              <th className={hdr}>Acciones</th>
               <th className={hdr}>Fecha</th>
+              <th className={`${hdr} text-right`}>Costo ($)</th>
               <th className={hdr}>Vehículo</th>
               <th className={hdr}>Solicitante</th>
               <th className={hdr}>Salida</th>
               <th className={hdr}>Llegada</th>
-              <th className={`${hdr} text-center w-[64px]`}>#Num</th>
+              <th className={`${hdr} text-center w-[64px]`}># Personas</th>
               <th className={`${hdr} min-w-[220px]`}>Ruta</th>
               <th className={`${hdr} min-w-[220px]`}>Motivo</th>
-              <th className={`${hdr} text-right`}>Costo ($)</th>
-              <th className={hdr}>Acciones</th>
             </tr>
           </thead>
 
@@ -190,7 +190,28 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
                     trip.status === 'pending' ? 'bg-yellow-50' : 'bg-white'
                   } hover:bg-blue-50/20 transition-colors`}
                 >
+                  <td className={cell}>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <IconButton
+                        icon={<SquarePenIcon size={15} />}
+                        onClick={() => startEdit(trip)}
+                        ariaLabel="Editar"
+                        size="xs"
+                        variant="info"
+                      />
+                      <IconButton
+                        icon={<Trash2 size={15} />}
+                        onClick={() => deleteTrip(trip.id)}
+                        ariaLabel="Eliminar"
+                        size="xs"
+                        variant="danger"
+                      />
+                    </div>
+                  </td>
                   <td className={cell}>{formatDate(trip.tripDate)}</td>
+                  <td className={`${cell} text-right font-medium`}>
+                    {trip.cost != null ? `$${trip.cost.toFixed(2)}` : '—'}
+                  </td>
                   <td className={cell}>{trip.vehicleType ?? '—'}</td>
                   <td className={cell}>{requesterLabel(trip.requesterId)}</td>
                   <td className={cell}>{trip.departureTime ?? '—'}</td>
@@ -202,29 +223,6 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
                   <td className={`${cell} break-words`}>
                     {reasonLabel(trip.reasonId, trip.reasonSnapshot)}
                   </td>
-                  <td className={`${cell} text-right font-medium`}>
-                    {trip.cost != null ? `$${trip.cost.toFixed(2)}` : '—'}
-                  </td>
-                  <td className={cell}>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(trip)}
-                        className="p-1 rounded text-blue-500 hover:bg-blue-50"
-                        title="Editar"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteTrip(trip.id)}
-                        className="p-1 rounded text-red-500 hover:bg-red-50"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
                 </tr>
               )
             )}
@@ -234,7 +232,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
           <tfoot>
             <tr className="bg-gray-50">
               <td
-                colSpan={8}
+                colSpan={2}
                 className={`${cell} text-right font-medium text-gray-700 border-t-2 border-gray-300`}
               >
                 Total de Costos:
@@ -244,7 +242,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
               >
                 ${totalCost.toFixed(2)}
               </td>
-              <td className={`${cell} border-t-2 border-gray-300`} />
+              <td colSpan={7} className={`${cell} border-t-2 border-gray-300`} />
             </tr>
           </tfoot>
         </table>
