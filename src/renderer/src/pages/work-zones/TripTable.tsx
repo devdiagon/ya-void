@@ -3,6 +3,7 @@ import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
+import { ExportButton } from '@renderer/components';
 
 interface TripTableProps {
   workZoneSheetId: number;
@@ -120,18 +121,25 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Section: Progress */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <h2 className="text-base font-semibold text-gray-800">Viajes — {sheetName}</h2>
-        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-          Total: {trips.length}
-        </span>
-        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-          Realizados: {totalReady}
-        </span>
-        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-          Pendientes: {totalPending}
-        </span>
+      {/* Header */}
+
+      <div className="flex justify-between">
+        {/* Progress */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-base font-semibold text-gray-800">Viajes — {sheetName}</h2>
+          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+            Total: {trips.length}
+          </span>
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+            Realizados: {totalReady}
+          </span>
+          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+            Pendientes: {totalPending}
+          </span>
+        </div>
+
+        {/* Download Button */}
+        <ExportButton onPDFDownload={() => {}} onExcelDownload={() => {}} />
       </div>
 
       {/* Table */}
