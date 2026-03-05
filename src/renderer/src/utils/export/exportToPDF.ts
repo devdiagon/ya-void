@@ -144,6 +144,39 @@ export const exportTripsToPDF = (data: ExportTripWorkSheet) => {
     }
   });
 
+  // ============== Firmas ============== \\
+  const finalY = (doc as any).lastAutoTable.finalY;
+  const signaturesY = finalY + 20;
+  const signatureLineWidth = 50;
+
+  const firma1CenterX = 65;
+  const firma2StartX = 145;
+
+  // Firma Proveedor
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.3);
+  doc.line(
+    firma1CenterX - signatureLineWidth / 2,
+    signaturesY,
+    firma1CenterX + signatureLineWidth / 2,
+    signaturesY
+  );
+
+  doc.setFont('times', 'bold');
+  doc.setFontSize(10);
+  doc.text('Proveedor del servicio', firma1CenterX, signaturesY + 5, { align: 'center' });
+
+  // Firma Gestor
+  doc.line(firma2StartX, signaturesY, firma2StartX + signatureLineWidth, signaturesY);
+
+  doc.setFont('times', 'bold');
+  doc.setFontSize(10);
+  const firma2LineHeight = 6;
+  const firma2Lines = ['Gestionado por:', 'Nombre temporal', 'C.I#: xxxxxxxxxx'];
+  firma2Lines.forEach((line, i) => {
+    doc.text(line, firma2StartX, signaturesY + 5 + i * firma2LineHeight);
+  });
+
   // ============== Descarga ============== \\
   doc.save(`${data.meta.workSheetName}_${data.meta.startDate}.pdf`);
 };
