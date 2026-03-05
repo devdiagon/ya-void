@@ -27,15 +27,15 @@ export class AreaController {
   /**
    * Crea una nueva área vinculada a una finca
    */
-  async create(payload: { name: string; farmId: number }): Promise<Area> {
-    return this.useArea.create(payload.name, payload.farmId)
+  async create(payload: { name: string; farmId: number; managerId?: number | null }): Promise<Area> {
+    return this.useArea.create(payload.name, payload.farmId, payload.managerId ?? null)
   }
 
   /**
    * Actualiza el nombre o la vinculación de una finca
    */
-  async update(id: number, payload: { name: string; farmId: number }): Promise<void> {
-    return this.useArea.update(id, payload.name, payload.farmId)
+  async update(id: number, payload: { name: string; farmId: number; managerId?: number | null }): Promise<void> {
+    return this.useArea.update(id, payload.name, payload.farmId, payload.managerId ?? null)
   }
 
   /**

@@ -39,8 +39,8 @@ export class UseRequester {
   /**
    * Crea un nuevo solicitante (el repo ya valida duplicados por nombre)
    */
-  create(name: string): Requester {
-    return this.requesterRepository.create(name)
+  create(name: string, cid: string): Requester {
+    return this.requesterRepository.create(name, cid)
   }
 
   /**
@@ -89,7 +89,7 @@ export class UseRequester {
    * Devuelve el solicitante con ese nombre, o lo crea globalmente.
    * También lo asigna al área de forma idempotente.
    */
-  findOrCreateForArea(name: string, areaId: number): Requester {
-    return this.requesterRepository.findOrCreateForArea(name, areaId)
+  findOrCreateForArea(name: string, cid: string, areaId: number): Requester {
+    return this.requesterRepository.findOrCreateForArea(name, cid, areaId)
   }
 }
