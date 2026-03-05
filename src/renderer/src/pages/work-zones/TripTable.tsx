@@ -232,10 +232,10 @@ export function TripTable({
               <th className={hdr}>Solicitante</th>
               <th className={hdr}>Salida</th>
               <th className={hdr}>Llegada</th>
-              <th className={`${hdr} text-center w-[64px]`}># Personas</th>
+              <th className={`${hdr} text-center w-[64px]`}>#Num</th>
               <th className={`${hdr} min-w-[220px]`}>Ruta</th>
               <th className={`${hdr} min-w-[220px]`}>Motivo</th>
-              <th className={`${hdr} min-w-[220px]`}>Área que solicita</th>
+              <th className={`${hdr} min-w-[220px]`}>Área</th>
             </tr>
           </thead>
 
