@@ -1,8 +1,8 @@
+import { IconButton } from '@renderer/components';
 import { TripVehicleType } from '@renderer/types';
 import { Save, X } from 'lucide-react';
 import { useState } from 'react';
 import { AutocompleteOption, CellAutocomplete } from './CellAutocomplete';
-import { IconButton } from '@renderer/components';
 
 /** Valida formato HH:MM con horas 00-23 y minutos 00-59. Acepta vacío. */
 function validateTime(value: string): string | null {
@@ -27,6 +27,7 @@ export interface TripFormData {
   passengerCount: string;
   routeId: number | null;
   reasonId: number | null;
+  subareaId: number | null;
   cost: string;
 }
 
@@ -39,6 +40,7 @@ export const emptyTripForm = (): TripFormData => ({
   passengerCount: '',
   routeId: null,
   reasonId: null,
+  subareaId: null,
   cost: ''
 });
 
@@ -57,6 +59,10 @@ interface TripFormRowProps {
   onDeleteRoute?: (opt: AutocompleteOption) => Promise<void>;
   onEditReason?: (opt: AutocompleteOption, newName: string) => Promise<void>;
   onDeleteReason?: (opt: AutocompleteOption) => Promise<void>;
+  subareas: AutocompleteOption[];
+  onFindOrCreateSubarea: (name: string) => Promise<AutocompleteOption | null>;
+  onEditSubarea?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteSubarea?: (opt: AutocompleteOption) => Promise<void>;
 }
 
 const cell = 'border border-gray-200 px-2 py-1 align-top';
@@ -75,7 +81,11 @@ export function TripFormRow({
   onEditRoute,
   onDeleteRoute,
   onEditReason,
-  onDeleteReason
+  onDeleteReason,
+  subareas,
+  onFindOrCreateSubarea,
+  onEditSubarea,
+  onDeleteSubarea
 }: TripFormRowProps) {
   const set = <K extends keyof TripFormData>(key: K, val: TripFormData[K]) =>
     setForm({ ...form, [key]: val });
@@ -238,6 +248,19 @@ export function TripFormRow({
           onFindOrCreate={onFindOrCreateReason}
           onEditOption={onEditReason}
           onDeleteOption={onDeleteReason}
+        />
+      </td>
+
+      {/* Área que solicita */}
+      <td className={`${cell} min-w-[220px]`}>
+        <CellAutocomplete
+          options={subareas}
+          value={form.subareaId}
+          placeholder="Buscar área..."
+          onChange={(id) => set('subareaId', id)}
+          onFindOrCreate={onFindOrCreateSubarea}
+          onEditOption={onEditSubarea}
+          onDeleteOption={onDeleteSubarea}
         />
       </td>
     </tr>

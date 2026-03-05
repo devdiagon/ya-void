@@ -15,8 +15,10 @@ export interface Trip {
   workZoneSheetId: number | null;
   routeId: number | null;
   reasonId: number | null;
+  subareaId: number | null;
   routeSnapshot: string | null;
   reasonSnapshot: string | null;
+  subareaSnapshot: string | null;
 }
 
 export interface FormTripDTO {
@@ -31,4 +33,5 @@ export interface FormTripDTO {
   workZoneSheetId?: number;
   routeId?: number;
   reasonId?: number;
+  subareaId?: number;
 }

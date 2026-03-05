@@ -16,9 +16,9 @@ contextBridge.exposeInMainWorld('api', {
   areas: {
     listByFarm: (farmId: number) => ipcRenderer.invoke('areas:listByFarm', farmId),
     getById: (id: number) => ipcRenderer.invoke('areas:getById', id),
-    create: (payload: { name: string; farmId: number }) =>
+    create: (payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }) =>
       ipcRenderer.invoke('areas:create', payload),
-    update: (id: number, payload: { name: string; farmId: number }) =>
+    update: (id: number, payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }) =>
       ipcRenderer.invoke('areas:update', id, payload),
     delete: (id: number) => ipcRenderer.invoke('areas:delete', id)
   },
@@ -110,6 +110,19 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('reasons:findOrCreate', payload)
   },
 
+  // --- SUBAREAS ---
+  subareas: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('subareas:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('subareas:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('subareas:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('subareas:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:findOrCreate', payload)
+  },
+
   // --- TRIPS ---
   trips: {
     listAll: (payload: {
@@ -146,6 +159,7 @@ contextBridge.exposeInMainWorld('api', {
       workZoneSheetId: number | null
       routeId: number | null
       reasonId: number | null
+      subareaId?: number | null
     }) => ipcRenderer.invoke('trips:create', payload),
     update: (
       id: number,
@@ -161,6 +175,7 @@ contextBridge.exposeInMainWorld('api', {
         workZoneSheetId?: number
         routeId?: number
         reasonId?: number
+        subareaId?: number | null
       }
     ) => ipcRenderer.invoke('trips:update', { id, ...payload }),
     confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),

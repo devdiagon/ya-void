@@ -84,6 +84,15 @@ CREATE TABLE reason (
     FOREIGN KEY (area_id) REFERENCES area(id)
 );
 
+-- Subarea
+CREATE TABLE subarea (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    area_id INTEGER NOT NULL,
+    UNIQUE (name, area_id),
+    FOREIGN KEY (area_id) REFERENCES area(id)
+);
+
 -- Trip
 CREATE TABLE trip (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,13 +108,16 @@ CREATE TABLE trip (
     work_zone_sheet_id INTEGER,
     route_id INTEGER,
     reason_id INTEGER,
+    subarea_id INTEGER,
     route_snapshot TEXT,
     reason_snapshot TEXT,
+    subarea_snapshot TEXT,
     FOREIGN KEY (requester_id) REFERENCES requester(id),
     FOREIGN KEY (area_id) REFERENCES area(id),
     FOREIGN KEY (work_zone_sheet_id) REFERENCES work_zone_sheet(id),
     FOREIGN KEY (route_id) REFERENCES route(id),
-    FOREIGN KEY (reason_id) REFERENCES reason(id)
+    FOREIGN KEY (reason_id) REFERENCES reason(id),
+    FOREIGN KEY (subarea_id) REFERENCES subarea(id)
 );
 
 -- Para búsquedas rápidas de viajes por fecha (Calendarios/Reportes)
@@ -117,6 +129,7 @@ CREATE INDEX idx_trip_status ON trip(status);
 -- Índices en claves foráneas con mucha actividad
 CREATE INDEX idx_trip_area_id ON trip(area_id);
 CREATE INDEX idx_trip_requester_id ON trip(requester_id);
+CREATE INDEX idx_trip_subarea_id ON trip(subarea_id);
 CREATE INDEX idx_area_farm_id ON area(farm_id);
 CREATE INDEX idx_work_zone_dates ON work_zone(start_date, end_date);
 
@@ -168,51 +181,38 @@ INSERT INTO area (id, name, farm_id, manager_name, manager_cid) VALUES
 (1,'Empaque',1,'Calderon Edgar Ivan','1309111472'),
 (2,'Logística',1,'Quiloango Tipanluisa Monica Lorena','1717580177'),
 (3,'Poscosecha',1,'Calderon Edgar Ivan','1309111472'),
-(4,'Sublimación',1,NULL,NULL),
 (5,'Administración',1,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (6,'Producción',1,'Murillo Redin Jorge Eduardo','1710203678'),
-(7,'Riego',1,NULL,NULL),
 (8,'Trabajo Social',1,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (9,'Nómina',1,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (10,'Talento Humano',1,'Diaz Toapanta Ruth Elisabeth','1711008431'),
-(11,'Bodega',1,NULL,NULL),
 (12,'Selección',1,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 
 (13,'Empaque',2,'Quinchiguango Morales Bethy Carolina','1003565478'),
 (14,'Logística',2,'Quiloango Tipanluisa Monica Lorena','1717580177'),
 (15,'Poscosecha',2,'Quinchiguango Morales Bethy Carolina','1003565478'),
-(16,'Sublimación',2,NULL,NULL),
 (17,'Administración',2,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (18,'Producción',2,'Murillo Redin Jorge Eduardo','1710203678'),
-(19,'Riego',2,NULL,NULL),
 (20,'Talento Humano',2,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (21,'Trabajo Social',2,'Diaz Toapanta Ruth Elisabeth','1711008431'),
-(22,'Bocashi',2,NULL,NULL),
-(23,'Sanidad Vegetal',2,NULL,NULL),
 (24,'Selección',2,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (25,'Dispensario Médico',2,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 
 (26,'Empaque',3,'Saquicela Coronel Laura Lucia','1400995625'),
 (27,'Logística',3,'Quiloango Tipanluisa Monica Lorena','1717580177'),
 (28,'Poscosecha',3,'Saquicela Coronel Laura Lucia','1400995625'),
-(29,'Sublimación',3,NULL,NULL),
 (30,'Administración',3,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (31,'Producción',3,'Murillo Redin Jorge Eduardo','1710203678'),
-(32,'Riego',3,NULL,NULL),
 (33,'Talento Humano',3,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (34,'Trabajo Social',3,'Diaz Toapanta Ruth Elisabeth','1711008431'),
-(35,'Bocashi',3,NULL,NULL),
-(36,'Sanidad Vegetal',3,NULL,NULL),
 (37,'Selección',3,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (38,'Dispensario Médico',3,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 
 (39,'Empaque',4,'Gualavisi Morales Angelica Marina','1718240094'),
 (40,'Logística',4,'Quiloango Tipanluisa Monica Lorena','1717580177'),
 (41,'Poscosecha',4,'Gualavisi Morales Angelica Marina','1718240094'),
-(42,'Sublimación',4,NULL,NULL),
 (43,'Administración',4,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (44,'Producción',4,'Murillo Redin Jorge Eduardo','1710203678'),
-(45,'Riego',4,NULL,NULL),
 (46,'Trabajo Social',4,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (47,'Selección',4,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (48,'Talento Humano',4,'Diaz Toapanta Ruth Elisabeth','1711008431'),
@@ -220,13 +220,58 @@ INSERT INTO area (id, name, farm_id, manager_name, manager_cid) VALUES
 (49,'Empaque',5,'Cuascota Erazo Manuel Mesias','1005358864'),
 (50,'Logística',5,'Quiloango Tipanluisa Monica Lorena','1717580177'),
 (51,'Poscosecha',5,'Cuascota Erazo Manuel Mesias','1005358864'),
-(52,'Sublimación',5,NULL,NULL),
 (53,'Administración',5,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (54,'Producción',5,'Murillo Redin Jorge Eduardo','1710203678'),
-(55,'Riego',5,NULL,NULL),
 (56,'Trabajo Social',5,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (57,'Talento Humano',5,'Diaz Toapanta Ruth Elisabeth','1711008431'),
 (58,'Selección',5,'Diaz Toapanta Ruth Elisabeth','1711008431');
+
+
+-- Subarea
+INSERT INTO subarea (id, name, area_id) VALUES
+(1,'Empaque',1),
+(2,'Logística',2),
+(3,'Poscosecha',3),
+(5,'Administración',5),
+(6,'Producción',6),
+(8,'Trabajo Social',8),
+(9,'Nómina',9),
+(10,'Talento Humano',10),
+(12,'Selección',12),
+(13,'Empaque',13),
+(14,'Logística',14),
+(15,'Poscosecha',15),
+(17,'Administración',17),
+(18,'Producción',18),
+(20,'Talento Humano',20),
+(21,'Trabajo Social',21),
+(24,'Selección',24),
+(25,'Dispensario Médico',25),
+(26,'Empaque',26),
+(27,'Logística',27),
+(28,'Poscosecha',28),
+(30,'Administración',30),
+(31,'Producción',31),
+(33,'Talento Humano',33),
+(34,'Trabajo Social',34),
+(37,'Selección',37),
+(38,'Dispensario Médico',38),
+(39,'Empaque',39),
+(40,'Logística',40),
+(41,'Poscosecha',41),
+(43,'Administración',43),
+(44,'Producción',44),
+(46,'Trabajo Social',46),
+(47,'Selección',47),
+(48,'Talento Humano',48),
+(49,'Empaque',49),
+(50,'Logística',50),
+(51,'Poscosecha',51),
+(53,'Administración',53),
+(54,'Producción',54),
+(56,'Trabajo Social',56),
+(57,'Talento Humano',57),
+(58,'Selección',58);
 
 
 -- Area x Requester

@@ -79,13 +79,26 @@ export function CellAutocomplete({
     setOpen(true);
   };
 
-  const handleSelect = (opt: AutocompleteOption) => {
+  const focusNext = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const focusable = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((f) => !f.closest('[data-dropdown]'));
+    const idx = focusable.indexOf(el);
+    if (idx !== -1 && focusable[idx + 1]) focusable[idx + 1].focus();
+  };
+
+  const handleSelect = (opt: AutocompleteOption, andFocusNext = false) => {
     onChange(opt.id, opt.name);
     setQuery('');
     setOpen(false);
+    if (andFocusNext) setTimeout(focusNext, 0);
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (andFocusNext = false) => {
     if (!onFindOrCreate || !query.trim()) return;
     setBusy(true);
     const result = await onFindOrCreate(query.trim());
@@ -93,6 +106,7 @@ export function CellAutocomplete({
     if (result) onChange(result.id, result.name);
     setQuery('');
     setOpen(false);
+    if (andFocusNext) setTimeout(focusNext, 0);
   };
 
   // Close dropdown on outside click
@@ -153,9 +167,28 @@ export function CellAutocomplete({
           if (e.key === 'Escape') {
             setOpen(false);
             setQuery('');
+            return;
           }
-          // Prevent newline on Enter
-          if (e.key === 'Enter') e.preventDefault();
+          if (e.key === 'Tab') {
+            // Close dropdown and let the browser move focus to the next field
+            setOpen(false);
+            setQuery('');
+            return;
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!query.trim()) return;
+            const exactMatch = options.find(
+              (o) => o.name.toLowerCase() === query.toLowerCase().trim()
+            );
+            if (exactMatch) {
+              handleSelect(exactMatch, true);
+            } else if (filtered.length === 1) {
+              handleSelect(filtered[0], true);
+            } else if (showCreate) {
+              handleCreate(true);
+            }
+          }
         }}
       />
 

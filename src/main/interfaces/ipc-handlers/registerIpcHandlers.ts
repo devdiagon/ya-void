@@ -7,6 +7,7 @@ import { FarmWorkZoneRepository } from '../../data/repositories/FarmWorkZoneRepo
 import { ReasonRepository } from '../../data/repositories/ReasonRepository'
 import { RequesterRepository } from '../../data/repositories/RequesterRepository'
 import { RouteRepository } from '../../data/repositories/RouteRepository'
+import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 import { TripRepository } from '../../data/repositories/TripRepository'
 import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
 import { WorkZoneSheetRepository } from '../../data/repositories/WorkZoneSheetRepository'
@@ -18,6 +19,7 @@ import { FarmWorkZoneController } from '../../interfaces/controllers/FarmWorkZon
 import { ReasonController } from '../../interfaces/controllers/ReasonController'
 import { RequesterController } from '../../interfaces/controllers/RequesterController'
 import { RouteController } from '../../interfaces/controllers/RouteController'
+import { SubareaController } from '../../interfaces/controllers/SubareaController'
 import { TripController } from '../../interfaces/controllers/TripController'
 import { WorkZoneController } from '../../interfaces/controllers/WorkZoneController'
 import { WorkZoneSheetController } from '../../interfaces/controllers/WorkZoneSheetController'
@@ -37,6 +39,7 @@ export function registerIpcHandlers(): void {
   const workZoneSheetRepo = new WorkZoneSheetRepository()
   const routeRepo = new RouteRepository()
   const reasonRepo = new ReasonRepository()
+  const subareaRepo = new SubareaRepository()
   const tripRepo = new TripRepository()
 
   // 2. Instanciar Controladores
@@ -48,6 +51,7 @@ export function registerIpcHandlers(): void {
   const workZoneSheetCtrl = new WorkZoneSheetController(workZoneSheetRepo)
   const routeCtrl = new RouteController(routeRepo)
   const reasonCtrl = new ReasonController(reasonRepo)
+  const subareaCtrl = new SubareaController(subareaRepo)
   const tripCtrl = new TripController(tripRepo)
 
   // --- FARMS HANDLERS ---
@@ -163,6 +167,20 @@ export function registerIpcHandlers(): void {
     reasonCtrl.findOrCreate(payload)
   )
 
+  // --- SUBAREAS HANDLERS ---
+  ipcMain.handle('subareas:listByArea', (_, areaId: number) => subareaCtrl.listByArea(areaId))
+  ipcMain.handle('subareas:getById', (_, id: number) => subareaCtrl.getById(id))
+  ipcMain.handle('subareas:create', (_, payload: { name: string; areaId: number }) =>
+    subareaCtrl.create(payload)
+  )
+  ipcMain.handle('subareas:update', (_, id: number, payload: { name: string }) =>
+    subareaCtrl.update(id, payload)
+  )
+  ipcMain.handle('subareas:delete', (_, id: number) => subareaCtrl.delete(id))
+  ipcMain.handle('subareas:findOrCreate', (_, payload: { name: string; areaId: number }) =>
+    subareaCtrl.findOrCreate(payload)
+  )
+
   // --- TRIPS HANDLERS ---
   ipcMain.handle(
     'trips:listAll',
@@ -197,7 +215,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('trips:getById', (_, id: number) => tripCtrl.getById(id))
   ipcMain.handle(
     'trips:create',
-    (_, payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>) =>
+    (_, payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>) =>
       tripCtrl.create(payload)
   )
   ipcMain.handle('trips:update', (_, payload: Trip) => tripCtrl.update(payload))
