@@ -110,6 +110,19 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('reasons:findOrCreate', payload)
   },
 
+  // --- SUBAREAS ---
+  subareas: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('subareas:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('subareas:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('subareas:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('subareas:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:findOrCreate', payload)
+  },
+
   // --- TRIPS ---
   trips: {
     listAll: (payload: {

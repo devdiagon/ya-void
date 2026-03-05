@@ -4,6 +4,7 @@ import { FarmWorkZone, FormFarmWorkZoneDTO } from './farmWorkZone.type';
 import { FormReasonDTO, Reason } from './reason.type';
 import { FormRequesterDTO, Requester } from './requester.type';
 import { FormRouteDTO, Route } from './route.type';
+import { FormSubareaDTO, Subarea } from './subarea.type';
 import { FormTripDTO, Trip, TripStatus } from './trip.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
 import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
@@ -70,6 +71,14 @@ export interface ElectronAPI {
     update: (id: number, payload: { name: string }) => Promise<boolean>;
     delete: (id: number) => Promise<void>;
     findOrCreate: (payload: { name: string; areaId: number }) => Promise<Reason>;
+  };
+  subareas: {
+    listByArea: (areaId: number) => Promise<Subarea[]>;
+    getById: (id: number) => Promise<Subarea>;
+    create: (payload: FormSubareaDTO) => Promise<Subarea>;
+    update: (id: number, payload: { name: string }) => Promise<boolean>;
+    delete: (id: number) => Promise<void>;
+    findOrCreate: (payload: { name: string; areaId: number }) => Promise<Subarea>;
   };
   trips: {
     listAll: (payload: {
