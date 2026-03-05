@@ -7,4 +7,4 @@ export * from './route.type';
 export * from './trip.type';
 export * from './workZone.type';
 export * from './workZoneSheet.type';
-
+export * from './export.trip.type';

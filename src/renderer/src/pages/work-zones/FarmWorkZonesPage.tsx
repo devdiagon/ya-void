@@ -7,16 +7,10 @@ import { Modal } from '@renderer/components/Modal';
 import { useFarmWorkZones, useFarms, useModal } from '@renderer/hooks';
 import { FarmWorkZoneFormData } from '@renderer/schemas/farmWorkZone.schema';
 import { FarmWorkZone, WorkZone } from '@renderer/types';
-import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
+import { formatDate, PAGE_SUBTITLE_CLASS } from '@renderer/utils';
 import { LayoutDashboardIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const formatDate = (value: string | Date) => {
-  const parsed = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(parsed.getTime())) return String(value);
-  return parsed.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-};
 
 export const FarmWorkZonesPage = () => {
   const navigate = useNavigate();
@@ -101,25 +95,16 @@ export const FarmWorkZonesPage = () => {
           ]}
         />
 
-        <div className="flex items-start justify-between gap-4 mt-4">
-          <div>
-            <h1 className={PAGE_TITLE_CLASS}>{workZone?.name ?? '...'}</h1>
+        <div className="flex  items-center justify-between mt-4">
+          <>
             {workZone && (
               <p className={PAGE_SUBTITLE_CLASS}>
                 {formatDate(workZone.startDate)} - {formatDate(workZone.endDate)}
               </p>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 px-6 py-6 overflow-auto bg-gray-50">
-        {/* Section header */}
-        <div className="flex items-center justify-between mb-10">
-          <h2 className="text-xl font-bold text-gray-800">Fincas</h2>
+          </>
           <ActionButton
-            variant="success"
+            variant="primary"
             size="md"
             icon={<PlusIcon size={18} />}
             onClick={() => createModal.open()}
@@ -127,7 +112,10 @@ export const FarmWorkZonesPage = () => {
             Añadir Finca
           </ActionButton>
         </div>
+      </div>
 
+      {/* Content */}
+      <div className="flex-1 px-6 py-6 overflow-auto bg-gray-50">
         {errors.fetch ? (
           <div className="h-full flex items-center justify-center">
             <ErrorCard
@@ -137,14 +125,14 @@ export const FarmWorkZonesPage = () => {
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {farmWorkZones.map((fwz) => (
               <ListCard
                 key={fwz.id}
                 title={fwz.name}
-                subtitle={`${fwz.name} - ${workZone?.name ?? ''}`}
+                subtitle="Clic para revisar detalles"
                 icon={<LayoutDashboardIcon size={24} />}
-                iconBgColor="#4ade80"
+                iconBgColor="#60c0eaff"
                 loading={loading}
                 onNavigate={() => handleNavigate(fwz)}
                 onEdit={() => updateModal.open(fwz)}
@@ -153,7 +141,7 @@ export const FarmWorkZonesPage = () => {
             ))}
             {!loading && farmWorkZones.length === 0 && (
               <div className="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                No hay fincas registradas para esta zona de trabajo
+                No hay fincas registradas para este reporte
               </div>
             )}
           </div>
@@ -163,7 +151,7 @@ export const FarmWorkZonesPage = () => {
       {/* Modals */}
       <Modal isOpen={createModal.isOpen} onClose={createModal.close} size="lg">
         <FarmWorkZoneForm
-          title="Añadir Finca a Zona de Trabajo"
+          title="Añadir Finca a Reporte"
           farms={farms}
           onCancel={createModal.close}
           onConfirm={handleCreate}
@@ -173,7 +161,7 @@ export const FarmWorkZonesPage = () => {
       <Modal isOpen={updateModal.isOpen} onClose={updateModal.close} size="lg">
         {updateModal.data && (
           <FarmWorkZoneForm
-            title="Editar Finca en Zona de Trabajo"
+            title="Editar Finca en Reporte"
             farms={farms}
             initialData={{
               farmId: updateModal.data.farmId,

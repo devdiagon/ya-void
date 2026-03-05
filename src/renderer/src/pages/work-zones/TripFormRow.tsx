@@ -2,6 +2,7 @@ import { TripVehicleType } from '@renderer/types';
 import { Save, X } from 'lucide-react';
 import { useState } from 'react';
 import { AutocompleteOption, CellAutocomplete } from './CellAutocomplete';
+import { IconButton } from '@renderer/components';
 
 /** Valida formato HH:MM con horas 00-23 y minutos 00-59. Acepta vacío. */
 function validateTime(value: string): string | null {
@@ -100,6 +101,27 @@ export function TripFormRow({
 
   return (
     <tr className="bg-white ring-1 ring-inset ring-blue-400">
+      {/* Acciones */}
+      <td className={`${cell} min-w-[72px]`}>
+        <div className="flex items-center gap-1">
+          <IconButton
+            icon={<Save size={15} />}
+            onClick={onSave}
+            disabled={!!(timeErrors.departure || timeErrors.arrival)}
+            ariaLabel="Guardar"
+            size="xs"
+            variant="info"
+          />
+          <IconButton
+            icon={<X size={15} />}
+            onClick={onCancel}
+            ariaLabel="Cancelar"
+            size="xs"
+            variant="danger"
+          />
+        </div>
+      </td>
+
       {/* Fecha */}
       <td className={`${cell} min-w-[120px]`}>
         <input
@@ -108,6 +130,21 @@ export function TripFormRow({
           value={form.tripDate}
           onChange={(e) => set('tripDate', e.target.value)}
         />
+      </td>
+
+      {/* Costo */}
+      <td className={`${cell} min-w-[90px]`}>
+        <div className="flex items-center gap-0.5">
+          <span className="text-gray-400 text-xs">$</span>
+          <input
+            type="number"
+            min={0}
+            step={0.01}
+            className={inputCls}
+            value={form.cost}
+            onChange={(e) => set('cost', e.target.value)}
+          />
+        </div>
       </td>
 
       {/* Vehículo */}
@@ -202,44 +239,6 @@ export function TripFormRow({
           onEditOption={onEditReason}
           onDeleteOption={onDeleteReason}
         />
-      </td>
-
-      {/* Costo */}
-      <td className={`${cell} min-w-[90px]`}>
-        <div className="flex items-center gap-0.5">
-          <span className="text-gray-400 text-xs">$</span>
-          <input
-            type="number"
-            min={0}
-            step={0.01}
-            className={inputCls}
-            value={form.cost}
-            onChange={(e) => set('cost', e.target.value)}
-          />
-        </div>
-      </td>
-
-      {/* Acciones */}
-      <td className={`${cell} min-w-[72px]`}>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={!!(timeErrors.departure || timeErrors.arrival)}
-            className="p-1 rounded text-green-600 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Guardar"
-          >
-            <Save size={15} />
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="p-1 rounded text-red-500 hover:bg-red-50"
-            title="Cancelar"
-          >
-            <X size={15} />
-          </button>
-        </div>
       </td>
     </tr>
   );

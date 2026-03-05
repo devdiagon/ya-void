@@ -6,7 +6,7 @@ import { Modal } from '@renderer/components/Modal';
 import { useAreas, useModal, useWorkZoneSheets } from '@renderer/hooks';
 import { WorkZoneSheetFormData } from '@renderer/schemas/workZoneSheet.schema';
 import { FarmWorkZone, WorkZone, WorkZoneSheet } from '@renderer/types';
-import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
+import { formatDate, PAGE_SUBTITLE_CLASS } from '@renderer/utils';
 import { PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -116,15 +116,12 @@ export const WorkZoneSheetsPage = () => {
           ]}
         />
 
-        <div className="flex items-start justify-between gap-4 mt-4">
-          <div>
-            <h1 className={PAGE_TITLE_CLASS}>{farmWorkZone?.name ?? '...'}</h1>
-            {farmWorkZone && workZone && (
-              <p className={PAGE_SUBTITLE_CLASS}>
-                {farmWorkZone.name} - {workZone.name}
-              </p>
-            )}
-          </div>
+        <div className="flex items-center justify-between mt-4">
+          {workZone && (
+            <p className={PAGE_SUBTITLE_CLASS}>
+              {formatDate(workZone.startDate)} - {formatDate(workZone.endDate)}
+            </p>
+          )}
 
           <ActionButton
             variant="primary"
@@ -175,6 +172,10 @@ export const WorkZoneSheetsPage = () => {
               workZoneSheetId={activeSheet.id}
               sheetName={activeSheet.name}
               areaId={activeSheet.areaId}
+              parentAreaName={areas.find((a) => a.id === activeSheet.areaId)?.name ?? ''}
+              parentFarmName={farmWorkZone?.name ?? ''}
+              sheetStartDate={formatDate(workZone?.startDate ?? '')}
+              sheetEndDate={formatDate(workZone?.endDate ?? '')}
             />
           ) : null}
         </div>

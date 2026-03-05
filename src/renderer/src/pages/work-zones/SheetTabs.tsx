@@ -63,7 +63,7 @@ export const SheetTabs = ({
             }}
             className={`flex items-center px-4 py-1.5 rounded-lg cursor-pointer select-none transition-all text-sm font-medium whitespace-nowrap ${
               activeSheetId === sheet.id
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-blue-800 text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
             onClick={() => handleTabClick(sheet)}
