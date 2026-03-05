@@ -5,7 +5,7 @@ import { mapRowToTrip, TripRow } from '../mappers/TripMapper'
 const SELECT_TRIP = `
   SELECT id, vehicle_type, status, trip_date, departure_time, arrival_time,
          passenger_count, cost, requester_id, area_id, work_zone_sheet_id,
-         route_id, reason_id, route_snapshot, reason_snapshot
+         route_id, reason_id, subarea_id, route_snapshot, reason_snapshot, subarea_snapshot
   FROM trip
 `
 
@@ -155,13 +155,13 @@ export class TripRepository {
    * Crea un nuevo viaje. El estado inicial es siempre 'pending' sin importar
    * lo que venga en data.status — la única vía para llegar a 'ready' es confirm().
    */
-  create(data: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>): number {
+  create(data: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>): number {
     const stmt = this.db.prepare(`
       INSERT INTO trip (
         vehicle_type, status, trip_date, departure_time, arrival_time,
         passenger_count, cost, requester_id, area_id, work_zone_sheet_id,
-        route_id, reason_id, route_snapshot, reason_snapshot
-      ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)
+        route_id, reason_id, subarea_id, route_snapshot, reason_snapshot, subarea_snapshot
+      ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
     `)
     const result = stmt.run(
       data.vehicleType,
@@ -174,7 +174,8 @@ export class TripRepository {
       data.areaId,
       data.workZoneSheetId,
       data.routeId,
-      data.reasonId
+      data.reasonId,
+      data.subareaId
     )
     return result.lastInsertRowid as number
   }
@@ -188,7 +189,7 @@ export class TripRepository {
       UPDATE trip SET
         vehicle_type = ?, trip_date = ?, departure_time = ?,
         arrival_time = ?, passenger_count = ?, cost = ?, requester_id = ?,
-        area_id = ?, work_zone_sheet_id = ?, route_id = ?, reason_id = ?
+        area_id = ?, work_zone_sheet_id = ?, route_id = ?, reason_id = ?, subarea_id = ?
       WHERE id = ?
     `)
     const result = stmt.run(
@@ -203,6 +204,7 @@ export class TripRepository {
       data.workZoneSheetId,
       data.routeId,
       data.reasonId,
+      data.subareaId,
       data.id
     )
     return result.changes > 0
@@ -226,10 +228,14 @@ export class TripRepository {
         ? (this.db.prepare<{ name: string }>('SELECT name FROM reason WHERE id = ?').get(trip.reasonId)?.name ?? null)
         : null
 
+      const subareaSnapshot = trip.subareaId
+        ? (this.db.prepare<{ name: string }>('SELECT name FROM subarea WHERE id = ?').get(trip.subareaId)?.name ?? null)
+        : null
+
       const stmt = this.db.prepare(
-        'UPDATE trip SET status = ?, route_snapshot = ?, reason_snapshot = ? WHERE id = ?'
+        'UPDATE trip SET status = ?, route_snapshot = ?, reason_snapshot = ?, subarea_snapshot = ? WHERE id = ?'
       )
-      const result = stmt.run('ready', routeSnapshot, reasonSnapshot, id)
+      const result = stmt.run('ready', routeSnapshot, reasonSnapshot, subareaSnapshot, id)
       return result.changes > 0
     })
 
@@ -242,7 +248,7 @@ export class TripRepository {
    */
   reopen(id: number): boolean {
     const stmt = this.db.prepare(
-      'UPDATE trip SET status = ?, route_snapshot = NULL, reason_snapshot = NULL WHERE id = ?'
+      'UPDATE trip SET status = ?, route_snapshot = NULL, reason_snapshot = NULL, subarea_snapshot = NULL WHERE id = ?'
     )
     const result = stmt.run('pending', id)
     return result.changes > 0

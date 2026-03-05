@@ -215,7 +215,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('trips:getById', (_, id: number) => tripCtrl.getById(id))
   ipcMain.handle(
     'trips:create',
-    (_, payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>) =>
+    (_, payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>) =>
       tripCtrl.create(payload)
   )
   ipcMain.handle('trips:update', (_, payload: Trip) => tripCtrl.update(payload))

@@ -159,6 +159,7 @@ contextBridge.exposeInMainWorld('api', {
       workZoneSheetId: number | null
       routeId: number | null
       reasonId: number | null
+      subareaId?: number | null
     }) => ipcRenderer.invoke('trips:create', payload),
     update: (
       id: number,
@@ -174,6 +175,7 @@ contextBridge.exposeInMainWorld('api', {
         workZoneSheetId?: number
         routeId?: number
         reasonId?: number
+        subareaId?: number | null
       }
     ) => ipcRenderer.invoke('trips:update', { id, ...payload }),
     confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),

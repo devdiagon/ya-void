@@ -1,10 +1,10 @@
-import { useReasons, useRequesters, useRoutes, useTrips } from '@renderer/hooks';
+import { ExportButton, IconButton } from '@renderer/components';
+import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
+import { buildExportPayload, exportTripsToPDF } from '@renderer/utils';
 import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
-import { ExportButton, IconButton } from '@renderer/components';
-import { buildExportPayload, exportTripsToPDF } from '@renderer/utils';
 
 interface TripTableProps {
   workZoneSheetId: number;
@@ -26,6 +26,7 @@ function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): For
     passengerCount: form.passengerCount ? Number(form.passengerCount) : undefined,
     routeId: form.routeId ?? undefined,
     reasonId: form.reasonId ?? undefined,
+    subareaId: form.subareaId ?? undefined,
     cost: form.cost ? Number(form.cost) : undefined,
     workZoneSheetId,
     areaId
@@ -61,6 +62,12 @@ export function TripTable({
     deleteReason
   } = useReasons(areaId);
   const { requesters, findOrCreateForArea } = useRequesters(areaId);
+  const {
+    subareas,
+    findOrCreate: findOrCreateSubarea,
+    updateSubarea,
+    deleteSubarea
+  } = useSubareas(areaId);
 
   const [newForm, setNewForm] = useState<TripFormData>(emptyTripForm());
   const [editId, setEditId] = useState<number | null>(null);
@@ -87,6 +94,7 @@ export function TripTable({
       passengerCount: trip.passengerCount != null ? String(trip.passengerCount) : '',
       routeId: trip.routeId,
       reasonId: trip.reasonId,
+      subareaId: trip.subareaId,
       cost: trip.cost != null ? String(trip.cost) : ''
     });
   };
@@ -106,6 +114,8 @@ export function TripTable({
     snap ?? (id ? (routes.find((r) => r.id === id)?.name ?? '—') : '—');
   const reasonLabel = (id: number | null, snap: string | null) =>
     snap ?? (id ? (reasons.find((r) => r.id === id)?.name ?? '—') : '—');
+  const subareaLabel = (id: number | null, snap: string | null) =>
+    snap ?? (id ? (subareas.find((s) => s.id === id)?.name ?? '—') : '—');
 
   const sharedRowProps = {
     routes,
@@ -125,6 +135,14 @@ export function TripTable({
     },
     onDeleteReason: async (opt: { id: number }) => {
       await deleteReason(opt.id);
+    },
+    subareas,
+    onFindOrCreateSubarea: findOrCreateSubarea,
+    onEditSubarea: async (opt: { id: number; name: string }, newName: string) => {
+      await updateSubarea(opt.id, newName);
+    },
+    onDeleteSubarea: async (opt: { id: number }) => {
+      await deleteSubarea(opt.id);
     }
   };
 
@@ -217,6 +235,7 @@ export function TripTable({
               <th className={`${hdr} text-center w-[64px]`}># Personas</th>
               <th className={`${hdr} min-w-[220px]`}>Ruta</th>
               <th className={`${hdr} min-w-[220px]`}>Motivo</th>
+              <th className={`${hdr} min-w-[220px]`}>Área que solicita</th>
             </tr>
           </thead>
 
@@ -283,6 +302,9 @@ export function TripTable({
                   <td className={`${cell} break-words`}>
                     {reasonLabel(trip.reasonId, trip.reasonSnapshot)}
                   </td>
+                  <td className={`${cell} break-words`}>
+                    {subareaLabel(trip.subareaId, trip.subareaSnapshot)}
+                  </td>
                 </tr>
               )
             )}
@@ -302,7 +324,7 @@ export function TripTable({
               >
                 ${totalCost.toFixed(2)}
               </td>
-              <td colSpan={7} className={`${cell} border-t-2 border-gray-300`} />
+              <td colSpan={8} className={`${cell} border-t-2 border-gray-300`} />
             </tr>
           </tfoot>
         </table>

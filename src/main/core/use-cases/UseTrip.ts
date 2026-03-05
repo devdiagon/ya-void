@@ -65,7 +65,7 @@ export class UseTrip {
    * Todos los campos son opcionales — el status visual del frontend indicará
    * qué campos faltan para poder confirmar el viaje.
    */
-  create(data: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>): Trip {
+  create(data: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>): Trip {
     const newId = this.tripRepository.create(data)
     const created = this.tripRepository.findById(newId)
     if (!created) throw new Error('Error al crear el viaje.')

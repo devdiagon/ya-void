@@ -14,8 +14,10 @@ export type TripRow = {
   work_zone_sheet_id: number | null
   route_id: number | null
   reason_id: number | null
+  subarea_id: number | null
   route_snapshot: string | null
   reason_snapshot: string | null
+  subarea_snapshot: string | null
 }
 
 export function mapRowToTrip(raw: TripRow): Trip {
@@ -33,7 +35,9 @@ export function mapRowToTrip(raw: TripRow): Trip {
     workZoneSheetId: raw.work_zone_sheet_id,
     routeId: raw.route_id,
     reasonId: raw.reason_id,
+    subareaId: raw.subarea_id,
     routeSnapshot: raw.route_snapshot,
-    reasonSnapshot: raw.reason_snapshot
+    reasonSnapshot: raw.reason_snapshot,
+    subareaSnapshot: raw.subarea_snapshot
   }
 }

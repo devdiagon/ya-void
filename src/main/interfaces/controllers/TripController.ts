@@ -37,7 +37,7 @@ export class TripController {
   }
 
   async create(
-    payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot'>
+    payload: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>
   ): Promise<Trip> {
     return this.useTrip.create(payload)
   }
