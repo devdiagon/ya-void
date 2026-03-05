@@ -62,7 +62,12 @@ export function useAreas(farmId: number) {
     updateError('update', null);
 
     try {
-      await window.api.areas.update(area.id, { name: area.name, farmId: area.farm_id });
+      await window.api.areas.update(area.id, {
+        name: area.name,
+        farmId: area.farm_id,
+        managerName: area.manager_name,
+        managerCid: area.manager_cid
+      });
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'No se ha podido actualizar el área';

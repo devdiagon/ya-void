@@ -38,7 +38,9 @@ export const AreasAdminPage = () => {
   const handleCreate = async (data: AreaFormData) => {
     await createArea({
       name: data.name,
-      farmId: parsedFarmId
+      farmId: parsedFarmId,
+      managerName: data.managerName || null,
+      managerCid: data.managerCid || null
     });
     createModal.close();
     refetch();
@@ -50,7 +52,9 @@ export const AreasAdminPage = () => {
     const updateData: Area = {
       id: updateModal.data.id,
       name: data.name,
-      farm_id: updateModal.data.farm_id
+      farm_id: updateModal.data.farm_id,
+      manager_name: data.managerName || null,
+      manager_cid: data.managerCid || null
     };
 
     await updateArea(updateData);
@@ -158,7 +162,11 @@ export const AreasAdminPage = () => {
           <div className="space-y-4">
             <AdminAreaForm
               title="Editar Área"
-              initialData={{ name: updateModal.data.name || '' }}
+              initialData={{
+                name: updateModal.data.name || '',
+                managerName: updateModal.data.manager_name || '',
+                managerCid: updateModal.data.manager_cid || ''
+              }}
               handleCancel={() => {
                 updateModal.close();
                 clearError('update');
