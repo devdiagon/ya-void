@@ -7,7 +7,7 @@ export class RequesterRepository {
 
   findAll(): Requester[] {
     try {
-      const stmt = this.db.prepare<RequesterRow>('SELECT id, name, cid FROM requester ORDER BY name')
+      const stmt = this.db.prepare<RequesterRow>('SELECT id, name FROM requester ORDER BY name')
       const rows = stmt.all()
       return rows.map(mapRowToRequester)
     } catch (error) {
@@ -19,7 +19,7 @@ export class RequesterRepository {
   findAllByArea(area_id: number): Requester[] {
     try {
       const stmt = this.db.prepare<RequesterRow>(
-        `SELECT DISTINCT r.id, r.name, r.cid
+        `SELECT DISTINCT r.id, r.name
          FROM requester r
          JOIN area_requester ar ON r.id = ar.requester_id
          WHERE ar.area_id = ?
@@ -35,7 +35,7 @@ export class RequesterRepository {
 
   findById(id: number): Requester | null {
     try {
-      const stmt = this.db.prepare<RequesterRow>('SELECT id, name, cid FROM requester WHERE id = ?')
+      const stmt = this.db.prepare<RequesterRow>('SELECT id, name FROM requester WHERE id = ?')
       const row = stmt.get(id)
       return row ? mapRowToRequester(row) : null
     } catch (error) {
@@ -44,16 +44,14 @@ export class RequesterRepository {
     }
   }
 
-  create(name: string, cid: string): Requester {
+  create(name: string): Requester {
     const normalizedName = name.trim()
     if (!normalizedName) throw new Error('Requester name cannot be empty')
-    const normalizedCid = cid.trim()
-    if (!normalizedCid) throw new Error('Requester CID cannot be empty')
 
     try {
-      const insert = this.db.prepare('INSERT INTO requester (name, cid) VALUES (?, ?)')
-      const info = insert.run(normalizedName, normalizedCid)
-      return { id: Number(info.lastInsertRowid), name: normalizedName, cid: normalizedCid }
+      const insert = this.db.prepare('INSERT INTO requester (name) VALUES (?)')
+      const info = insert.run(normalizedName)
+      return { id: Number(info.lastInsertRowid), name: normalizedName }
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
         throw new Error('A requester with that name already exists')
@@ -168,7 +166,7 @@ export class RequesterRepository {
   getRequestersByFarm(farmId: number): Requester[] {
     try {
       const stmt = this.db.prepare<RequesterRow>(
-        `SELECT DISTINCT r.id, r.name, r.cid
+        `SELECT DISTINCT r.id, r.name
          FROM requester r
          JOIN area_requester ar ON r.id = ar.requester_id
          JOIN area a ON ar.area_id = a.id
@@ -199,7 +197,7 @@ export class RequesterRepository {
    * Busca un solicitante por nombre exacto (case-sensitive).
    */
   findByName(name: string): Requester | null {
-    const stmt = this.db.prepare<RequesterRow>('SELECT id, name, cid FROM requester WHERE name = ?')
+    const stmt = this.db.prepare<RequesterRow>('SELECT id, name FROM requester WHERE name = ?')
     const row = stmt.get(name)
     return row ? mapRowToRequester(row) : null
   }
@@ -209,14 +207,14 @@ export class RequesterRepository {
    * Si ya existe pero no está asignado al área, lo asigna.
    * Garantiza que el solicitante quedará disponible para autocompletar en esa área.
    */
-  findOrCreateForArea(name: string, cid: string, areaId: number): Requester {
+  findOrCreateForArea(name: string, areaId: number): Requester {
     const normalizedName = name.trim()
     if (!normalizedName) throw new Error('El nombre del solicitante no puede estar vacío')
 
     let requester = this.findByName(normalizedName)
 
     if (!requester) {
-      requester = this.create(normalizedName, cid)
+      requester = this.create(normalizedName)
     }
 
     // Idempotente: createInArea ignora si la relación ya existe

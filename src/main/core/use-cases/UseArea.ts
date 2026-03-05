@@ -25,7 +25,7 @@ export class UseArea {
   /**
    * Crea una nueva área validando nombre y relación con finca
    */
-  create(name: string, farmId: number, managerId: number | null = null): Area {
+  create(name: string, farmId: number, managerName: string | null = null, managerCid: string | null = null): Area {
     if (!name || name.trim() === '') {
       throw new Error('Area name cannot be empty')
     }
@@ -34,18 +34,18 @@ export class UseArea {
       throw new Error('A valid Farm ID is required to create an Area')
     }
 
-    return this.areaRepository.create(name.trim(), farmId, managerId)
+    return this.areaRepository.create(name.trim(), farmId, managerName, managerCid)
   }
 
   /**
    * Actualiza los datos de un área
    */
-  update(id: number, name: string, farmId: number, managerId: number | null = null): void {
+  update(id: number, name: string, farmId: number, managerName: string | null = null, managerCid: string | null = null): void {
     if (!name || name.trim() === '') {
       throw new Error('Area name cannot be empty')
     }
 
-    const success = this.areaRepository.update(id, name.trim(), farmId, managerId)
+    const success = this.areaRepository.update(id, name.trim(), farmId, managerName, managerCid)
     if (!success) {
       throw new Error(`Could not update area: Area with ID ${id} not found`)
     }

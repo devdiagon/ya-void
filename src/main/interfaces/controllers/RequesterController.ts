@@ -24,8 +24,8 @@ export class RequesterController {
     return this.useRequester.getById(id)
   }
 
-  async create(payload: { name: string; cid: string }): Promise<Requester> {
-    return this.useRequester.create(payload.name, payload.cid)
+  async create(payload: { name: string }): Promise<Requester> {
+    return this.useRequester.create(payload.name)
   }
 
   async update(id: number, payload: { name: string }): Promise<Requester> {
@@ -46,7 +46,7 @@ export class RequesterController {
     return this.useRequester.removeFromArea(payload.requesterId, payload.areaId)
   }
 
-  async findOrCreateForArea(payload: { name: string; cid: string; areaId: number }): Promise<Requester> {
-    return this.useRequester.findOrCreateForArea(payload.name, payload.cid, payload.areaId)
+  async findOrCreateForArea(payload: { name: string; areaId: number }): Promise<Requester> {
+    return this.useRequester.findOrCreateForArea(payload.name, payload.areaId)
   }
 }
