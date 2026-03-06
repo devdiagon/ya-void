@@ -111,6 +111,142 @@ export function TripFormRow({
 
   return (
     <tr className="bg-white ring-1 ring-inset ring-blue-400">
+      {/* Fecha */}
+      <td className={`${cell} min-w-[120px]`}>
+        <input
+          type="date"
+          className={inputCls}
+          value={form.tripDate}
+          onChange={(e) => set('tripDate', e.target.value)}
+        />
+      </td>
+
+      {/* Vehículo */}
+      <td className={`${cell} min-w-[110px]`}>
+        <select
+          className="w-full bg-transparent border-0 outline-none text-sm py-0 cursor-pointer"
+          value={form.vehicleType}
+          onChange={(e) => set('vehicleType', e.target.value as TripVehicleType | '')}
+        >
+          <option value="">—</option>
+          {VEHICLE_TYPES.map((v) => (
+            <option key={v} value={v}>
+              {v}
+            </option>
+          ))}
+        </select>
+      </td>
+
+      {/* Llegada */}
+      <td className={`${cell} min-w-[100px] ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
+        <input
+          type="text"
+          className={`${inputCls} ${timeErrors.arrival ? 'text-red-600' : ''}`}
+          value={form.arrivalTime}
+          placeholder="HH:MM"
+          maxLength={5}
+          onChange={(e) => handleTimeChange('arrivalTime', 'arrival', e.target.value)}
+        />
+        {timeErrors.arrival && (
+          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.arrival}</p>
+        )}
+      </td>
+
+      {/* Salida */}
+      <td className={`${cell} min-w-[100px] ${timeErrors.departure ? 'bg-red-50' : ''}`}>
+        <input
+          type="text"
+          className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
+          value={form.departureTime}
+          placeholder="HH:MM"
+          maxLength={5}
+          onChange={(e) => handleTimeChange('departureTime', 'departure', e.target.value)}
+        />
+        {timeErrors.departure && (
+          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.departure}</p>
+        )}
+      </td>
+
+      {/* Pasajeros */}
+      <td className={`${cell} min-w-[56px] w-[60px]`}>
+        <input
+          type="number"
+          min={0}
+          className={`${inputCls} text-center`}
+          value={form.passengerCount}
+          onChange={(e) => set('passengerCount', e.target.value)}
+        />
+      </td>
+
+      {/* Solicitante */}
+      <td className={`${cell} min-w-[140px]`}>
+        <CellAutocomplete
+          options={requesters}
+          value={form.requesterId}
+          placeholder="Buscar solicitante..."
+          onChange={(id) => set('requesterId', id)}
+          onClear={() => set('requesterId', null)}
+          onFindOrCreate={onFindOrCreateRequester}
+        />
+      </td>
+
+      {/* Área que solicita */}
+      <td className={`${cell} min-w-[140px]`}>
+        <CellAutocomplete
+          options={subareas}
+          value={form.subareaId}
+          placeholder="Buscar área..."
+          onChange={(id) => set('subareaId', id)}
+          onClear={() => set('subareaId', null)}
+          onFindOrCreate={onFindOrCreateSubarea}
+          onEditOption={onEditSubarea}
+          onDeleteOption={onDeleteSubarea}
+        />
+      </td>
+
+      {/* Motivo */}
+      <td className={`${cell} min-w-[300px]`}>
+        <CellAutocomplete
+          options={reasons}
+          value={form.reasonId}
+          placeholder="Buscar motivo..."
+          onChange={(id) => set('reasonId', id)}
+          onClear={() => set('reasonId', null)}
+          onFindOrCreate={onFindOrCreateReason}
+          onEditOption={onEditReason}
+          onDeleteOption={onDeleteReason}
+        />
+      </td>
+
+      {/* Ruta */}
+      <td className={`${cell} min-w-[300px]`}>
+        <CellAutocomplete
+          options={routes}
+          value={form.routeId}
+          placeholder="Buscar ruta..."
+          onChange={(id) => set('routeId', id)}
+          onClear={() => set('routeId', null)}
+          onFindOrCreate={onFindOrCreateRoute}
+          onEditOption={onEditRoute}
+          onDeleteOption={onDeleteRoute}
+        />
+      </td>
+
+      {/* Costo */}
+      <td className={`${cell} min-w-[90px]`}>
+        <div className="flex items-center gap-0.5">
+          <span className="text-gray-400 text-xs">$</span>
+          <input
+            type="number"
+            min={0}
+            step={0.01}
+            className={inputCls}
+            value={form.cost}
+            onChange={(e) => set('cost', e.target.value)}
+          />
+        </div>
+      </td>
+
       {/* Acciones */}
       <td className={`${cell} min-w-[72px]`}>
         <div className="flex items-center gap-1">
@@ -130,138 +266,6 @@ export function TripFormRow({
             variant="danger"
           />
         </div>
-      </td>
-
-      {/* Fecha */}
-      <td className={`${cell} min-w-[120px]`}>
-        <input
-          type="date"
-          className={inputCls}
-          value={form.tripDate}
-          onChange={(e) => set('tripDate', e.target.value)}
-        />
-      </td>
-
-      {/* Costo */}
-      <td className={`${cell} min-w-[90px]`}>
-        <div className="flex items-center gap-0.5">
-          <span className="text-gray-400 text-xs">$</span>
-          <input
-            type="number"
-            min={0}
-            step={0.01}
-            className={inputCls}
-            value={form.cost}
-            onChange={(e) => set('cost', e.target.value)}
-          />
-        </div>
-      </td>
-
-      {/* Vehículo */}
-      <td className={`${cell} min-w-[110px]`}>
-        <select
-          className="w-full bg-transparent border-0 outline-none text-sm py-0 cursor-pointer"
-          value={form.vehicleType}
-          onChange={(e) => set('vehicleType', e.target.value as TripVehicleType | '')}
-        >
-          <option value="">—</option>
-          {VEHICLE_TYPES.map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </td>
-
-      {/* Solicitante */}
-      <td className={`${cell} min-w-[140px]`}>
-        <CellAutocomplete
-          options={requesters}
-          value={form.requesterId}
-          placeholder="Buscar solicitante..."
-          onChange={(id) => set('requesterId', id)}
-          onFindOrCreate={onFindOrCreateRequester}
-        />
-      </td>
-
-      {/* Salida */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.departure ? 'bg-red-50' : ''}`}>
-        <input
-          type="text"
-          className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
-          value={form.departureTime}
-          placeholder="HH:MM"
-          maxLength={5}
-          onChange={(e) => handleTimeChange('departureTime', 'departure', e.target.value)}
-        />
-        {timeErrors.departure && (
-          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.departure}</p>
-        )}
-      </td>
-
-      {/* Llegada */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
-        <input
-          type="text"
-          className={`${inputCls} ${timeErrors.arrival ? 'text-red-600' : ''}`}
-          value={form.arrivalTime}
-          placeholder="HH:MM"
-          maxLength={5}
-          onChange={(e) => handleTimeChange('arrivalTime', 'arrival', e.target.value)}
-        />
-        {timeErrors.arrival && (
-          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.arrival}</p>
-        )}
-      </td>
-
-      {/* Pasajeros */}
-      <td className={`${cell} min-w-[56px] w-[60px]`}>
-        <input
-          type="number"
-          min={0}
-          className={`${inputCls} text-center`}
-          value={form.passengerCount}
-          onChange={(e) => set('passengerCount', e.target.value)}
-        />
-      </td>
-
-      {/* Ruta */}
-      <td className={`${cell} min-w-[220px]`}>
-        <CellAutocomplete
-          options={routes}
-          value={form.routeId}
-          placeholder="Buscar ruta..."
-          onChange={(id) => set('routeId', id)}
-          onFindOrCreate={onFindOrCreateRoute}
-          onEditOption={onEditRoute}
-          onDeleteOption={onDeleteRoute}
-        />
-      </td>
-
-      {/* Motivo */}
-      <td className={`${cell} min-w-[220px]`}>
-        <CellAutocomplete
-          options={reasons}
-          value={form.reasonId}
-          placeholder="Buscar motivo..."
-          onChange={(id) => set('reasonId', id)}
-          onFindOrCreate={onFindOrCreateReason}
-          onEditOption={onEditReason}
-          onDeleteOption={onDeleteReason}
-        />
-      </td>
-
-      {/* Área que solicita */}
-      <td className={`${cell} min-w-[220px]`}>
-        <CellAutocomplete
-          options={subareas}
-          value={form.subareaId}
-          placeholder="Buscar área..."
-          onChange={(id) => set('subareaId', id)}
-          onFindOrCreate={onFindOrCreateSubarea}
-          onEditOption={onEditSubarea}
-          onDeleteOption={onDeleteSubarea}
-        />
       </td>
     </tr>
   );

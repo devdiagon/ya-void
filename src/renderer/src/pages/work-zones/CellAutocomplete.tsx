@@ -20,6 +20,8 @@ interface CellAutocompleteProps {
   onChange: (id: number, name: string) => void;
   /** When provided, shows a "Crear: …" option for unmatched text */
   onFindOrCreate?: (name: string) => Promise<AutocompleteOption | null>;
+  /** Called when the user clears the input and blurs without selecting anything */
+  onClear?: () => void;
   /** When provided, shows "Editar" on right-click of an option */
   onEditOption?: (opt: AutocompleteOption, newName: string) => Promise<void>;
   /** When provided, shows "Eliminar" on right-click of an option */
@@ -33,6 +35,7 @@ export function CellAutocomplete({
   placeholder,
   onChange,
   onFindOrCreate,
+  onClear,
   onEditOption,
   onDeleteOption,
   disabled
@@ -114,13 +117,14 @@ export function CellAutocomplete({
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) {
+        if (query === '' && value != null) onClear?.();
         setOpen(false);
         setQuery('');
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  }, [open, query, value, onClear]);
 
   // Close context menu on outside click
   useEffect(() => {
@@ -155,9 +159,11 @@ export function CellAutocomplete({
         placeholder={placeholder}
         value={displayValue}
         className="w-full bg-transparent border-0 outline-none text-sm py-0 placeholder:text-gray-400 disabled:opacity-40 resize-none overflow-hidden leading-snug"
-        onFocus={() => {
-          setQuery('');
+        onFocus={(e) => {
+          setQuery(selectedName);
           openDropdown();
+          // Select all text so the user can immediately replace it
+          e.target.select();
         }}
         onChange={(e) => {
           setQuery(e.target.value);
