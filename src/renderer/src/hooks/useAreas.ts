@@ -46,15 +46,17 @@ export function useAreas(farmId: number) {
     }
   }, [farmId]);
 
-  const createArea = async (areaData: FormAreaDTO) => {
+  const createArea = async (areaData: FormAreaDTO): Promise<Area> => {
     updateError('create', null);
 
     try {
       const newArea = await window.api.areas.create(areaData);
       setAreas((prevAreas) => [...prevAreas, newArea]);
+      return newArea;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'No se ha podido crear el área';
       updateError('create', errorMessage);
+      throw err;
     }
   };
 

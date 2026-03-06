@@ -23,7 +23,7 @@ export const WorkZoneSheetsPage = () => {
   const [farmWorkZone, setFarmWorkZone] = useState<FarmWorkZone | null>(null);
   const [activeSheetId, setActiveSheetId] = useState<number | null>(null);
 
-  const { areas } = useAreas(farmWorkZone?.farmId ?? 0);
+  const { areas, createArea, refetch: refetchAreas } = useAreas(farmWorkZone?.farmId ?? 0);
 
   const {
     workZoneSheets,
@@ -80,6 +80,7 @@ export const WorkZoneSheetsPage = () => {
     });
     createModal.close();
     refetch();
+    refetchAreas();
   };
 
   const handleEdit = async (data: WorkZoneSheetFormData) => {
@@ -186,6 +187,8 @@ export const WorkZoneSheetsPage = () => {
         <WorkZoneSheetForm
           title="Nueva Hoja"
           areas={areas}
+          farmId={farmWorkZone?.farmId}
+          onCreateArea={createArea}
           onCancel={createModal.close}
           onConfirm={handleCreate}
         />
