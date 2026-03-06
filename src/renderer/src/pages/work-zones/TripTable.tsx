@@ -225,17 +225,17 @@ export function TripTable({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              <th className={hdr}>Acciones</th>
               <th className={hdr}>Fecha</th>
-              <th className={`${hdr} text-right`}>Costo ($)</th>
               <th className={hdr}>Vehículo</th>
-              <th className={hdr}>Solicitante</th>
-              <th className={hdr}>Salida</th>
               <th className={hdr}>Llegada</th>
+              <th className={hdr}>Salida</th>
               <th className={`${hdr} text-center w-[64px]`}>#Num</th>
-              <th className={`${hdr} min-w-[220px]`}>Ruta</th>
-              <th className={`${hdr} min-w-[220px]`}>Motivo</th>
-              <th className={`${hdr} min-w-[220px]`}>Área</th>
+              <th className={hdr}>Solicitante</th>
+              <th className={`${hdr} min-w-[140px]`}>Área</th>
+              <th className={`${hdr} min-w-[300px]`}>Motivo</th>
+              <th className={`${hdr} min-w-[300px]`}>Ruta</th>
+              <th className={`${hdr} text-right`}>Costo ($)</th>
+              <th className={hdr}>Acciones</th>
             </tr>
           </thead>
 
@@ -269,6 +269,24 @@ export function TripTable({
                     trip.status === 'pending' ? 'bg-yellow-50' : 'bg-white'
                   } hover:bg-blue-50/20 transition-colors`}
                 >
+                  <td className={cell}>{formatDate(trip.tripDate)}</td>
+                  <td className={cell}>{trip.vehicleType ?? '—'}</td>
+                  <td className={cell}>{trip.arrivalTime ?? '—'}</td>
+                  <td className={cell}>{trip.departureTime ?? '—'}</td>
+                  <td className={`${cell} text-center`}>{trip.passengerCount ?? '—'}</td>
+                  <td className={cell}>{requesterLabel(trip.requesterId)}</td>
+                  <td className={`${cell} break-words`}>
+                    {subareaLabel(trip.subareaId, trip.subareaSnapshot)}
+                  </td>
+                  <td className={`${cell} break-words`}>
+                    {reasonLabel(trip.reasonId, trip.reasonSnapshot)}
+                  </td>
+                  <td className={`${cell} break-words`}>
+                    {routeLabel(trip.routeId, trip.routeSnapshot)}
+                  </td>
+                  <td className={`${cell} text-right font-medium`}>
+                    {trip.cost != null ? `$${trip.cost.toFixed(2)}` : '—'}
+                  </td>
                   <td className={cell}>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <IconButton
@@ -287,24 +305,6 @@ export function TripTable({
                       />
                     </div>
                   </td>
-                  <td className={cell}>{formatDate(trip.tripDate)}</td>
-                  <td className={`${cell} text-right font-medium`}>
-                    {trip.cost != null ? `$${trip.cost.toFixed(2)}` : '—'}
-                  </td>
-                  <td className={cell}>{trip.vehicleType ?? '—'}</td>
-                  <td className={cell}>{requesterLabel(trip.requesterId)}</td>
-                  <td className={cell}>{trip.departureTime ?? '—'}</td>
-                  <td className={cell}>{trip.arrivalTime ?? '—'}</td>
-                  <td className={`${cell} text-center`}>{trip.passengerCount ?? '—'}</td>
-                  <td className={`${cell} break-words`}>
-                    {routeLabel(trip.routeId, trip.routeSnapshot)}
-                  </td>
-                  <td className={`${cell} break-words`}>
-                    {reasonLabel(trip.reasonId, trip.reasonSnapshot)}
-                  </td>
-                  <td className={`${cell} break-words`}>
-                    {subareaLabel(trip.subareaId, trip.subareaSnapshot)}
-                  </td>
                 </tr>
               )
             )}
@@ -314,7 +314,7 @@ export function TripTable({
           <tfoot>
             <tr className="bg-gray-50">
               <td
-                colSpan={2}
+                colSpan={9}
                 className={`${cell} text-right font-medium text-gray-700 border-t-2 border-gray-300`}
               >
                 Total de Costos:
@@ -324,7 +324,7 @@ export function TripTable({
               >
                 ${totalCost.toFixed(2)}
               </td>
-              <td colSpan={8} className={`${cell} border-t-2 border-gray-300`} />
+              <td className={`${cell} border-t-2 border-gray-300`} />
             </tr>
           </tfoot>
         </table>
