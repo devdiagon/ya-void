@@ -100,6 +100,11 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('workZones:list', () => workZoneCtrl.listWorkZones())
   ipcMain.handle('workZones:getById', (_, id: number) => workZoneCtrl.getWorkZoneById(id))
   ipcMain.handle(
+    'workZones:getAllWorkZonesTrips',
+     (_, workZoneId: number, farmWorkZoneId: number) =>
+      workZoneCtrl.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
+  )
+  ipcMain.handle(
     'workZones:create',
     (_, payload: { name: string; startDate: string; endDate: string }) =>
       workZoneCtrl.createWorkZone(payload)

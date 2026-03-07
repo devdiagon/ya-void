@@ -44,6 +44,8 @@ contextBridge.exposeInMainWorld('api', {
   workZones: {
     list: () => ipcRenderer.invoke('workZones:list'),
     getById: (id: number) => ipcRenderer.invoke('workZones:getById', id),
+    getAllWorkZonesTrips: (workZoneId: number, farmWorkZoneId: number) => 
+      ipcRenderer.invoke('workZones:getAllWorkZonesTrips', workZoneId, farmWorkZoneId),
     create: (payload: { name: string; startDate: string; endDate: string }) =>
       ipcRenderer.invoke('workZones:create', payload),
     update: (id: number, payload: { name: string; startDate: string; endDate: string }) =>
