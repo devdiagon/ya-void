@@ -207,19 +207,29 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   c2.font = FONT_APTOS_12B;
   c2.alignment = { horizontal: 'center', wrapText: true };
 
-  // Row 3 – Month | Farm | Area
-  ws.mergeCells('A3:D3');
+  // -------- Row 3 ----> Sections: (Month | Farm | Area)
+  // Month label
   const c3a = ws.getCell('A3');
-  c3a.value = `MES               Del ${d.meta.startDate} al ${d.meta.endDate}`;
+  c3a.value = 'MES';
   c3a.font = FONT_APTOS_12B;
   c3a.alignment = { horizontal: 'left' };
 
+  // Month date detail
+  ws.mergeCells('B3:F3');
+  const c3b = ws.getCell('B3');
+  c3b.value = `Del ${d.meta.startDate} al ${d.meta.endDate}`;
+  c3b.font = FONT_APTOS_12B;
+  c3b.alignment = { horizontal: 'left' };
+
+  // Farm
   ws.getCell('G3').value = `Finca: ${d.meta.farmName}`;
   ws.getCell('G3').font = FONT_APTOS_12B;
 
+  // Area label
   ws.getCell('J3').value = 'Área:';
   ws.getCell('J3').font = FONT_APTOS_12B;
 
+  // Area detail
   ws.mergeCells('K3:L3');
   ws.getCell('K3').value = d.meta.areaName;
   ws.getCell('K3').font = FONT_APTOS_12B;
