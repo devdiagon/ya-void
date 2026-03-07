@@ -1,7 +1,6 @@
 import { TripVehicleType } from './trip.type';
 
 export interface ExportTripRow {
-  id: number;
   tripDate: string;
   departureTime: string;
   arrivalTime: string;
@@ -26,5 +25,8 @@ export interface ExportTripWorkSheet {
     workSheetName: string;
   };
   rows: ExportTripRow[];
-  totalCost: number;
+  manager: {
+    name: string;
+    ci: string;
+  };
 }

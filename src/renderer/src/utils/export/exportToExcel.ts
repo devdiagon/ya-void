@@ -1,44 +1,6 @@
+import { ExportTripRow, ExportTripWorkSheet } from '@renderer/types';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-
-export interface RegistroViaje {
-  fechaEjecucion: string; // Col A  – "DD/MM/YYYY"
-  horaIngreso: string; // Col B  – "HH:MM" (se calcula D automáticamente)
-  horaSalida: string; // Col C  – "HH:MM"
-  personas: number; // Col E
-  motivoContratacion: string; // Col F
-  personaSolicita: string; // Col G
-  areaTraslado: string; // Col H
-  rutaEjecutada: string; // Col I
-  costo: number; // Col J
-  tipoTransporte: string; // Col K
-  firmaUsuario?: string; // Col L  – opcional (texto / iniciales)
-}
-
-export interface DatosHoja {
-  /** Nombre de la pestaña en el libro Excel */
-  nombreHoja: string;
-  /** Nombre del responsable – fila 2 */
-  nombreReferencia: string;
-  /** Texto completo de la fila 3 izq. Ej: "MES  Del 01 al 07 de Abril del 2026." */
-  mes: string;
-  /** Finca – fila 3 centro. Ej: "Finca: R2" */
-  finca: string;
-  /** Área – fila 3 der. Ej: "Empaque" */
-  area: string;
-  /** Ruta del contrato – fila 4 */
-  rutaContrato: string;
-  /** Registros de viajes (máx. 16 filas, rows 6-21) */
-  registros: RegistroViaje[];
-  /** Nombre del proveedor del servicio – sección de firmas */
-  proveedorServicio?: string;
-  /** Nombre de quien gestiona – sección de firmas */
-  gestionadoPor?: string;
-  /** Cargo del gestor */
-  cargoGestor?: string;
-  /** Cédula del gestor */
-  cedulaGestor?: string;
-}
 
 /// =========================================
 /// Constants
@@ -109,17 +71,17 @@ const CELL_HEIGHT_SF = 1.25;
 /// Main export function
 /// =========================================
 
-export async function exportarViajes(
-  hojas: DatosHoja[],
+export async function exportTripsToExcel(
+  workSheets: ExportTripWorkSheet[],
   archivo = 'Reporte_Transporte'
 ): Promise<void> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'Sistema de Viajes';
+  wb.creator = 'Trip Registry';
   wb.created = new Date();
 
-  for (const datos of hojas) {
-    const ws = wb.addWorksheet(datos.nombreHoja);
-    aplicarTemplate(ws, datos);
+  for (const sheet of workSheets) {
+    const ws = wb.addWorksheet(sheet.meta.workSheetName);
+    applyFormat(ws, sheet);
   }
 
   const buffer = await wb.xlsx.writeBuffer();
@@ -133,10 +95,10 @@ export async function exportarViajes(
 /// Style the Excel Sheet
 /// =========================================
 
-function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
+function applyFormat(ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void {
   // Set rows reference positions
   const DATA_START = 6;
-  const DATA_END = DATA_START + d.registros.length - 1;
+  const DATA_END = DATA_START + d.rows.length - 1;
   const TOTAL_ROW = DATA_END + 1;
   const POST_TABLE_SPACE_ROW = TOTAL_ROW + 1;
   const SIG_LINE_ROW = POST_TABLE_SPACE_ROW + 1;
@@ -180,7 +142,7 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
 
   // ===================== HEADER (1-4 rows) ===================== \\
 
-  // Row 1 – Ttile
+  // Row 1 – Title
   ws.mergeCells('A1:L1');
   const c1 = ws.getCell('A1');
   c1.value = 'DETALLE DE TRANSPORTE EXTERNO';
@@ -190,25 +152,25 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   // Row 2 – Owner Name
   ws.mergeCells('A2:L2');
   const c2 = ws.getCell('A2');
-  c2.value = d.nombreReferencia;
+  c2.value = 'Sr. LUIS ORLANDO HERNANDEZ QUISHPE';
   c2.font = FONT_APTOS_12B;
   c2.alignment = { horizontal: 'center', wrapText: true };
 
   // Row 3 – Month | Farm | Area
   ws.mergeCells('A3:D3');
   const c3a = ws.getCell('A3');
-  c3a.value = d.mes;
+  c3a.value = `MES               Del ${d.meta.startDate} al ${d.meta.endDate}`;
   c3a.font = FONT_APTOS_12B;
   c3a.alignment = { horizontal: 'left' };
 
-  ws.getCell('G3').value = d.finca;
+  ws.getCell('G3').value = `Finca: ${d.meta.farmName}`;
   ws.getCell('G3').font = FONT_APTOS_12B;
 
   ws.getCell('J3').value = 'Área:';
   ws.getCell('J3').font = FONT_APTOS_12B;
 
   ws.mergeCells('K3:L3');
-  ws.getCell('K3').value = d.area;
+  ws.getCell('K3').value = d.meta.areaName;
   ws.getCell('K3').font = FONT_APTOS_12B;
   ws.getCell('K3').alignment = { horizontal: 'left' };
 
@@ -222,7 +184,7 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   };
   ws.getCell('A4').alignment = { horizontal: 'left', wrapText: true };
 
-  ws.getCell('B4').value = d.rutaContrato;
+  ws.getCell('B4').value = 'Cayambe';
   ws.getCell('B4').font = {
     name: 'Aptos Narrow',
     size: 11,
@@ -260,7 +222,7 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   // ===================== DATA ROWS ===================== \\
 
   for (let r = DATA_START; r <= DATA_END; r++) {
-    const reg = d.registros[r - DATA_START] as RegistroViaje | undefined;
+    const reg = d.rows[r - DATA_START] as ExportTripRow;
     const dataCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
     // Cols A-K: Cambria 9, thin border, centered
@@ -278,36 +240,38 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
     cellL.alignment = { horizontal: 'center', vertical: 'middle' };
 
     if (reg) {
-      ws.getCell(`A${r}`).value = reg.fechaEjecucion;
-      ws.getCell(`B${r}`).value = reg.horaIngreso;
-      ws.getCell(`C${r}`).value = reg.horaSalida;
-      ws.getCell(`D${r}`).value = { formula: `=C${r}-B${r}` };
-      ws.getCell(`E${r}`).value = reg.personas;
-      ws.getCell(`F${r}`).value = reg.motivoContratacion;
-      ws.getCell(`G${r}`).value = reg.personaSolicita;
-      ws.getCell(`H${r}`).value = reg.areaTraslado;
-      ws.getCell(`I${r}`).value = reg.rutaEjecutada;
-      ws.getCell(`J${r}`).value = reg.costo;
-      ws.getCell(`K${r}`).value = reg.tipoTransporte;
-      if (reg.firmaUsuario) ws.getCell(`L${r}`).value = reg.firmaUsuario;
+      ws.getCell(`A${r}`).value = reg.tripDate;
+      ws.getCell(`B${r}`).value = reg.departureTime;
+      ws.getCell(`C${r}`).value = reg.arrivalTime;
+      ws.getCell(`D${r}`).value = reg.waitingTime;
+      ws.getCell(`E${r}`).value = reg.passengerCount;
+      ws.getCell(`F${r}`).value = reg.reason;
+      ws.getCell(`G${r}`).value = reg.requester.name;
+      ws.getCell(`H${r}`).value = reg.requester.area;
+      ws.getCell(`I${r}`).value = reg.route;
+      ws.getCell(`J${r}`).value = reg.cost;
+      ws.getCell(`K${r}`).value = reg.vehicleType;
     }
   }
 
   // ===================== TOTAL ===================== \\
 
+  const totalMergeCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+  for (const col of totalMergeCols) {
+    const borderDef: Partial<ExcelJS.Borders> = {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    if (col === 'A') borderDef.left = { style: 'thin' };
+    if (col === 'I') borderDef.right = { style: 'thin' };
+    ws.getCell(`${col}${TOTAL_ROW}`).border = borderDef;
+  }
+
   ws.mergeCells(`A${TOTAL_ROW}:I${TOTAL_ROW}`);
   const cTotal = ws.getCell(`A${TOTAL_ROW}`);
   cTotal.value = 'Total';
   cTotal.font = FONT_CAMBRIA_9;
-  cTotal.border = BORDER_THIN;
   cTotal.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-
-  // Col I with right border
-  ws.getCell(`I${TOTAL_ROW}`).border = {
-    top: { style: 'thin' },
-    bottom: { style: 'thin' },
-    right: { style: 'thin' }
-  };
 
   // Col J – SUM formula
   const cSum = ws.getCell(`J${TOTAL_ROW}`);
@@ -336,7 +300,7 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   // Text below the signature line
   ws.mergeCells(`A${SIG_NAME_ROW}:D${SIG_NAME_ROW}`);
   const c25a = ws.getCell(`A${SIG_NAME_ROW}`);
-  c25a.value = `                    ${d.proveedorServicio ?? 'Proveedor del servicio'}`;
+  c25a.value = `                    Transportes Andes S.A.`;
   c25a.font = FONT_CAMBRIA_12B;
   c25a.alignment = { horizontal: 'center' };
 
@@ -357,7 +321,7 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   ws.mergeCells(`B${SIG_EXTRA_ROW1}:E${SIG_EXTRA_ROW1}`);
   ws.getCell(`B${SIG_EXTRA_ROW1}`).alignment = { horizontal: 'center' };
 
-  ws.getCell(`G${SIG_EXTRA_ROW1}`).value = d.gestionadoPor ?? 'Nombre de Referencia';
+  ws.getCell(`G${SIG_EXTRA_ROW1}`).value = d.manager.name;
   ws.getCell(`G${SIG_EXTRA_ROW1}`).font = FONT_CAMBRIA_12B;
 
   ws.mergeCells(`J${SIG_EXTRA_ROW1}:K${SIG_EXTRA_ROW1}`);
@@ -366,12 +330,12 @@ function aplicarTemplate(ws: ExcelJS.Worksheet, d: DatosHoja): void {
   // Row 2
   ws.mergeCells(`G${SIG_EXTRA_ROW2}:H${SIG_EXTRA_ROW2}`);
   const c27g = ws.getCell(`G${SIG_EXTRA_ROW2}`);
-  c27g.value = d.cargoGestor ?? 'Jefe de Poscosecha';
+  c27g.value = `Jefe de ${d.meta.areaName}`;
   c27g.font = FONT_CAMBRIA_12B;
   c27g.alignment = { horizontal: 'left', wrapText: true };
 
   // Row 3
-  ws.getCell(`G${SIG_EXTRA_ROW3}`).value = d.cedulaGestor ?? 'C.I. 0000000000';
+  ws.getCell(`G${SIG_EXTRA_ROW3}`).value = `C.I. ${d.manager.ci}`;
   ws.getCell(`G${SIG_EXTRA_ROW3}`).font = FONT_APTOS_11B;
   ws.getCell(`G${SIG_EXTRA_ROW3}`).alignment = { horizontal: 'left' };
 }

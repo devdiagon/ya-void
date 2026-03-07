@@ -16,6 +16,20 @@ export const formatDate = (value: string | Date) => {
   });
 };
 
+/* ========================= 
+  Format Date from: 'aaaa-mm-dd' to dd/mmm/aaaa 
+ ===========================*/
+export const formatShortDate = (d: string | null) => {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('es-EC', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+};
+
 export const toInputDate = (value: string | Date) => {
   const parsedDate = value instanceof Date ? value : new Date(value);
 
