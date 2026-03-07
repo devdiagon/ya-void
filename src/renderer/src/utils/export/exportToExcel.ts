@@ -73,7 +73,7 @@ const CELL_HEIGHT_SF = 1.25;
 
 export async function exportTripsToExcel(
   workSheets: ExportTripWorkSheet[],
-  archivo = 'Reporte_Transporte'
+  file = 'Reporte_Transporte'
 ): Promise<void> {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Trip Registry';
@@ -88,7 +88,43 @@ export async function exportTripsToExcel(
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   });
-  saveAs(blob, `${archivo}.xlsx`);
+  saveAs(blob, `${file}.xlsx`);
+}
+
+/// =========================================
+/// HELPERS
+/// =========================================
+
+const DEFAULT_ROW_HEIGHT = 24.9 * 1.25;
+const LINE_HEIGHT_PT = 14;
+
+function estimateRowHeight(
+  texts: Array<{ text: string; colWidth: number; fontSize: number }>,
+  defaultHeight = DEFAULT_ROW_HEIGHT
+): number {
+  let maxLines = 1;
+
+  for (const { text, colWidth, fontSize } of texts) {
+    if (!text) continue;
+
+    // Approximate characters per line based on column width
+    // colWidth is in Excel units (~1 unit ≈ 1 char at 11pt)
+    // Adjusted proportionally to font size used
+    const charsPerLine = Math.max(1, Math.floor(colWidth * (11 / fontSize)));
+
+    // Estimate explicit line breaks + wrap
+    const segments = text.split(/\r?\n/);
+    let lines = 0;
+    for (const seg of segments) {
+      lines += Math.ceil(seg.length / charsPerLine) || 1;
+    }
+    if (lines > maxLines) maxLines = lines;
+  }
+
+  if (maxLines <= 1) return defaultHeight;
+
+  // Minimum Height: defaultHeight; scale proportionally if there are more line breaks
+  return Math.max(defaultHeight, maxLines * LINE_HEIGHT_PT * 1.25);
 }
 
 /// =========================================
@@ -128,8 +164,8 @@ function applyFormat(ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void {
   ws.getRow(4).height = 41.4 * CELL_HEIGHT_SF;
   ws.getRow(5).height = 39.6 * CELL_HEIGHT_SF;
 
-  // Data Rows + Total Row (set default heigh with scale factor for now)
-  for (let r = DATA_START; r <= TOTAL_ROW; r++) ws.getRow(r).height = 24.9 * CELL_HEIGHT_SF;
+  // Total Row (set default heigh with scale factor)
+  ws.getRow(TOTAL_ROW).height = 24.9 * CELL_HEIGHT_SF;
 
   // Post-table row spacing
   ws.getRow(POST_TABLE_SPACE_ROW).height = 42.0 * CELL_HEIGHT_SF;
@@ -239,19 +275,26 @@ function applyFormat(ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void {
     cellL.border = BORDER_THIN;
     cellL.alignment = { horizontal: 'center', vertical: 'middle' };
 
-    if (reg) {
-      ws.getCell(`A${r}`).value = reg.tripDate;
-      ws.getCell(`B${r}`).value = reg.departureTime;
-      ws.getCell(`C${r}`).value = reg.arrivalTime;
-      ws.getCell(`D${r}`).value = reg.waitingTime;
-      ws.getCell(`E${r}`).value = reg.passengerCount;
-      ws.getCell(`F${r}`).value = reg.reason;
-      ws.getCell(`G${r}`).value = reg.requester.name;
-      ws.getCell(`H${r}`).value = reg.requester.area;
-      ws.getCell(`I${r}`).value = reg.route;
-      ws.getCell(`J${r}`).value = reg.cost;
-      ws.getCell(`K${r}`).value = reg.vehicleType;
-    }
+    // Fill data values in the row
+    ws.getCell(`A${r}`).value = reg.tripDate;
+    ws.getCell(`B${r}`).value = reg.departureTime;
+    ws.getCell(`C${r}`).value = reg.arrivalTime;
+    ws.getCell(`D${r}`).value = reg.waitingTime;
+    ws.getCell(`E${r}`).value = reg.passengerCount;
+    ws.getCell(`F${r}`).value = reg.reason;
+    ws.getCell(`G${r}`).value = reg.requester.name;
+    ws.getCell(`H${r}`).value = reg.requester.area;
+    ws.getCell(`I${r}`).value = reg.route;
+    ws.getCell(`J${r}`).value = reg.cost;
+    ws.getCell(`K${r}`).value = reg.vehicleType;
+
+    // Set row height based on the longest text that could be in the rows (F-I)
+    ws.getRow(r).height = estimateRowHeight([
+      { text: reg.reason, colWidth: 24.0, fontSize: 9 },
+      { text: reg.requester.name, colWidth: 13.7, fontSize: 9 },
+      { text: reg.requester.area, colWidth: 13.9, fontSize: 9 },
+      { text: reg.route, colWidth: 34.9, fontSize: 9 }
+    ]);
   }
 
   // ===================== TOTAL ===================== \\

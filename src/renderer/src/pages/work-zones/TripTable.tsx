@@ -148,6 +148,18 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
           'Finca R1 → Empaque Central (ida y vuelta) texto innecesariamente extenso, nose que poner aqui para rellenar el espacio, ero se que sería un tema demasiado largo, tanto que ni idea de como quede',
         cost: 45.5,
         vehicleType: 'Furgoneta'
+      },
+      {
+        tripDate: formatShortDate('2026-03-03'),
+        departureTime: '07:00',
+        arrivalTime: '07:05',
+        waitingTime: calcTimeDifference('07:00', '07:05'),
+        passengerCount: 5,
+        reason: 'Traslado de personal',
+        requester: { name: 'Juan Pérez', area: 'Poscosecha' },
+        route: 'Finca R1 → Empaque Central',
+        cost: 45.5,
+        vehicleType: 'Furgoneta'
       }
     ];
 
