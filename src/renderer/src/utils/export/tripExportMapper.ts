@@ -1,53 +1,28 @@
-import { ExportTripRow, ExportTripWorkSheet, Trip } from '@renderer/types';
-import { calcTimeDifference } from '../dateUtils';
+import { ExportTripWorkSheet, ExportWorkZoneSheet } from '@renderer/types';
+import { calcTimeDifference, formatDate, formatShortDate } from '../dateUtils';
 
-interface BuildExportPayloadParams {
-  trips: Trip[];
-  farmName: string;
-  areaName: string;
-  startDate: string;
-  endDate: string;
-  workSheetName: string;
-  totalCost: number;
-  getRequesterName: (id: number | null) => string; // Parent callback to get requester Name based on on its ID
-}
-
-export const buildExportPayload = ({
-  trips,
-  farmName,
-  areaName,
-  startDate,
-  endDate,
-  workSheetName,
-  totalCost,
-  getRequesterName
-}: BuildExportPayloadParams): ExportTripWorkSheet => {
-  const rows: ExportTripRow[] = trips.map((trip) => ({
-    id: trip.id,
-    tripDate: trip.tripDate ?? '-',
-    departureTime: trip.departureTime ?? '-',
-    arrivalTime: trip.arrivalTime ?? '-',
-    waitingTime: calcTimeDifference(trip.departureTime ?? '00:00', trip.arrivalTime ?? '00:00'),
-    passengerCount: trip.passengerCount ?? 0,
-    reason: trip.reasonSnapshot ?? '-',
-    requester: {
-      name: getRequesterName(trip.requesterId),
-      area: areaName
-    },
-    route: trip.routeSnapshot ?? '-',
-    cost: trip.cost ?? 0,
-    vehicleType: trip.vehicleType ?? 'Camioneta'
-  }));
-
-  return {
+// From ExportWorkZoneSheet[] (backend) ------> ExportTripWorkSheet (frontend export use) with formatted date
+export const buildExportPayload = (data: ExportWorkZoneSheet[]): ExportTripWorkSheet[] => {
+  return data.map((sheet) => ({
     meta: {
-      farmName: farmName,
-      areaName: areaName,
-      startDate: startDate,
-      endDate: endDate,
-      workSheetName: workSheetName
+      farmName: sheet.workSheet.farmName,
+      areaName: sheet.workSheet.areaName,
+      startDate: formatDate(sheet.workSheet.startDate),
+      endDate: formatDate(sheet.workSheet.endDate),
+      workSheetName: sheet.workSheet.name
     },
-    rows,
-    totalCost
-  };
+    rows: sheet.trips.map((trip) => ({
+      tripDate: formatShortDate(trip.tripDate),
+      departureTime: trip.departureTime,
+      arrivalTime: trip.arrivalTime,
+      waitingTime: calcTimeDifference(trip.arrivalTime, trip.departureTime),
+      passengerCount: trip.passengerCount,
+      reason: trip.reason,
+      requester: trip.requester,
+      route: trip.route,
+      cost: trip.cost,
+      vehicleType: trip.vehicleType
+    })),
+    manager: sheet.manager
+  }));
 };

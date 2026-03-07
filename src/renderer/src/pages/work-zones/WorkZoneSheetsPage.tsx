@@ -173,10 +173,9 @@ export const WorkZoneSheetsPage = () => {
               workZoneSheetId={activeSheet.id}
               sheetName={activeSheet.name}
               areaId={activeSheet.areaId}
-              parentAreaName={areas.find((a) => a.id === activeSheet.areaId)?.name ?? ''}
-              parentFarmName={farmWorkZone?.name ?? ''}
-              sheetStartDate={formatDate(workZone?.startDate ?? '')}
-              sheetEndDate={formatDate(workZone?.endDate ?? '')}
+              workZoneId={parsedWorkZoneId}
+              farmWorkZoneId={parsedFarmWorkZoneId}
+              workZoneName={workZone?.name ?? ''}
             />
           ) : null}
         </div>

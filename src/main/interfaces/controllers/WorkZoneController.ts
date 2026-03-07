@@ -1,3 +1,4 @@
+import { ExportWorkZoneSheet } from '../../core/entities/ExportWorkZoneSheet'
 import { WorkZone } from '../../core/entities/WorkZone'
 import { UseWorkZone } from '../../core/use-cases/UseWorkZone'
 import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
@@ -15,6 +16,10 @@ export class WorkZoneController {
 
   async getWorkZoneById(id: number): Promise<WorkZone> {
     return this.useWorkZone.getById(id)
+  }
+
+  async getAllFarmRelatedTrips(workZoneId: number, farmWorkZoneId: number): Promise<ExportWorkZoneSheet[]> {
+    return this.useWorkZone.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
   }
 
   async createWorkZone(payload: {

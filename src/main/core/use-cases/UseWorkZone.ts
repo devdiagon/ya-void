@@ -1,4 +1,5 @@
 import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
+import { ExportWorkZoneSheet } from '../entities/ExportWorkZoneSheet'
 import { WorkZone } from '../entities/WorkZone'
 
 export class UseWorkZone {
@@ -20,6 +21,16 @@ export class UseWorkZone {
       throw new Error(`Work Zone with ID ${id} not found`)
     }
     return workZone
+  }
+
+  /**
+   * Obtiene todos los viajes de las áreas (WorkZoneSheets) de una zona de trabajo y finca específica de esa zona de trabajo
+   * @param workZoneId: int de la zona de trabajo actual
+   * @param farmWorkZoneId: int de la finca de la zona de trabajo perteneciente
+   * @returns ExportWorkZoneSheet[]: objeto serializado con los datos necesarios a de cada área (WorkZoneSheet)
+   */
+  getAllFarmRelatedTrips(workZoneId: number, farmWorkZoneId: number): ExportWorkZoneSheet[] {
+    return this.workZoneRepository.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
   }
 
   /**

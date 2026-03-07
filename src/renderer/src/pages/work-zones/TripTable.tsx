@@ -1,19 +1,19 @@
-import { ExportButton, IconButton } from '@renderer/components';
+import { IconButton, OutlineButton } from '@renderer/components';
 import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
-import { buildExportPayload, exportTripsToPDF } from '@renderer/utils';
-import { SquarePenIcon, Trash2 } from 'lucide-react';
+import { buildExportPayload, exportTripsToExcel, formatShortDate } from '@renderer/utils';
+import { DownloadIcon, SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
+import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 
 interface TripTableProps {
   workZoneSheetId: number;
   sheetName: string;
   areaId: number;
-  parentAreaName: string;
-  parentFarmName: string;
-  sheetStartDate: string;
-  sheetEndDate: string;
+  workZoneId: number;
+  farmWorkZoneId: number;
+  workZoneName: string;
 }
 
 function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): FormTripDTO {
@@ -33,12 +33,6 @@ function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): For
   };
 }
 
-function formatDate(d: string | null) {
-  if (!d) return '—';
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
 const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
   'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
@@ -47,10 +41,9 @@ export function TripTable({
   workZoneSheetId,
   sheetName,
   areaId,
-  parentAreaName,
-  parentFarmName,
-  sheetStartDate,
-  sheetEndDate
+  workZoneId,
+  farmWorkZoneId,
+  workZoneName
 }: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
     useTrips(workZoneSheetId);
@@ -146,48 +139,10 @@ export function TripTable({
     }
   };
 
-  const handlePDFDownloadClick = () => {
-    const validTrips = trips.filter((trip) => trip.status === 'ready');
-
-    if (validTrips.length === 0) {
-      return;
-    }
-
-    // At this point every attribute MUST be non null due to the "ready" status validation
-    const payload = buildExportPayload({
-      trips: validTrips,
-      farmName: parentFarmName,
-      areaName: parentAreaName,
-      startDate: sheetStartDate,
-      endDate: sheetEndDate,
-      workSheetName: sheetName,
-      totalCost,
-      getRequesterName: requesterLabel
-    });
-
-    exportTripsToPDF(payload);
-  };
-
-  const handleExelDownloadClick = () => {
-    const validTrips = trips.filter((trip) => trip.status === 'ready');
-
-    if (validTrips.length === 0) {
-      return;
-    }
-
-    // At this point every attribute MUST be non null due to the "ready" status validation
-    const payload = buildExportPayload({
-      trips: validTrips,
-      farmName: parentFarmName,
-      areaName: parentAreaName,
-      startDate: sheetStartDate,
-      endDate: sheetEndDate,
-      workSheetName: sheetName,
-      totalCost,
-      getRequesterName: requesterLabel
-    });
-
-    //exportTripsToExcel(payload);
+  const handleExcelDownloadClick = async () => {
+    const backendData = await fetchAllWorkZonesFarmRelatedTrips(workZoneId, farmWorkZoneId);
+    const exportPayload = buildExportPayload(backendData);
+    await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZoneName}`);
   };
 
   if (loading) {
@@ -214,10 +169,14 @@ export function TripTable({
         </div>
 
         {/* Download Button */}
-        <ExportButton
-          onPDFDownload={handlePDFDownloadClick}
-          onExcelDownload={handleExelDownloadClick}
-        />
+        <OutlineButton
+          size="sm"
+          variant="info"
+          icon={<DownloadIcon size={16} />}
+          onClick={handleExcelDownloadClick}
+        >
+          Descargar Excel
+        </OutlineButton>
       </div>
 
       {/* Table */}
@@ -269,7 +228,7 @@ export function TripTable({
                     trip.status === 'pending' ? 'bg-yellow-50' : 'bg-white'
                   } hover:bg-blue-50/20 transition-colors`}
                 >
-                  <td className={cell}>{formatDate(trip.tripDate)}</td>
+                  <td className={cell}>{formatShortDate(trip.tripDate)}</td>
                   <td className={cell}>{trip.vehicleType ?? '—'}</td>
                   <td className={cell}>{trip.arrivalTime ?? '—'}</td>
                   <td className={cell}>{trip.departureTime ?? '—'}</td>
