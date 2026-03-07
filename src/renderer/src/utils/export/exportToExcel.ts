@@ -71,10 +71,10 @@ const CELL_HEIGHT_SF = 1.25;
 /// Main export function
 /// =========================================
 
-export async function exportTripsToExcel(
+export const exportTripsToExcel = async (
   workSheets: ExportTripWorkSheet[],
   file = 'Reporte_Transporte'
-): Promise<void> {
+): Promise<void> => {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Trip Registry';
   wb.created = new Date();
@@ -89,7 +89,7 @@ export async function exportTripsToExcel(
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   });
   saveAs(blob, `${file}.xlsx`);
-}
+};
 
 /// =========================================
 /// HELPERS
@@ -98,10 +98,10 @@ export async function exportTripsToExcel(
 const DEFAULT_ROW_HEIGHT = 24.9 * 1.25;
 const LINE_HEIGHT_PT = 14;
 
-function estimateRowHeight(
+const estimateRowHeight = (
   texts: Array<{ text: string; colWidth: number; fontSize: number }>,
   defaultHeight = DEFAULT_ROW_HEIGHT
-): number {
+): number => {
   let maxLines = 1;
 
   for (const { text, colWidth, fontSize } of texts) {
@@ -125,13 +125,28 @@ function estimateRowHeight(
 
   // Minimum Height: defaultHeight; scale proportionally if there are more line breaks
   return Math.max(defaultHeight, maxLines * LINE_HEIGHT_PT * 1.25);
-}
+};
 
 /// =========================================
 /// Style the Excel Sheet
 /// =========================================
 
-function applyFormat(ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void {
+const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
+  // Print configuration
+  ws.pageSetup = {
+    paperSize: 9,
+    orientation: 'landscape',
+    scale: 70,
+    margins: {
+      left: 0.25,
+      right: 0.25,
+      top: 0.75,
+      bottom: 0.75,
+      header: 0.3,
+      footer: 0.3
+    }
+  };
+
   // Set rows reference positions
   const DATA_START = 6;
   const DATA_END = DATA_START + d.rows.length - 1;
@@ -381,4 +396,4 @@ function applyFormat(ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void {
   ws.getCell(`G${SIG_EXTRA_ROW3}`).value = `C.I. ${d.manager.ci}`;
   ws.getCell(`G${SIG_EXTRA_ROW3}`).font = FONT_APTOS_11B;
   ws.getCell(`G${SIG_EXTRA_ROW3}`).alignment = { horizontal: 'left' };
-}
+};
