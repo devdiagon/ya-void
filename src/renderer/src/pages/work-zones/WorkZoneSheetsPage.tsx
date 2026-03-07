@@ -173,6 +173,9 @@ export const WorkZoneSheetsPage = () => {
               workZoneSheetId={activeSheet.id}
               sheetName={activeSheet.name}
               areaId={activeSheet.areaId}
+              workZoneId={parsedWorkZoneId}
+              farmWorkZoneId={parsedFarmWorkZoneId}
+              workZoneName={workZone?.name ?? ''}
             />
           ) : null}
         </div>

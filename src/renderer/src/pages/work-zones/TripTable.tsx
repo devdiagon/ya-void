@@ -1,20 +1,19 @@
 import { IconButton, OutlineButton } from '@renderer/components';
 import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
-import { ExportTripRow, FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
-import {
-  calcTimeDifference,
-  exportTripsToExcel,
-  formatDate,
-  formatShortDate
-} from '@renderer/utils';
+import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
+import { buildExportPayload, exportTripsToExcel, formatShortDate } from '@renderer/utils';
 import { DownloadIcon, SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
+import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 
 interface TripTableProps {
   workZoneSheetId: number;
   sheetName: string;
   areaId: number;
+  workZoneId: number;
+  farmWorkZoneId: number;
+  workZoneName: string;
 }
 
 function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): FormTripDTO {
@@ -38,7 +37,14 @@ const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
   'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
 
-export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
+export function TripTable({
+  workZoneSheetId,
+  sheetName,
+  areaId,
+  workZoneId,
+  farmWorkZoneId,
+  workZoneName
+}: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
     useTrips(workZoneSheetId);
   const { routes, findOrCreate: findOrCreateRoute, updateRoute, deleteRoute } = useRoutes(areaId);
@@ -134,51 +140,9 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
   };
 
   const handleExcelDownloadClick = async () => {
-    /// FOR TESTING - HARDCODED VALUES
-    const trips: ExportTripRow[] = [
-      {
-        tripDate: formatShortDate('2026-03-03'),
-        departureTime: '07:00',
-        arrivalTime: '07:05',
-        waitingTime: calcTimeDifference('07:00', '07:05'),
-        passengerCount: 5,
-        reason: 'Traslado de personal por daño de vía',
-        requester: { name: 'Juan Pérez', area: 'Poscosecha' },
-        route:
-          'Finca R1 → Empaque Central (ida y vuelta) texto innecesariamente extenso, nose que poner aqui para rellenar el espacio, ero se que sería un tema demasiado largo, tanto que ni idea de como quede',
-        cost: 45.5,
-        vehicleType: 'Furgoneta'
-      },
-      {
-        tripDate: formatShortDate('2026-03-03'),
-        departureTime: '07:00',
-        arrivalTime: '07:05',
-        waitingTime: calcTimeDifference('07:00', '07:05'),
-        passengerCount: 5,
-        reason: 'Traslado de personal',
-        requester: { name: 'Juan Pérez', area: 'Poscosecha' },
-        route: 'Finca R1 → Empaque Central',
-        cost: 45.5,
-        vehicleType: 'Furgoneta'
-      }
-    ];
-
-    await exportTripsToExcel(
-      [
-        {
-          meta: {
-            farmName: 'R1',
-            areaName: 'Empaque',
-            startDate: formatDate('2026-03-02'),
-            endDate: formatDate('2026-03-08'),
-            workSheetName: 'Rutas de apoyo'
-          },
-          rows: trips,
-          manager: { name: 'María López', ci: '1234567890' }
-        }
-      ],
-      'Reporte_Transporte_Semana1'
-    );
+    const backendData = await fetchAllWorkZonesFarmRelatedTrips(workZoneId, farmWorkZoneId);
+    const exportPayload = buildExportPayload(backendData);
+    await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZoneName}`);
   };
 
   if (loading) {

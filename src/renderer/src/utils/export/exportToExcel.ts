@@ -302,8 +302,8 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
 
     // Fill data values in the row
     ws.getCell(`A${r}`).value = reg.tripDate;
-    ws.getCell(`B${r}`).value = reg.departureTime;
-    ws.getCell(`C${r}`).value = reg.arrivalTime;
+    ws.getCell(`B${r}`).value = reg.arrivalTime;
+    ws.getCell(`C${r}`).value = reg.departureTime;
     ws.getCell(`D${r}`).value = reg.waitingTime;
     ws.getCell(`E${r}`).value = reg.passengerCount;
     ws.getCell(`F${r}`).value = reg.reason;

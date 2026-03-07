@@ -1,4 +1,5 @@
 import { Area, FormAreaDTO } from './area.type';
+import { ExportWorkZoneSheet } from './export.trip.type';
 import { Farm, FormFarmDTO } from './farm.type';
 import { FarmWorkZone, FormFarmWorkZoneDTO } from './farmWorkZone.type';
 import { FormReasonDTO, Reason } from './reason.type';
@@ -38,6 +39,10 @@ export interface ElectronAPI {
   workZones: {
     list: () => Promise<WorkZone[]>;
     getById: (id: number) => Promise<WorkZone>;
+    getAllWorkZonesTrips: (
+      workZoneId: number,
+      farmWorkZoneId: number
+    ) => Promise<ExportWorkZoneSheet[]>;
     create: (payload: FormWorkZoneDTO) => Promise<WorkZone>;
     update: (id: number, payload: FormWorkZoneDTO) => Promise<void>;
     delete: (id: number) => Promise<void>;
