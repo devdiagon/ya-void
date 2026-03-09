@@ -21,6 +21,7 @@ export class FarmRepository {
     const insert = this.db.prepare('INSERT INTO farm (name) VALUES (?)')
     const info = insert.run(name)
     return { id: Number(info.lastInsertRowid), name, deletedAt: null }
+  }
 
   update(farm: Farm): boolean {
     const stmt = this.db.prepare('UPDATE farm SET name = ? WHERE id = ?')
