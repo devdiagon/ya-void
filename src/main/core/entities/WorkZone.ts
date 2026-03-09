@@ -3,4 +3,5 @@ export interface WorkZone {
   name: string
   startDate: Date
   endDate: Date
+  deletedAt?: string | null
 }

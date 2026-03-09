@@ -7,14 +7,14 @@ export class AreaRepository {
 
   findAllByFarm(farmId: number): Area[] {
     const stmt = this.db.prepare<AreaRow>(
-      'SELECT id, name, farm_id, manager_name, manager_cid FROM area WHERE farm_id = ? ORDER BY name'
+      'SELECT id, name, farm_id, manager_name, manager_cid, deleted_at FROM area WHERE farm_id = ? AND deleted_at IS NULL ORDER BY name'
     )
     const rows = stmt.all(farmId)
     return rows.map(mapRowToArea)
   }
 
   findById(id: number): Area | null {
-    const stmt = this.db.prepare<AreaRow>('SELECT id, name, farm_id, manager_name, manager_cid FROM area WHERE id = ?')
+    const stmt = this.db.prepare<AreaRow>('SELECT id, name, farm_id, manager_name, manager_cid, deleted_at FROM area WHERE id = ? AND deleted_at IS NULL')
     const row = stmt.get(id)
     return row ? mapRowToArea(row) : null
   }
@@ -27,7 +27,8 @@ export class AreaRepository {
       name,
       farm_id: farmId,
       manager_name: managerName,
-      manager_cid: managerCid
+      manager_cid: managerCid,
+      deletedAt: null
     }
   }
 
@@ -38,7 +39,7 @@ export class AreaRepository {
   }
 
   delete(id: number): boolean {
-    const stmt = this.db.prepare('DELETE FROM area WHERE id = ?')
+    const stmt = this.db.prepare("UPDATE area SET deleted_at = datetime('now') WHERE id = ? AND deleted_at IS NULL")
     const info = stmt.run(id)
     return info.changes > 0
   }

@@ -5,6 +5,7 @@ export type WorkZoneRow = {
   name: string
   start_date: string
   end_date: string
+  deleted_at: string | null
 }
 
 export function mapRowToWorkZone(raw: WorkZoneRow): WorkZone {
@@ -12,6 +13,7 @@ export function mapRowToWorkZone(raw: WorkZoneRow): WorkZone {
     id: raw.id,
     name: raw.name,
     startDate: new Date(raw.start_date),
-    endDate: new Date(raw.end_date)
+    endDate: new Date(raw.end_date),
+    deletedAt: raw.deleted_at ?? null
   }
 }

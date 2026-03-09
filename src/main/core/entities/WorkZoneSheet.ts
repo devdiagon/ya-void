@@ -4,4 +4,5 @@ export interface WorkZoneSheet {
   farmWorkZoneId: number
   areaId: number
   totalSheet: number
+  deletedAt?: string | null
 }
