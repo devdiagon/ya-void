@@ -1,19 +1,15 @@
-import { IconButton, OutlineButton } from '@renderer/components';
+import { IconButton } from '@renderer/components';
 import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
-import { buildExportPayload, exportTripsToExcel, formatShortDate } from '@renderer/utils';
-import { DownloadIcon, SquarePenIcon, Trash2 } from 'lucide-react';
+import { formatShortDate } from '@renderer/utils';
+import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
-import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 
 interface TripTableProps {
   workZoneSheetId: number;
   sheetName: string;
   areaId: number;
-  workZoneId: number;
-  farmWorkZoneId: number;
-  workZoneName: string;
 }
 
 function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): FormTripDTO {
@@ -37,14 +33,7 @@ const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
   'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
 
-export function TripTable({
-  workZoneSheetId,
-  sheetName,
-  areaId,
-  workZoneId,
-  farmWorkZoneId,
-  workZoneName
-}: TripTableProps) {
+export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
     useTrips(workZoneSheetId);
   const { routes, findOrCreate: findOrCreateRoute, updateRoute, deleteRoute } = useRoutes(areaId);
@@ -139,12 +128,6 @@ export function TripTable({
     }
   };
 
-  const handleExcelDownloadClick = async () => {
-    const backendData = await fetchAllWorkZonesFarmRelatedTrips(workZoneId, farmWorkZoneId);
-    const exportPayload = buildExportPayload(backendData);
-    await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZoneName}`);
-  };
-
   if (loading) {
     return <p className="text-sm text-gray-400 py-4">Cargando viajes…</p>;
   }
@@ -167,16 +150,6 @@ export function TripTable({
             Pendientes: {totalPending}
           </span>
         </div>
-
-        {/* Download Button */}
-        <OutlineButton
-          size="sm"
-          variant="info"
-          icon={<DownloadIcon size={16} />}
-          onClick={handleExcelDownloadClick}
-        >
-          Descargar Excel
-        </OutlineButton>
       </div>
 
       {/* Table */}
