@@ -6,6 +6,7 @@ export type WorkZoneSheetRow = {
   farm_work_zone_id: number
   area_id: number
   total_sheet: number
+  deleted_at: string | null
 }
 
 export function mapRowToWorkZoneSheet(raw: WorkZoneSheetRow): WorkZoneSheet {
@@ -14,6 +15,7 @@ export function mapRowToWorkZoneSheet(raw: WorkZoneSheetRow): WorkZoneSheet {
     name: raw.name,
     farmWorkZoneId: raw.farm_work_zone_id,
     areaId: raw.area_id,
-    totalSheet: raw.total_sheet
+    totalSheet: raw.total_sheet,
+    deletedAt: raw.deleted_at ?? null
   }
 }

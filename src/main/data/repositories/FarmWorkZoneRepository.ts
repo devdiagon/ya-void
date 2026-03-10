@@ -10,7 +10,7 @@ export class FarmWorkZoneRepository {
    */
   findByWorkZoneId(workZoneId: number): FarmWorkZone[] {
     const stmt = this.db.prepare<FarmWorkZoneRow>(
-      'SELECT id, work_zone_id, farm_id, name FROM farm_work_zone WHERE work_zone_id = ?'
+      'SELECT id, work_zone_id, farm_id, name, deleted_at FROM farm_work_zone WHERE work_zone_id = ? AND deleted_at IS NULL'
     )
     const rows = stmt.all(workZoneId)
     return rows.map(mapRowToFarmWorkZone)
@@ -21,7 +21,7 @@ export class FarmWorkZoneRepository {
    */
   findById(id: number): FarmWorkZone | null {
     const stmt = this.db.prepare<FarmWorkZoneRow>(
-      'SELECT id, work_zone_id, farm_id, name FROM farm_work_zone WHERE id = ?'
+      'SELECT id, work_zone_id, farm_id, name, deleted_at FROM farm_work_zone WHERE id = ? AND deleted_at IS NULL'
     )
     const row = stmt.get(id)
     return row ? mapRowToFarmWorkZone(row) : null
@@ -54,7 +54,7 @@ export class FarmWorkZoneRepository {
    * Nota: Esto afectará a 'work_zone_sheet' si existen registros vinculados.
    */
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM farm_work_zone WHERE id = ?')
+    const stmt = this.db.prepare("UPDATE farm_work_zone SET deleted_at = datetime('now') WHERE id = ? AND deleted_at IS NULL")
     stmt.run(id)
   }
 }

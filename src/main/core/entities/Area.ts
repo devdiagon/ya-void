@@ -4,4 +4,5 @@ export interface Area {
   farm_id: number
   manager_name: string | null
   manager_cid: string | null
+  deletedAt?: string | null
 }

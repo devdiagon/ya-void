@@ -1,5 +1,6 @@
 import { IconButton } from '@renderer/components';
 import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
+import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
 import { formatShortDate } from '@renderer/utils';
 import { SquarePenIcon, Trash2 } from 'lucide-react';
@@ -43,7 +44,8 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     updateReason,
     deleteReason
   } = useReasons(areaId);
-  const { requesters, findOrCreateForArea } = useRequesters(areaId);
+  const { requesters, findOrCreateForArea, updateRequester, deleteRequester } =
+    useRequesters(areaId);
   const {
     subareas,
     findOrCreate: findOrCreateSubarea,
@@ -106,6 +108,12 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     onFindOrCreateRoute: findOrCreateRoute,
     onFindOrCreateReason: findOrCreateReason,
     onFindOrCreateRequester: (name: string) => findOrCreateForArea(name),
+    onEditRequester: async (opt: { id: number; name: string }, newName: string) => {
+      await updateRequester({ id: opt.id, name: newName });
+    },
+    onDeleteRequester: async (opt: { id: number }) => {
+      await deleteRequester(opt.id);
+    },
     onEditRoute: async (opt: { id: number; name: string }, newName: string) => {
       await updateRoute(opt.id, newName);
     },

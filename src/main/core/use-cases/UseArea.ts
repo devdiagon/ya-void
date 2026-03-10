@@ -1,8 +1,12 @@
 import { AreaRepository } from '../../data/repositories/AreaRepository'
+import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 import { Area } from '../entities/Area'
 
 export class UseArea {
-  constructor(private areaRepository: AreaRepository) {}
+  constructor(
+    private areaRepository: AreaRepository,
+    private subareaRepository: SubareaRepository
+  ) {}
 
   /**
    * Obtiene todas las áreas de una finca específica
@@ -34,7 +38,9 @@ export class UseArea {
       throw new Error('A valid Farm ID is required to create an Area')
     }
 
-    return this.areaRepository.create(name.trim(), farmId, managerName, managerCid)
+    const area = this.areaRepository.create(name.trim(), farmId, managerName, managerCid)
+    this.subareaRepository.create(area.name, area.id)
+    return area
   }
 
   /**

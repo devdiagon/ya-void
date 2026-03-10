@@ -8,7 +8,8 @@ PRAGMA foreign_keys = ON;
 -- Farm
 CREATE TABLE farm (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    deleted_at DATETIME DEFAULT NULL
 );
 
 -- Requester
@@ -24,6 +25,7 @@ CREATE TABLE area (
     farm_id INTEGER NOT NULL,
     manager_name TEXT,
     manager_cid TEXT,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (farm_id) REFERENCES farm(id)
 );
 
@@ -42,7 +44,8 @@ CREATE TABLE work_zone (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL
+    end_date DATE NOT NULL,
+    deleted_at DATETIME DEFAULT NULL
 );
 
 -- Farm Work Zone
@@ -51,6 +54,7 @@ CREATE TABLE farm_work_zone (
     work_zone_id INTEGER NOT NULL,
     farm_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (work_zone_id) REFERENCES work_zone(id),
     FOREIGN KEY (farm_id) REFERENCES farm(id)
 );
@@ -62,6 +66,7 @@ CREATE TABLE work_zone_sheet (
     farm_work_zone_id INTEGER NOT NULL,
     area_id INTEGER NOT NULL,
     total_sheet REAL DEFAULT 0,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (farm_work_zone_id) REFERENCES farm_work_zone(id),
     FOREIGN KEY (area_id) REFERENCES area(id)
 );

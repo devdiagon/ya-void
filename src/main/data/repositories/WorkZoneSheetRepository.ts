@@ -10,7 +10,7 @@ export class WorkZoneSheetRepository {
    */
   findByFarmWorkZoneId(farmWorkZoneId: number): WorkZoneSheet[] {
     const stmt = this.db.prepare<WorkZoneSheetRow>(
-      'SELECT id, name, farm_work_zone_id, area_id, total_sheet FROM work_zone_sheet WHERE farm_work_zone_id = ?'
+      'SELECT id, name, farm_work_zone_id, area_id, total_sheet, deleted_at FROM work_zone_sheet WHERE farm_work_zone_id = ? AND deleted_at IS NULL'
     )
     const rows = stmt.all(farmWorkZoneId)
     return rows.map(mapRowToWorkZoneSheet)
@@ -21,7 +21,7 @@ export class WorkZoneSheetRepository {
    */
   findById(id: number): WorkZoneSheet | null {
     const stmt = this.db.prepare<WorkZoneSheetRow>(
-      'SELECT id, name, farm_work_zone_id, area_id, total_sheet FROM work_zone_sheet WHERE id = ?'
+      'SELECT id, name, farm_work_zone_id, area_id, total_sheet, deleted_at FROM work_zone_sheet WHERE id = ? AND deleted_at IS NULL'
     )
     const row = stmt.get(id)
     return row ? mapRowToWorkZoneSheet(row) : null
@@ -54,7 +54,7 @@ export class WorkZoneSheetRepository {
    * Nota: Esto puede afectar a la tabla 'trip' si hay viajes vinculados a este sheet_id.
    */
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM work_zone_sheet WHERE id = ?')
+    const stmt = this.db.prepare("UPDATE work_zone_sheet SET deleted_at = datetime('now') WHERE id = ? AND deleted_at IS NULL")
     stmt.run(id)
   }
 }

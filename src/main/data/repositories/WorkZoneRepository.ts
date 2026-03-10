@@ -16,7 +16,7 @@ export class WorkZoneRepository {
    */
   findAll(): WorkZone[] {
     const stmt = this.db.prepare<WorkZoneRow>(
-      'SELECT id, name, start_date, end_date FROM work_zone ORDER BY start_date DESC'
+      'SELECT id, name, start_date, end_date, deleted_at FROM work_zone WHERE deleted_at IS NULL ORDER BY start_date DESC'
     )
     const rows = stmt.all()
     return rows.map(mapRowToWorkZone)
@@ -27,7 +27,7 @@ export class WorkZoneRepository {
    */
   findById(id: number): WorkZone | null {
     const stmt = this.db.prepare<WorkZoneRow>(
-      'SELECT id, name, start_date, end_date FROM work_zone WHERE id = ?'
+      'SELECT id, name, start_date, end_date, deleted_at FROM work_zone WHERE id = ? AND deleted_at IS NULL'
     )
     const row = stmt.get(id)
     return row ? mapRowToWorkZone(row) : null
@@ -125,7 +125,7 @@ export class WorkZoneRepository {
    * Nota: Debido a las claves foráneas, esto podría fallar si hay registros en 'farm_work_zone'.
    */
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM work_zone WHERE id = ?')
+    const stmt = this.db.prepare("UPDATE work_zone SET deleted_at = datetime('now') WHERE id = ? AND deleted_at IS NULL")
     stmt.run(id)
   }
 }

@@ -1,12 +1,13 @@
 import { Area } from '../../core/entities/Area'
 import { UseArea } from '../../core/use-cases/UseArea'
 import { AreaRepository } from '../../data/repositories/AreaRepository'
+import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 
 export class AreaController {
   private useArea: UseArea
 
   constructor(private areaRepository: AreaRepository) {
-    this.useArea = new UseArea(this.areaRepository)
+    this.useArea = new UseArea(this.areaRepository, new SubareaRepository())
   }
 
   /**
