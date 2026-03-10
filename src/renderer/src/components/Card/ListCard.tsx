@@ -1,6 +1,12 @@
 import { Card, CardContent, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
 import { hexToGlow, hexToRgba } from '@renderer/utils';
-import { EllipsisVerticalIcon, LucideProps, SquarePenIcon, Trash2Icon } from 'lucide-react';
+import {
+  EllipsisVerticalIcon,
+  LucideProps,
+  SquarePenIcon,
+  TableIcon,
+  Trash2Icon
+} from 'lucide-react';
 import { cloneElement, KeyboardEvent, ReactElement, useState } from 'react';
 
 interface ListCardProps {
@@ -12,6 +18,7 @@ interface ListCardProps {
   onNavigate?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onExport?: () => void;
 }
 
 export const ListCard = ({
@@ -22,7 +29,8 @@ export const ListCard = ({
   loading,
   onNavigate,
   onEdit,
-  onDelete
+  onDelete,
+  onExport
 }: ListCardProps) => {
   // Menu dropdown state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -136,6 +144,27 @@ export const ListCard = ({
                     }
                   }}
                 >
+                  {onExport && (
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClose();
+                        onExport();
+                      }}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: hexToRgba('#1f8f53', 0.1)
+                        }
+                      }}
+                    >
+                      <MenuItemSlot
+                        icon={<TableIcon size={16} />}
+                        label="Descargar Excel"
+                        color="#1f8f53"
+                      />
+                    </MenuItem>
+                  )}
+
                   {onEdit && (
                     <MenuItem
                       onClick={(e) => {
