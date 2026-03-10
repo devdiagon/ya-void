@@ -5,9 +5,15 @@ import { DeleteConfirmation } from '@renderer/components/DeleteConfirmation';
 import { FarmWorkZoneForm } from '@renderer/components/Form';
 import { Modal } from '@renderer/components/Modal';
 import { useFarmWorkZones, useFarms, useModal } from '@renderer/hooks';
+import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 import { FarmWorkZoneFormData } from '@renderer/schemas/farmWorkZone.schema';
 import { FarmWorkZone, WorkZone } from '@renderer/types';
-import { formatDate, PAGE_SUBTITLE_CLASS } from '@renderer/utils';
+import {
+  buildExportPayload,
+  exportTripsToExcel,
+  formatDate,
+  PAGE_SUBTITLE_CLASS
+} from '@renderer/utils';
 import { LayoutDashboardIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -84,6 +90,12 @@ export const FarmWorkZonesPage = () => {
     navigate(`/work-zones/${parsedWorkZoneId}/farms/${fwz.id}`);
   };
 
+  const handleExportExcel = async (farmWorkZoneId: number) => {
+    const backendData = await fetchAllWorkZonesFarmRelatedTrips(parsedWorkZoneId, farmWorkZoneId);
+    const exportPayload = buildExportPayload(backendData);
+    await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZone?.name}`);
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -137,6 +149,7 @@ export const FarmWorkZonesPage = () => {
                 onNavigate={() => handleNavigate(fwz)}
                 onEdit={() => updateModal.open(fwz)}
                 onDelete={() => deleteModal.open(fwz)}
+                onExport={() => handleExportExcel(fwz.id)}
               />
             ))}
             {!loading && farmWorkZones.length === 0 && (

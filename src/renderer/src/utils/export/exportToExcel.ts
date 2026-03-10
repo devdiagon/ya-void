@@ -235,7 +235,8 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   ws.getCell('K3').font = FONT_APTOS_12B;
   ws.getCell('K3').alignment = { horizontal: 'left' };
 
-  // Row 4 – Contract route
+  // Row 4 ----> (Contract route | Sub-Area name)
+  //  Contract route
   ws.getCell('A4').value = 'Ruta que consta en el Contrato:';
   ws.getCell('A4').font = {
     name: 'Aptos Narrow',
@@ -253,6 +254,18 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
     color: { argb: COLOR_TEXTO_OSC }
   };
   ws.getCell('B4').alignment = { horizontal: 'left', vertical: 'middle' };
+
+  // Sub-area
+  ws.mergeCells('J4:L4');
+  const c4j = ws.getCell('J4');
+  c4j.value = d.meta.areaName == d.meta.workSheetName ? '' : d.meta.workSheetName;
+  c4j.font = {
+    name: 'Aptos Narrow',
+    size: 11,
+    bold: false,
+    color: { argb: COLOR_TEXTO_OSC }
+  };
+  c4j.alignment = { horizontal: 'left', vertical: 'middle' };
 
   // ===================== TABLE HEADER (5th row) ===================== \\
 
