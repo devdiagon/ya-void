@@ -59,6 +59,8 @@ interface TripFormRowProps {
   onDeleteRoute?: (opt: AutocompleteOption) => Promise<void>;
   onEditReason?: (opt: AutocompleteOption, newName: string) => Promise<void>;
   onDeleteReason?: (opt: AutocompleteOption) => Promise<void>;
+  onEditRequester?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteRequester?: (opt: AutocompleteOption) => Promise<void>;
   subareas: AutocompleteOption[];
   onFindOrCreateSubarea: (name: string) => Promise<AutocompleteOption | null>;
   onEditSubarea?: (opt: AutocompleteOption, newName: string) => Promise<void>;
@@ -82,6 +84,8 @@ export function TripFormRow({
   onDeleteRoute,
   onEditReason,
   onDeleteReason,
+  onEditRequester,
+  onDeleteRequester,
   subareas,
   onFindOrCreateSubarea,
   onEditSubarea,
@@ -187,6 +191,8 @@ export function TripFormRow({
           onChange={(id) => set('requesterId', id)}
           onClear={() => set('requesterId', null)}
           onFindOrCreate={onFindOrCreateRequester}
+          onEditOption={onEditRequester}
+          onDeleteOption={onDeleteRequester}
         />
       </td>
 

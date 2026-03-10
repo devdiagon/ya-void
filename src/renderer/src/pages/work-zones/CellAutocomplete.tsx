@@ -1,5 +1,5 @@
 import { Check, Pencil, Trash2, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface AutocompleteOption {
@@ -61,6 +61,18 @@ export function CellAutocomplete({
 
   const displayValue = open ? query : selectedName;
 
+  const updateDropdownPosition = () => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 1,
+      left: rect.left,
+      minWidth: Math.max(rect.width, 180),
+      zIndex: 9999
+    });
+  };
+
   // Auto-resize textarea height to fit content
   useEffect(() => {
     const el = textareaRef.current;
@@ -71,16 +83,17 @@ export function CellAutocomplete({
 
   const openDropdown = () => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setDropdownStyle({
-      position: 'fixed',
-      top: rect.bottom + 1,
-      left: rect.left,
-      minWidth: Math.max(rect.width, 180),
-      zIndex: 9999
-    });
+    updateDropdownPosition();
     setOpen(true);
   };
+
+  // Reposition dropdown whenever the container resizes (e.g. textarea grows to multiple rows)
+  useLayoutEffect(() => {
+    if (!open || !containerRef.current) return;
+    const observer = new ResizeObserver(() => updateDropdownPosition());
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [open]);
 
   const focusNext = () => {
     const el = textareaRef.current;
@@ -256,7 +269,7 @@ export function CellAutocomplete({
                 <button
                   key={opt.id}
                   type="button"
-                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 truncate"
+                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 break-words whitespace-normal"
                   onMouseDown={(e) => {
                     if (e.button !== 0) return; // ignore right-click
                     e.preventDefault();
