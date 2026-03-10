@@ -1,4 +1,4 @@
-import { ExportWorkZoneSheet } from '../../core/entities/ExportWorkZoneSheet'
+import { ExportWorkZoneSheet } from '../../core/entities/ExportWorkZoneSheet';
 import { TripVehicleType } from '../../core/entities/Trip';
 
 export type ExportTripRow = {
@@ -58,7 +58,7 @@ export function mapRowToExportWorkZoneSheet(rows: ExportTripRow[]): ExportWorkZo
       vehicleType:    row.vehicle_type,
       requester: {
         name: row.requester_name,
-        area: row.requester_area,
+        area: row.subarea,
       },
     });
   }
