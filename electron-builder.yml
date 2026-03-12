@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: front-trip-mgr
+appId: com.voy.app
+productName: VOY!
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: front-trip-mgr
+  executableName: VOY!
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

@@ -12,7 +12,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     center: true,
-    title: 'Electron Test',
+    title: 'VOY!',
     webPreferences: {
       // Nota: Verifica que la ruta del preload sea correcta según tu estructura
       preload: join(__dirname, '../preload/index.js'),
