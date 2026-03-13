@@ -1,11 +1,11 @@
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { RootLayout } from './layouts/RootLayout';
 
 function App(): React.JSX.Element {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <RootLayout />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
