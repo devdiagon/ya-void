@@ -88,7 +88,7 @@ export const SheetTabs = ({
                 <>
                   <button
                     type="button"
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={() => {
                       setMenu(null);
@@ -100,7 +100,7 @@ export const SheetTabs = ({
                   </button>
                   <button
                     type="button"
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={() => {
                       setMenu(null);
