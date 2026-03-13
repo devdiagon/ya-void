@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActionButton, OutlineButton } from '../Button';
 import { Modal } from './Modal';
+import { PackageIcon, TriangleAlertIcon } from 'lucide-react';
 
 type UpdaterState = 'idle' | 'available' | 'downloading' | 'ready' | 'error';
 
@@ -40,29 +41,39 @@ export function UpdaterModal() {
 
   return (
     <Modal
-      size="sm"
+      size="lg"
       isOpen={state !== 'idle'}
       onClose={handleClose}
       closeOnOutsideClick={state !== 'downloading'}
     >
       {state === 'available' && (
-        <>
-          <h2 className="text-2xl text-blue-700 font-semibold mb-4">
-            Hay una nueva versión disponible
-          </h2>
-          <p className="text-sm text-gray-500 my-4">
+        <div className="flex flex-col gap-4 p-2">
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-100 rounded-md p-3 flex-shrink-0">
+              <PackageIcon className="text-blue-600" size={24} />
+            </div>
+            <h3 className="text-2xl font-semibold text-blue-700 mb-4">
+              Hay una nueva versión disponible
+            </h3>
+          </div>
+          <p className="text-gray-700 mb-8">
             La versión <span className="font-medium text-green-600">{info?.version}</span> está
             lista para descargar.
           </p>
-          <div className="flex gap-2 justify-end m-4">
+          <div className="flex gap-2 justify-end">
             <OutlineButton onClick={() => setState('idle')}>Más tarde</OutlineButton>
             <ActionButton onClick={() => window.updater.downloadUpdate()}>Descargar</ActionButton>
           </div>
-        </>
+        </div>
       )}
       {state === 'downloading' && (
-        <>
-          <h2 className="text-lg font-semibold mb-3">Descargando actualización...</h2>
+        <div className="flex flex-col gap-4 p-2">
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-100 rounded-md p-3 flex-shrink-0">
+              <PackageIcon className="text-blue-600" size={24} />
+            </div>
+            <h3 className="text-2xl font-semibold text-blue-700 mb-4">Descarga en curso</h3>
+          </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
@@ -70,30 +81,38 @@ export function UpdaterModal() {
             />
           </div>
           <p className="text-sm text-gray-500 text-right">{progress}%</p>
-        </>
+        </div>
       )}
       {state === 'ready' && (
-        <>
-          <h2 className="text-lg font-semibold mb-1">¡Lista para instalar!</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            La actualización fue descargada. Reinicia para aplicarla.
-          </p>
+        <div className="flex flex-col gap-4 p-2">
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-100 rounded-md p-3 flex-shrink-0">
+              <PackageIcon className="text-blue-600" size={24} />
+            </div>
+            <h3 className="text-2xl font-semibold text-blue-700 mb-4">Descarga completada</h3>
+          </div>
+          <p className="text-sm text-gray-500 mb-4">Reinicia la aplicación para aplicarla.</p>
           <div className="flex gap-2 justify-end">
             <OutlineButton onClick={() => setState('idle')}>Más tarde</OutlineButton>
             <ActionButton onClick={() => window.updater.installUpdate()}>
               Reiniciar ahora
             </ActionButton>
           </div>
-        </>
+        </div>
       )}
       {state === 'error' && (
-        <>
-          <h2 className="text-lg font-semibold text-red-600 mb-1">Error al actualizar</h2>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
+        <div className="flex flex-col gap-4 p-2">
+          <div className="flex items-center gap-2">
+            <div className="bg-red-100 rounded-md p-3 flex-shrink-0">
+              <TriangleAlertIcon className="text-red-600" size={24} />
+            </div>
+            <h3 className="text-2xl font-semibold text-red-700 mb-4">Error al actualizar</h3>
+          </div>
+          <p className="text-gray-700 mb-8">{error}</p>
           <div className="flex justify-end">
             <ActionButton onClick={() => setState('idle')}>Cerrar</ActionButton>
           </div>
-        </>
+        </div>
       )}
     </Modal>
   );

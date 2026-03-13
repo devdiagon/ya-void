@@ -1,15 +1,9 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
-import path, { join } from 'path'
+import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './interfaces/ipc-handlers/registerIpcHandlers'
-
-// Dev ONLY -TESTING TMP
-if (!app.isPackaged) {
-  autoUpdater.updateConfigPath = path.join(__dirname, '../../dev-update.yml')
-  Object.defineProperty(app, 'isPackaged', { get: () => true })
-}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -29,6 +23,7 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    setTimeout(() => checkForUpdates(mainWindow), 1500)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -41,8 +36,6 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-
-    checkForUpdates(mainWindow)
 }
 
 // Auto Updates - Check
