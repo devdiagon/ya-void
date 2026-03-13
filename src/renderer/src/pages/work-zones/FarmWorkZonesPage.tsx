@@ -96,6 +96,8 @@ export const FarmWorkZonesPage = () => {
     await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZone?.name}`);
   };
 
+  const gridColsClass = farmWorkZones.length === 0 ? 'grid-cols-1' : 'grid-cols-3';
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -137,7 +139,7 @@ export const FarmWorkZonesPage = () => {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className={`grid ${gridColsClass} gap-4`}>
             {farmWorkZones.map((fwz) => (
               <ListCard
                 key={fwz.id}
