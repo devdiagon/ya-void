@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { app, ipcMain } from 'electron'
 
 // --- Repositories ---
 import { AreaRepository } from '../../data/repositories/AreaRepository'
@@ -53,6 +53,9 @@ export function registerIpcHandlers(): void {
   const reasonCtrl = new ReasonController(reasonRepo)
   const subareaCtrl = new SubareaController(subareaRepo)
   const tripCtrl = new TripController(tripRepo)
+
+  // --- META DATA HANDLERS ---
+  ipcMain.handle('get-version', () => app.getVersion())
 
   // --- FARMS HANDLERS ---
   ipcMain.handle('farms:list', () => farmCtrl.list())

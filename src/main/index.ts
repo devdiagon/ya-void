@@ -1,7 +1,7 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
-import path, { join } from 'path'
+import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './interfaces/ipc-handlers/registerIpcHandlers'
 
@@ -42,14 +42,7 @@ function createWindow(): void {
 }
 
 // Auto Updates - Check
-function checkForUpdates(mainWindow: BrowserWindow) {
-  
-  // Dev Only check
-  if (!app.isPackaged) {
-    autoUpdater.updateConfigPath = path.join(__dirname, '../../dev-update.yml')
-    Object.defineProperty(app, 'isPackaged', { get: () => true })
-  }
-  
+function checkForUpdates(mainWindow: BrowserWindow) {  
   autoUpdater.autoDownload = false
   
   autoUpdater.on('update-available', (info) => {

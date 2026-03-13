@@ -203,3 +203,8 @@ contextBridge.exposeInMainWorld('updater', {
   downloadUpdate: () => ipcRenderer.send('download-update'),
   installUpdate: () => ipcRenderer.send('install-update')
 })
+
+// --- APP-META ---
+contextBridge.exposeInMainWorld('app', {
+  getVersion: () => ipcRenderer.invoke('get-version')
+})

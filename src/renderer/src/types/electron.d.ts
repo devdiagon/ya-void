@@ -124,5 +124,8 @@ declare global {
   interface Window {
     api: VoyAppAPI;
     updater: VoyAppUpdater;
+    app: {
+      getVersion: () => Promise<string>;
+    };
   }
 }
