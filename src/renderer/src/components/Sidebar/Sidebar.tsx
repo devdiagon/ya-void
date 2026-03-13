@@ -11,7 +11,6 @@ export const Sidebar = () => {
         <div className="p-4 border-b border-gray-800">
           <div className="flex flex-col items-center gap-2">
             <img src={logo} alt="VOY logo" className="h-24 w-24 object-contain" />
-            <h1 className="text-xl font-bold text-white">VOY!</h1>
           </div>
         </div>
 
