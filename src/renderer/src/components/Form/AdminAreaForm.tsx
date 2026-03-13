@@ -38,7 +38,7 @@ export const AdminAreaForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <h3 className="text-lg font-bold">{title}</h3>
 
-      <div className="space-y-4 pt-4">
+      <div className="flex flex-col gap-4 pt-4 w-full items-stretch">
         <TextField
           fullWidth
           label="Nombre"
