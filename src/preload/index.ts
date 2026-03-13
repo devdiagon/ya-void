@@ -185,3 +185,21 @@ contextBridge.exposeInMainWorld('api', {
     delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
   }
 })
+
+// --- UPDATER ---
+contextBridge.exposeInMainWorld('updater', {
+  onUpdateAvailable: (callback: (info: unknown) => void) =>
+    ipcRenderer.on('update-available', (_, info) => callback(info)),
+
+  onUpdateDownloaded: (callback: () => void) =>
+    ipcRenderer.on('update-downloaded', () => callback()),
+
+  onDownloadProgress: (callback: (progress: number) => void) =>
+    ipcRenderer.on('download-progress', (_, progress) => callback(progress)),
+
+  onError: (callback: (err: string) => void) =>
+    ipcRenderer.on('update-error', (_, err) => callback(err)),
+
+  downloadUpdate: () => ipcRenderer.send('download-update'),
+  installUpdate: () => ipcRenderer.send('install-update')
+})
