@@ -1,6 +1,5 @@
 import { IconButton } from '@renderer/components';
 import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
-import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
 import { formatShortDate } from '@renderer/utils';
 import { SquarePenIcon, Trash2 } from 'lucide-react';

@@ -1,6 +1,6 @@
 {
   "name": "voy",
-  "version": "1.0.0",
+  "version": "pre-release-1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -49,6 +49,7 @@
     "autoprefixer": "^10.4.23",
     "electron": "^39.2.6",
     "electron-builder": "^26.0.12",
+    "electron-updater": "^6.8.3",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
