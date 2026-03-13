@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ActionButton, OutlineButton } from '../Button';
+import { Modal } from './Modal';
 
 type UpdaterState = 'idle' | 'available' | 'downloading' | 'ready' | 'error';
 
@@ -34,85 +36,65 @@ export function UpdaterModal() {
     });
   }, []);
 
-  if (state === 'idle') return null;
+  const handleClose = () => setState('idle');
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-        {state === 'available' && (
-          <>
-            <h2 className="text-lg font-semibold mb-1">Nueva actualización disponible</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              Versión <span className="font-medium">{info?.version}</span> está lista para descargar.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setState('idle')}
-                className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-50"
-              >
-                Más tarde
-              </button>
-              <button
-                onClick={() => window.updater.downloadUpdate()}
-                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              >
-                Descargar
-              </button>
-            </div>
-          </>
-        )}
-
-        {state === 'downloading' && (
-          <>
-            <h2 className="text-lg font-semibold mb-3">Descargando actualización...</h2>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-sm text-gray-500 text-right">{progress}%</p>
-          </>
-        )}
-
-        {state === 'ready' && (
-          <>
-            <h2 className="text-lg font-semibold mb-1">¡Lista para instalar!</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              La actualización fue descargada. Reinicia para aplicarla.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setState('idle')}
-                className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-50"
-              >
-                Más tarde
-              </button>
-              <button
-                onClick={() => window.updater.installUpdate()}
-                className="px-4 py-2 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700"
-              >
-                Reiniciar ahora
-              </button>
-            </div>
-          </>
-        )}
-
-        {state === 'error' && (
-          <>
-            <h2 className="text-lg font-semibold text-red-600 mb-1">Error al actualizar</h2>
-            <p className="text-sm text-gray-500 mb-4">{error}</p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setState('idle')}
-                className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-50"
-              >
-                Cerrar
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    <Modal
+      size="sm"
+      isOpen={state !== 'idle'}
+      onClose={handleClose}
+      closeOnOutsideClick={state !== 'downloading'}
+    >
+      {state === 'available' && (
+        <>
+          <h2 className="text-2xl text-blue-700 font-semibold mb-4">
+            Hay una nueva versión disponible
+          </h2>
+          <p className="text-sm text-gray-500 my-4">
+            La versión <span className="font-medium text-green-600">{info?.version}</span> está
+            lista para descargar.
+          </p>
+          <div className="flex gap-2 justify-end m-4">
+            <OutlineButton onClick={() => setState('idle')}>Más tarde</OutlineButton>
+            <ActionButton onClick={() => window.updater.downloadUpdate()}>Descargar</ActionButton>
+          </div>
+        </>
+      )}
+      {state === 'downloading' && (
+        <>
+          <h2 className="text-lg font-semibold mb-3">Descargando actualización...</h2>
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+            <div
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-500 text-right">{progress}%</p>
+        </>
+      )}
+      {state === 'ready' && (
+        <>
+          <h2 className="text-lg font-semibold mb-1">¡Lista para instalar!</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            La actualización fue descargada. Reinicia para aplicarla.
+          </p>
+          <div className="flex gap-2 justify-end">
+            <OutlineButton onClick={() => setState('idle')}>Más tarde</OutlineButton>
+            <ActionButton onClick={() => window.updater.installUpdate()}>
+              Reiniciar ahora
+            </ActionButton>
+          </div>
+        </>
+      )}
+      {state === 'error' && (
+        <>
+          <h2 className="text-lg font-semibold text-red-600 mb-1">Error al actualizar</h2>
+          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <div className="flex justify-end">
+            <ActionButton onClick={() => setState('idle')}>Cerrar</ActionButton>
+          </div>
+        </>
+      )}
+    </Modal>
   );
 }
