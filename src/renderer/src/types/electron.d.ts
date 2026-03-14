@@ -10,7 +10,7 @@ import { FormTripDTO, Trip, TripStatus } from './trip.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
 import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
 
-export interface ElectronAPI {
+export interface VoyAppAPI {
   farms: {
     list: () => Promise<Farm[]>;
     getById: (id: number) => Promise<Farm>;
@@ -111,8 +111,21 @@ export interface ElectronAPI {
   };
 }
 
+export interface VoyAppUpdater {
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void;
+  onUpdateDownloaded: (callback: () => void) => void;
+  onDownloadProgress: (callback: (progress: number) => void) => void;
+  onError: (callback: (err: string) => void) => void;
+  downloadUpdate: () => void;
+  installUpdate: () => void;
+}
+
 declare global {
   interface Window {
-    api: ElectronAPI;
+    api: VoyAppAPI;
+    updater: VoyAppUpdater;
+    app: {
+      getVersion: () => Promise<string>;
+    };
   }
 }

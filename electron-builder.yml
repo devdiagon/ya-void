@@ -11,13 +11,19 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - node_modules/better-sqlite3/**
+  - node_modules/bindings/**
+  - node_modules/node-gyp-build/**
 win:
-  executableName: VOY!
+  executableName: VOY
+  forceCodeSigning: false
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -37,7 +43,8 @@ linux:
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: false
+npmRebuild: true
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: devdiagon
+  repo: ya-void
