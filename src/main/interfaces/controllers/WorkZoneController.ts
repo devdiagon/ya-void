@@ -1,7 +1,7 @@
 import { ExportWorkZoneSheet } from '../../core/entities/ExportWorkZoneSheet'
 import { WorkZone } from '../../core/entities/WorkZone'
 import { UseWorkZone } from '../../core/use-cases/UseWorkZone'
-import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
+import { WorkZonePanelMetrics, WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
 
 export class WorkZoneController {
   private useWorkZone: UseWorkZone
@@ -20,6 +20,10 @@ export class WorkZoneController {
 
   async getAllFarmRelatedTrips(workZoneId: number, farmWorkZoneId: number): Promise<ExportWorkZoneSheet[]> {
     return this.useWorkZone.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
+  }
+
+  async getPanelMetrics(workZoneId: number): Promise<WorkZonePanelMetrics> {
+    return this.useWorkZone.getPanelMetrics(workZoneId)
   }
 
   async createWorkZone(payload: {

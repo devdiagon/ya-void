@@ -107,6 +107,9 @@ export function registerIpcHandlers(): void {
      (_, workZoneId: number, farmWorkZoneId: number) =>
       workZoneCtrl.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
   )
+  ipcMain.handle('workZones:getPanelMetrics', (_, workZoneId: number) =>
+    workZoneCtrl.getPanelMetrics(workZoneId)
+  )
   ipcMain.handle(
     'workZones:create',
     (_, payload: { name: string; startDate: string; endDate: string }) =>

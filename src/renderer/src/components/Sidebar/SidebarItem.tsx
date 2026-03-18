@@ -1,4 +1,4 @@
-import { ClipboardIcon, FileSlidersIcon, SearchIcon } from 'lucide-react';
+import { BarChart3Icon, ClipboardIcon, FileSlidersIcon, SearchIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,6 +10,12 @@ interface SidebarItemConfig {
 }
 
 export const sidebarItems: SidebarItemConfig[] = [
+  {
+    id: 'panel',
+    label: 'Panel',
+    icon: <BarChart3Icon size={20} />,
+    path: '/panel'
+  },
   {
     id: 'work-zones',
     label: 'Reportes',

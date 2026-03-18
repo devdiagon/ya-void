@@ -8,6 +8,7 @@ import { FormRouteDTO, Route } from './route.type';
 import { FormSubareaDTO, Subarea } from './subarea.type';
 import { FormTripDTO, Trip, TripStatus } from './trip.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
+import { WorkZonePanelMetrics } from './workZonePanel.type';
 import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
 
 export interface VoyAppAPI {
@@ -43,6 +44,7 @@ export interface VoyAppAPI {
       workZoneId: number,
       farmWorkZoneId: number
     ) => Promise<ExportWorkZoneSheet[]>;
+    getPanelMetrics: (workZoneId: number) => Promise<WorkZonePanelMetrics>;
     create: (payload: FormWorkZoneDTO) => Promise<WorkZone>;
     update: (id: number, payload: FormWorkZoneDTO) => Promise<void>;
     delete: (id: number) => Promise<void>;

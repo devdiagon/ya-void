@@ -4,6 +4,27 @@ import { getDb } from '../db/database'
 import { ExportTripRow, mapRowToExportWorkZoneSheet } from '../mappers/ExportWorkZoneSheetMapper'
 import { WorkZoneRow, mapRowToWorkZone } from '../mappers/WorkZoneMapper'
 
+export interface WorkZoneTripsByFarmMetric {
+  farmId: number
+  farmName: string
+  totalTrips: number
+}
+
+export interface WorkZoneSheetTotalsByFarmWorkZoneMetric {
+  farmWorkZoneId: number
+  farmWorkZoneName: string
+  farmId: number
+  farmName: string
+  totalSheet: number
+}
+
+export interface WorkZonePanelMetrics {
+  workZoneId: number
+  totalTrips: number
+  tripsByFarm: WorkZoneTripsByFarmMetric[]
+  totalSheetByFarmWorkZone: WorkZoneSheetTotalsByFarmWorkZoneMetric[]
+}
+
 export class WorkZoneRepository {
   private db = getDb()
 
@@ -88,6 +109,62 @@ export class WorkZoneRepository {
 
     const rows = stmt.all(workZoneId, farmWorkZoneId) as ExportTripRow[]
     return mapRowToExportWorkZoneSheet(rows)
+  }
+
+  getPanelMetrics(workZoneId: number): WorkZonePanelMetrics {
+    const totalTripsStmt = this.db.prepare<{ totalTrips: number }>(`
+      SELECT COUNT(t.id) AS totalTrips
+      FROM trip t
+      INNER JOIN work_zone_sheet wzs ON wzs.id = t.work_zone_sheet_id
+      INNER JOIN farm_work_zone fwz ON fwz.id = wzs.farm_work_zone_id
+      WHERE fwz.work_zone_id = ?
+        AND fwz.deleted_at IS NULL
+        AND wzs.deleted_at IS NULL
+        AND t.status = 'ready'
+    `)
+
+    const tripsByFarmStmt = this.db.prepare<WorkZoneTripsByFarmMetric>(`
+      SELECT
+        f.id AS farmId,
+        f.name AS farmName,
+        COUNT(t.id) AS totalTrips
+      FROM farm_work_zone fwz
+      INNER JOIN farm f ON f.id = fwz.farm_id
+      LEFT JOIN work_zone_sheet wzs ON wzs.farm_work_zone_id = fwz.id AND wzs.deleted_at IS NULL
+      LEFT JOIN trip t ON t.work_zone_sheet_id = wzs.id AND t.status = 'ready'
+      WHERE fwz.work_zone_id = ?
+        AND fwz.deleted_at IS NULL
+      GROUP BY f.id, f.name
+      ORDER BY f.name ASC
+    `)
+
+    const totalSheetByFarmWorkZoneStmt =
+      this.db.prepare<WorkZoneSheetTotalsByFarmWorkZoneMetric>(`
+      SELECT
+        fwz.id AS farmWorkZoneId,
+        fwz.name AS farmWorkZoneName,
+        f.id AS farmId,
+        f.name AS farmName,
+        COALESCE(SUM(wzs.total_sheet), 0) AS totalSheet
+      FROM farm_work_zone fwz
+      INNER JOIN farm f ON f.id = fwz.farm_id
+      LEFT JOIN work_zone_sheet wzs ON wzs.farm_work_zone_id = fwz.id AND wzs.deleted_at IS NULL
+      WHERE fwz.work_zone_id = ?
+        AND fwz.deleted_at IS NULL
+      GROUP BY fwz.id, fwz.name, f.id, f.name
+      ORDER BY f.name ASC, fwz.name ASC
+    `)
+
+    const totalTripsRow = totalTripsStmt.get(workZoneId)
+    const tripsByFarm = tripsByFarmStmt.all(workZoneId)
+    const totalSheetByFarmWorkZone = totalSheetByFarmWorkZoneStmt.all(workZoneId)
+
+    return {
+      workZoneId,
+      totalTrips: totalTripsRow?.totalTrips ?? 0,
+      tripsByFarm,
+      totalSheetByFarmWorkZone
+    }
   }
 
   /**

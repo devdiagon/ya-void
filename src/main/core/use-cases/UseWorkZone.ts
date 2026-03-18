@@ -1,4 +1,4 @@
-import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
+import { WorkZonePanelMetrics, WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
 import { ExportWorkZoneSheet } from '../entities/ExportWorkZoneSheet'
 import { WorkZone } from '../entities/WorkZone'
 
@@ -31,6 +31,10 @@ export class UseWorkZone {
    */
   getAllFarmRelatedTrips(workZoneId: number, farmWorkZoneId: number): ExportWorkZoneSheet[] {
     return this.workZoneRepository.getAllFarmRelatedTrips(workZoneId, farmWorkZoneId)
+  }
+
+  getPanelMetrics(workZoneId: number): WorkZonePanelMetrics {
+    return this.workZoneRepository.getPanelMetrics(workZoneId)
   }
 
   /**
