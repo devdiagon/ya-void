@@ -42,6 +42,9 @@ export function registerIpcHandlers(): void {
   const subareaRepo = new SubareaRepository()
   const tripRepo = new TripRepository()
 
+  // Sincroniza total_sheet históricos al iniciar para que el panel muestre datos consistentes.
+  tripRepo.syncAllWorkZoneSheetTotals()
+
   // 2. Instanciar Controladores
   const farmCtrl = new FarmController(farmRepo)
   const areaCtrl = new AreaController(areaRepo)

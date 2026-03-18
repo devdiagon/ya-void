@@ -31,6 +31,43 @@ export class TripRepository {
   private db = getDb()
 
   /**
+   * Recalcula el total de una hoja sumando los costos de sus viajes.
+   */
+  private syncWorkZoneSheetTotal(workZoneSheetId: number | null | undefined): void {
+    if (!workZoneSheetId) return
+
+    const stmt = this.db.prepare(`
+      UPDATE work_zone_sheet
+      SET total_sheet = COALESCE((
+        SELECT SUM(COALESCE(t.cost, 0))
+        FROM trip t
+        WHERE t.work_zone_sheet_id = ?
+      ), 0)
+      WHERE id = ?
+        AND deleted_at IS NULL
+    `)
+
+    stmt.run(workZoneSheetId, workZoneSheetId)
+  }
+
+  /**
+   * Recalcula todos los total_sheet existentes para corregir datos históricos.
+   */
+  syncAllWorkZoneSheetTotals(): void {
+    const stmt = this.db.prepare(`
+      UPDATE work_zone_sheet
+      SET total_sheet = COALESCE((
+        SELECT SUM(COALESCE(t.cost, 0))
+        FROM trip t
+        WHERE t.work_zone_sheet_id = work_zone_sheet.id
+      ), 0)
+      WHERE deleted_at IS NULL
+    `)
+
+    stmt.run()
+  }
+
+  /**
    * Obtiene todos los viajes vinculados a una hoja de zona de trabajo.
    * Ordenados por fecha y hora de salida para presentación cronológica.
    */
@@ -177,6 +214,8 @@ export class TripRepository {
       data.reasonId,
       data.subareaId
     )
+
+    this.syncWorkZoneSheetTotal(data.workZoneSheetId)
     return result.lastInsertRowid as number
   }
 
@@ -185,6 +224,8 @@ export class TripRepository {
    * No toca status ni snapshots — esos se gestionan con confirm/reopen.
    */
   update(data: Trip): boolean {
+    const previousTrip = this.findById(data.id)
+
     const stmt = this.db.prepare(`
       UPDATE trip SET
         vehicle_type = ?, trip_date = ?, departure_time = ?,
@@ -207,6 +248,10 @@ export class TripRepository {
       data.subareaId,
       data.id
     )
+
+    this.syncWorkZoneSheetTotal(previousTrip?.workZoneSheetId)
+    this.syncWorkZoneSheetTotal(data.workZoneSheetId)
+
     return result.changes > 0
   }
 
@@ -236,6 +281,7 @@ export class TripRepository {
         'UPDATE trip SET status = ?, route_snapshot = ?, reason_snapshot = ?, subarea_snapshot = ? WHERE id = ?'
       )
       const result = stmt.run('ready', routeSnapshot, reasonSnapshot, subareaSnapshot, id)
+      this.syncWorkZoneSheetTotal(trip.workZoneSheetId)
       return result.changes > 0
     })
 
@@ -247,10 +293,13 @@ export class TripRepository {
    * Los snapshots se recapturarán en el próximo confirm.
    */
   reopen(id: number): boolean {
+    const trip = this.findById(id)
+
     const stmt = this.db.prepare(
       'UPDATE trip SET status = ?, route_snapshot = NULL, reason_snapshot = NULL, subarea_snapshot = NULL WHERE id = ?'
     )
     const result = stmt.run('pending', id)
+    this.syncWorkZoneSheetTotal(trip?.workZoneSheetId)
     return result.changes > 0
   }
 
@@ -258,7 +307,11 @@ export class TripRepository {
    * Elimina un viaje por su ID.
    */
   delete(id: number): void {
+    const trip = this.findById(id)
+
     const stmt = this.db.prepare('DELETE FROM trip WHERE id = ?')
     stmt.run(id)
+
+    this.syncWorkZoneSheetTotal(trip?.workZoneSheetId)
   }
 }
