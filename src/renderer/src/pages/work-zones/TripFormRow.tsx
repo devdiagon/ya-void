@@ -116,7 +116,7 @@ export function TripFormRow({
   return (
     <tr className="bg-white ring-1 ring-inset ring-blue-400">
       {/* Fecha */}
-      <td className={`${cell} min-w-[120px]`}>
+      <td className={cell}>
         <input
           type="date"
           className={inputCls}
@@ -126,7 +126,7 @@ export function TripFormRow({
       </td>
 
       {/* Vehículo */}
-      <td className={`${cell} min-w-[110px]`}>
+      <td className={cell}>
         <select
           className="w-full bg-transparent border-0 outline-none text-sm py-0 cursor-pointer"
           value={form.vehicleType}
@@ -142,7 +142,7 @@ export function TripFormRow({
       </td>
 
       {/* Llegada */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
+      <td className={`${cell} ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
         <input
           type="text"
           className={`${inputCls} ${timeErrors.arrival ? 'text-red-600' : ''}`}
@@ -157,7 +157,7 @@ export function TripFormRow({
       </td>
 
       {/* Salida */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.departure ? 'bg-red-50' : ''}`}>
+      <td className={`${cell} ${timeErrors.departure ? 'bg-red-50' : ''}`}>
         <input
           type="text"
           className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
@@ -172,7 +172,7 @@ export function TripFormRow({
       </td>
 
       {/* Pasajeros */}
-      <td className={`${cell} min-w-[56px] w-[60px]`}>
+      <td className={cell}>
         <input
           type="number"
           min={0}
@@ -183,7 +183,7 @@ export function TripFormRow({
       </td>
 
       {/* Solicitante */}
-      <td className={`${cell} min-w-[140px]`}>
+      <td className={cell}>
         <CellAutocomplete
           options={requesters}
           value={form.requesterId}
@@ -197,7 +197,7 @@ export function TripFormRow({
       </td>
 
       {/* Área que solicita */}
-      <td className={`${cell} min-w-[140px]`}>
+      <td className={cell}>
         <CellAutocomplete
           options={subareas}
           value={form.subareaId}
@@ -211,7 +211,7 @@ export function TripFormRow({
       </td>
 
       {/* Motivo */}
-      <td className={`${cell} min-w-[300px]`}>
+      <td className={cell}>
         <CellAutocomplete
           options={reasons}
           value={form.reasonId}
@@ -225,7 +225,7 @@ export function TripFormRow({
       </td>
 
       {/* Ruta */}
-      <td className={`${cell} min-w-[300px]`}>
+      <td className={cell}>
         <CellAutocomplete
           options={routes}
           value={form.routeId}
@@ -239,7 +239,7 @@ export function TripFormRow({
       </td>
 
       {/* Costo */}
-      <td className={`${cell} min-w-[90px]`}>
+      <td className={cell}>
         <div className="flex items-center gap-0.5">
           <span className="text-gray-400 text-xs">$</span>
           <input
@@ -254,7 +254,7 @@ export function TripFormRow({
       </td>
 
       {/* Acciones */}
-      <td className={`${cell} min-w-[72px]`}>
+      <td className={cell}>
         <div className="flex items-center gap-1">
           <IconButton
             icon={<Save size={15} />}

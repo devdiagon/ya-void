@@ -161,18 +161,31 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
+          <colgroup>
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '5%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '5%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th className={hdr}>Fecha</th>
               <th className={hdr}>Vehículo</th>
               <th className={hdr}>Llegada</th>
               <th className={hdr}>Salida</th>
-              <th className={`${hdr} text-center w-[64px]`}>#Num</th>
+              <th className={`${hdr} text-center`}>#Num</th>
               <th className={hdr}>Solicitante</th>
-              <th className={`${hdr} min-w-[140px]`}>Área</th>
-              <th className={`${hdr} min-w-[300px]`}>Motivo</th>
-              <th className={`${hdr} min-w-[300px]`}>Ruta</th>
+              <th className={hdr}>Área</th>
+              <th className={hdr}>Motivo</th>
+              <th className={hdr}>Ruta</th>
               <th className={`${hdr} text-right`}>Costo ($)</th>
               <th className={hdr}>Acciones</th>
             </tr>
@@ -213,7 +226,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
                   <td className={cell}>{trip.arrivalTime ?? '—'}</td>
                   <td className={cell}>{trip.departureTime ?? '—'}</td>
                   <td className={`${cell} text-center`}>{trip.passengerCount ?? '—'}</td>
-                  <td className={cell}>{requesterLabel(trip.requesterId)}</td>
+                  <td className={`${cell} break-words`}>{requesterLabel(trip.requesterId)}</td>
                   <td className={`${cell} break-words`}>
                     {subareaLabel(trip.subareaId, trip.subareaSnapshot)}
                   </td>

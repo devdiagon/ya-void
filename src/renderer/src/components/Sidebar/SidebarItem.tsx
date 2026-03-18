@@ -33,9 +33,10 @@ export const sidebarItems: SidebarItemConfig[] = [
 interface SidebarItemProps {
   item: SidebarItemConfig;
   isActive: boolean;
+  collapsed?: boolean;
 }
 
-export const SidebarItem = ({ item, isActive }: SidebarItemProps) => {
+export const SidebarItem = ({ item, isActive, collapsed = false }: SidebarItemProps) => {
   const activeStyles = isActive
     ? 'bg-blue-600 text-white'
     : 'text-gray-300 hover:bg-gray-800 hover:text-white';
@@ -43,10 +44,13 @@ export const SidebarItem = ({ item, isActive }: SidebarItemProps) => {
   return (
     <Link
       to={item.path}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeStyles}`}
+      title={collapsed ? item.label : undefined}
+      className={`flex items-center rounded-lg transition-colors ${
+        collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3'
+      } ${activeStyles}`}
     >
       {item.icon}
-      <span className="font-medium">{item.label}</span>
+      {!collapsed && <span className="font-medium">{item.label}</span>}
     </Link>
   );
 };

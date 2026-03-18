@@ -341,7 +341,19 @@ export function SearchTripPage() {
               {total} {total === 1 ? 'viaje encontrado' : 'viajes encontrados'} · página {page} de{' '}
               {totalPages}
             </div>
-            <table className="w-full text-sm border-collapse">
+            <table className="w-full table-fixed text-sm border-collapse">
+              <colgroup>
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '9%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '8%' }} />
+              </colgroup>
               <thead className="sticky top-0 z-10">
                 <tr className="bg-blue-600 text-white text-xs">
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Fecha</th>
@@ -353,19 +365,15 @@ export function SearchTripPage() {
                   </th>
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Ruta</th>
                   <th className="px-3 py-2 text-left font-medium border border-blue-700">Motivo</th>
-                  <th className="px-3 py-2 text-center font-medium border border-blue-700 w-20">
+                  <th className="px-3 py-2 text-center font-medium border border-blue-700">
                     Salida
                   </th>
-                  <th className="px-3 py-2 text-center font-medium border border-blue-700 w-20">
+                  <th className="px-3 py-2 text-center font-medium border border-blue-700">
                     Llegada
                   </th>
-                  <th className="px-3 py-2 text-center font-medium border border-blue-700 w-16">
-                    #Num
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium border border-blue-700 w-24">
-                    Costo
-                  </th>
-                  <th className="px-3 py-2 text-center font-medium border border-blue-700 w-24">
+                  <th className="px-3 py-2 text-center font-medium border border-blue-700">#Num</th>
+                  <th className="px-3 py-2 text-right font-medium border border-blue-700">Costo</th>
+                  <th className="px-3 py-2 text-center font-medium border border-blue-700">
                     Estado
                   </th>
                 </tr>
@@ -384,13 +392,13 @@ export function SearchTripPage() {
                     <td className="px-3 py-1.5 border border-gray-200 whitespace-nowrap">
                       {trip.vehicleType ? VEHICLE_LABELS[trip.vehicleType] : '—'}
                     </td>
-                    <td className="px-3 py-1.5 border border-gray-200 whitespace-nowrap">
+                    <td className="px-3 py-1.5 border border-gray-200 break-words">
                       {resolveRequesterName(trip.requesterId)}
                     </td>
-                    <td className="px-3 py-1.5 border border-gray-200">
+                    <td className="px-3 py-1.5 border border-gray-200 break-words">
                       {trip.routeSnapshot ?? '—'}
                     </td>
-                    <td className="px-3 py-1.5 border border-gray-200">
+                    <td className="px-3 py-1.5 border border-gray-200 break-words">
                       {trip.reasonSnapshot ?? '—'}
                     </td>
                     <td className="px-3 py-1.5 border border-gray-200 text-center whitespace-nowrap">
