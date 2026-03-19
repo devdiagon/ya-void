@@ -2,14 +2,16 @@ name: Build & Release
 
 on:
   pull_request:
-    types: [closed]
-    branches: [ci/cd]
+    types:
+      - closed
+    branches:
+      - ci/cd
 
 permissions:
   contents: write
 
 jobs:
-  if: github.event.pull_request.merged == true
+  if: ${{ github.event.pull_request.merged == true }}
   build-windows:
     runs-on: windows-latest
 
