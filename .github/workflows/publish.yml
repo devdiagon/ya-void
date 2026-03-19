@@ -25,6 +25,7 @@ jobs:
         run: npm install
 
       - name: Create tag
+        shell: bash
         run: |
           TAG_VER="$(node -p "require('./package.json').version")"
           git tag "$TAG_VER"
