@@ -1,7 +1,7 @@
 {
   "name": "voy",
   "version": "1.0.0",
-  "description": "App created to manage Rosaprima's farms trips",
+  "description": "App created to manage Rosaprima's farms trips.",
   "main": "./out/main/index.js",
   "author": "gomiiDev & devdiagon",
   "homepage": "https://github.com/devdiagon/ya-void",
