@@ -1,0 +1,28 @@
+name: Check Version
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check version tag does not exist
+        run: |
+          TAG_VER="$(node -p "require('./package.json').version")"
+          echo "Verify if version tag $TAG_VER is not on the remote repository"
+
+          git fetch --tags
+
+          if git rev-parse "$TAG_VER" >/dev/null 2>&1; then
+            echo "::error::Version tag $TAG_VER already exists in the remote repository. Update package.json version definition before doing the merge."
+            exit 1
+          else
+            echo "Version $TAG_VER can be deployed."
+          fi
