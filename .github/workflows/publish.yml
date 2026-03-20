@@ -4,18 +4,12 @@ on:
   push:
     branches:
       - ci/cd
-  pull_request:
-    types:
-      - closed
-    branches:
-      - ci/cd
 
 permissions:
   contents: write
 
 jobs:
   build-windows:
-    if: github.event.pull_request.merged == true
     runs-on: windows-latest
 
     steps:
