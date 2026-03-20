@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 jobs:
-  if: github.event.pull_request.merged == true
   build-windows:
+    if: github.event.pull_request.merged == true
     runs-on: windows-latest
 
     steps:
