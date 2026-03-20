@@ -34,7 +34,6 @@ jobs:
           git push origin "$TAG_VER"
           gh release create "v$TAG_VER" \
             --title "VOY! v$TAG_VER" \
-            --generate-notes
 
       - name: Build and publish
         env:
