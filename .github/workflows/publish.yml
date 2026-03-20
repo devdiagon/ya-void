@@ -1,9 +1,7 @@
 name: Build & Release
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - ci/cd
 
@@ -12,7 +10,6 @@ permissions:
 
 jobs:
   build-windows:
-    if: ${{ github.event.pull_request.merged == true }}
     runs-on: windows-latest
 
     steps:
@@ -32,11 +29,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG_VER="v$(node -p "require('./package.json').version")"
+          TAG_VER="$(node -p "require('./package.json').version")"
           git tag "$TAG_VER"
           git push origin "$TAG_VER"
           gh release create "$TAG_VER" \
-            --title "VOY! $TAG_VER"
+            --title "VOY! v$TAG_VER"
 
       - name: Build and publish
         env:
