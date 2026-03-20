@@ -48,3 +48,5 @@ publish:
   provider: github
   owner: devdiagon
   repo: ya-void
+  releaseType: release
+  tagNamePrefix: v
