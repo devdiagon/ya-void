@@ -15,7 +15,7 @@ jobs:
 
       - name: Check version tag does not exist
         run: |
-          TAG_VER=$(node -p "require('./package.json').version")
+          TAG_VER="v$(node -p "require('./package.json').version")"
           echo "Verify if version tag $TAG_VER is not on the remote repository"
 
           git fetch --tags
