@@ -1,6 +1,8 @@
-import { useReasons, useRequesters, useRoutes, useTrips } from '@renderer/hooks';
+import { IconButton } from '@renderer/components';
+import { useReasons, useRequesters, useRoutes, useSubareas, useTrips } from '@renderer/hooks';
 import { FormTripDTO, Trip, TripVehicleType } from '@renderer/types';
-import { Pencil, Trash2 } from 'lucide-react';
+import { formatShortDate } from '@renderer/utils';
+import { SquarePenIcon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { emptyTripForm, TripFormData, TripFormRow } from './TripFormRow';
 
@@ -20,21 +22,16 @@ function toDTO(form: TripFormData, workZoneSheetId: number, areaId: number): For
     passengerCount: form.passengerCount ? Number(form.passengerCount) : undefined,
     routeId: form.routeId ?? undefined,
     reasonId: form.reasonId ?? undefined,
+    subareaId: form.subareaId ?? undefined,
     cost: form.cost ? Number(form.cost) : undefined,
     workZoneSheetId,
     areaId
   };
 }
 
-function formatDate(d: string | null) {
-  if (!d) return '—';
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
 const cell = 'border border-gray-200 px-2 py-1.5 text-sm align-middle';
 const hdr =
-  'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-600 whitespace-nowrap';
+  'border border-blue-700 px-2 py-2 text-xs font-semibold text-white bg-blue-800 whitespace-nowrap';
 
 export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps) {
   const { trips, loading, createTrip, updateTrip, confirmTrip, reopenTrip, deleteTrip } =
@@ -46,7 +43,14 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     updateReason,
     deleteReason
   } = useReasons(areaId);
-  const { requesters, findOrCreateForArea } = useRequesters(areaId);
+  const { requesters, findOrCreateForArea, updateRequester, deleteRequester } =
+    useRequesters(areaId);
+  const {
+    subareas,
+    findOrCreate: findOrCreateSubarea,
+    updateSubarea,
+    deleteSubarea
+  } = useSubareas(areaId);
 
   const [newForm, setNewForm] = useState<TripFormData>(emptyTripForm());
   const [editId, setEditId] = useState<number | null>(null);
@@ -73,6 +77,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
       passengerCount: trip.passengerCount != null ? String(trip.passengerCount) : '',
       routeId: trip.routeId,
       reasonId: trip.reasonId,
+      subareaId: trip.subareaId,
       cost: trip.cost != null ? String(trip.cost) : ''
     });
   };
@@ -92,6 +97,8 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     snap ?? (id ? (routes.find((r) => r.id === id)?.name ?? '—') : '—');
   const reasonLabel = (id: number | null, snap: string | null) =>
     snap ?? (id ? (reasons.find((r) => r.id === id)?.name ?? '—') : '—');
+  const subareaLabel = (id: number | null, snap: string | null) =>
+    snap ?? (id ? (subareas.find((s) => s.id === id)?.name ?? '—') : '—');
 
   const sharedRowProps = {
     routes,
@@ -100,6 +107,12 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     onFindOrCreateRoute: findOrCreateRoute,
     onFindOrCreateReason: findOrCreateReason,
     onFindOrCreateRequester: (name: string) => findOrCreateForArea(name),
+    onEditRequester: async (opt: { id: number; name: string }, newName: string) => {
+      await updateRequester({ id: opt.id, name: newName });
+    },
+    onDeleteRequester: async (opt: { id: number }) => {
+      await deleteRequester(opt.id);
+    },
     onEditRoute: async (opt: { id: number; name: string }, newName: string) => {
       await updateRoute(opt.id, newName);
     },
@@ -111,6 +124,14 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
     },
     onDeleteReason: async (opt: { id: number }) => {
       await deleteReason(opt.id);
+    },
+    subareas,
+    onFindOrCreateSubarea: findOrCreateSubarea,
+    onEditSubarea: async (opt: { id: number; name: string }, newName: string) => {
+      await updateSubarea(opt.id, newName);
+    },
+    onDeleteSubarea: async (opt: { id: number }) => {
+      await deleteSubarea(opt.id);
     }
   };
 
@@ -120,33 +141,51 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Section header */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <h2 className="text-base font-semibold text-gray-800">Viajes — {sheetName}</h2>
-        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-          Total: {trips.length}
-        </span>
-        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-          Realizados: {totalReady}
-        </span>
-        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-          Pendientes: {totalPending}
-        </span>
+      {/* Header */}
+
+      <div className="flex justify-between">
+        {/* Progress */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-base font-semibold text-gray-800">Viajes — {sheetName}</h2>
+          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+            Total: {trips.length}
+          </span>
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+            Realizados: {totalReady}
+          </span>
+          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+            Pendientes: {totalPending}
+          </span>
+        </div>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
+          <colgroup>
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '5%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '5%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th className={hdr}>Fecha</th>
               <th className={hdr}>Vehículo</th>
-              <th className={hdr}>Solicitante</th>
-              <th className={hdr}>Salida</th>
               <th className={hdr}>Llegada</th>
-              <th className={`${hdr} text-center w-[64px]`}>#Num</th>
-              <th className={`${hdr} min-w-[220px]`}>Ruta</th>
-              <th className={`${hdr} min-w-[220px]`}>Motivo</th>
+              <th className={hdr}>Salida</th>
+              <th className={`${hdr} text-center`}>#Num</th>
+              <th className={hdr}>Solicitante</th>
+              <th className={hdr}>Área</th>
+              <th className={hdr}>Motivo</th>
+              <th className={hdr}>Ruta</th>
               <th className={`${hdr} text-right`}>Costo ($)</th>
               <th className={hdr}>Acciones</th>
             </tr>
@@ -182,39 +221,40 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
                     trip.status === 'pending' ? 'bg-yellow-50' : 'bg-white'
                   } hover:bg-blue-50/20 transition-colors`}
                 >
-                  <td className={cell}>{formatDate(trip.tripDate)}</td>
+                  <td className={cell}>{formatShortDate(trip.tripDate)}</td>
                   <td className={cell}>{trip.vehicleType ?? '—'}</td>
-                  <td className={cell}>{requesterLabel(trip.requesterId)}</td>
-                  <td className={cell}>{trip.departureTime ?? '—'}</td>
                   <td className={cell}>{trip.arrivalTime ?? '—'}</td>
+                  <td className={cell}>{trip.departureTime ?? '—'}</td>
                   <td className={`${cell} text-center`}>{trip.passengerCount ?? '—'}</td>
+                  <td className={`${cell} break-words`}>{requesterLabel(trip.requesterId)}</td>
                   <td className={`${cell} break-words`}>
-                    {routeLabel(trip.routeId, trip.routeSnapshot)}
+                    {subareaLabel(trip.subareaId, trip.subareaSnapshot)}
                   </td>
                   <td className={`${cell} break-words`}>
                     {reasonLabel(trip.reasonId, trip.reasonSnapshot)}
+                  </td>
+                  <td className={`${cell} break-words`}>
+                    {routeLabel(trip.routeId, trip.routeSnapshot)}
                   </td>
                   <td className={`${cell} text-right font-medium`}>
                     {trip.cost != null ? `$${trip.cost.toFixed(2)}` : '—'}
                   </td>
                   <td className={cell}>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
+                      <IconButton
+                        icon={<SquarePenIcon size={15} />}
                         onClick={() => startEdit(trip)}
-                        className="p-1 rounded text-blue-500 hover:bg-blue-50"
-                        title="Editar"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        type="button"
+                        ariaLabel="Editar"
+                        size="xs"
+                        variant="info"
+                      />
+                      <IconButton
+                        icon={<Trash2 size={15} />}
                         onClick={() => deleteTrip(trip.id)}
-                        className="p-1 rounded text-red-500 hover:bg-red-50"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                        ariaLabel="Eliminar"
+                        size="xs"
+                        variant="danger"
+                      />
                     </div>
                   </td>
                 </tr>
@@ -226,7 +266,7 @@ export function TripTable({ workZoneSheetId, sheetName, areaId }: TripTableProps
           <tfoot>
             <tr className="bg-gray-50">
               <td
-                colSpan={8}
+                colSpan={9}
                 className={`${cell} text-right font-medium text-gray-700 border-t-2 border-gray-300`}
               >
                 Total de Costos:

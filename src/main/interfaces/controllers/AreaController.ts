@@ -1,12 +1,13 @@
 import { Area } from '../../core/entities/Area'
 import { UseArea } from '../../core/use-cases/UseArea'
 import { AreaRepository } from '../../data/repositories/AreaRepository'
+import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 
 export class AreaController {
   private useArea: UseArea
 
   constructor(private areaRepository: AreaRepository) {
-    this.useArea = new UseArea(this.areaRepository)
+    this.useArea = new UseArea(this.areaRepository, new SubareaRepository())
   }
 
   /**
@@ -27,15 +28,15 @@ export class AreaController {
   /**
    * Crea una nueva área vinculada a una finca
    */
-  async create(payload: { name: string; farmId: number }): Promise<Area> {
-    return this.useArea.create(payload.name, payload.farmId)
+  async create(payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }): Promise<Area> {
+    return this.useArea.create(payload.name, payload.farmId, payload.managerName ?? null, payload.managerCid ?? null)
   }
 
   /**
    * Actualiza el nombre o la vinculación de una finca
    */
-  async update(id: number, payload: { name: string; farmId: number }): Promise<void> {
-    return this.useArea.update(id, payload.name, payload.farmId)
+  async update(id: number, payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }): Promise<void> {
+    return this.useArea.update(id, payload.name, payload.farmId, payload.managerName ?? null, payload.managerCid ?? null)
   }
 
   /**

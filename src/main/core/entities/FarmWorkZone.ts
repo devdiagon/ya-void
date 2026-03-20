@@ -3,4 +3,5 @@ export interface FarmWorkZone {
   workZoneId: number
   farmId: number
   name: string
+  deletedAt?: string | null
 }

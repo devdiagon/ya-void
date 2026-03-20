@@ -123,7 +123,15 @@ export function useTrips(workZoneSheetId: number) {
       if (ok) {
         setTrips((prev) =>
           prev.map((t) =>
-            t.id === id ? { ...t, status: 'pending', routeSnapshot: null, reasonSnapshot: null } : t
+            t.id === id
+              ? {
+                  ...t,
+                  status: 'pending',
+                  routeSnapshot: null,
+                  reasonSnapshot: null,
+                  subareaSnapshot: null
+                }
+              : t
           )
         );
       }

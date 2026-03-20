@@ -119,7 +119,7 @@ export class RequesterRepository {
       const info = stmt.run(normalizedName, id)
 
       if (info.changes > 0) {
-        return { id, name: normalizedName }
+        return this.findById(id)
       }
       return null
     } catch (error) {

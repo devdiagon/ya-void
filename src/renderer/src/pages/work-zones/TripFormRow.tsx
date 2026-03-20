@@ -1,3 +1,4 @@
+import { IconButton } from '@renderer/components';
 import { TripVehicleType } from '@renderer/types';
 import { Save, X } from 'lucide-react';
 import { useState } from 'react';
@@ -26,6 +27,7 @@ export interface TripFormData {
   passengerCount: string;
   routeId: number | null;
   reasonId: number | null;
+  subareaId: number | null;
   cost: string;
 }
 
@@ -38,6 +40,7 @@ export const emptyTripForm = (): TripFormData => ({
   passengerCount: '',
   routeId: null,
   reasonId: null,
+  subareaId: null,
   cost: ''
 });
 
@@ -56,6 +59,12 @@ interface TripFormRowProps {
   onDeleteRoute?: (opt: AutocompleteOption) => Promise<void>;
   onEditReason?: (opt: AutocompleteOption, newName: string) => Promise<void>;
   onDeleteReason?: (opt: AutocompleteOption) => Promise<void>;
+  onEditRequester?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteRequester?: (opt: AutocompleteOption) => Promise<void>;
+  subareas: AutocompleteOption[];
+  onFindOrCreateSubarea: (name: string) => Promise<AutocompleteOption | null>;
+  onEditSubarea?: (opt: AutocompleteOption, newName: string) => Promise<void>;
+  onDeleteSubarea?: (opt: AutocompleteOption) => Promise<void>;
 }
 
 const cell = 'border border-gray-200 px-2 py-1 align-top';
@@ -74,7 +83,13 @@ export function TripFormRow({
   onEditRoute,
   onDeleteRoute,
   onEditReason,
-  onDeleteReason
+  onDeleteReason,
+  onEditRequester,
+  onDeleteRequester,
+  subareas,
+  onFindOrCreateSubarea,
+  onEditSubarea,
+  onDeleteSubarea
 }: TripFormRowProps) {
   const set = <K extends keyof TripFormData>(key: K, val: TripFormData[K]) =>
     setForm({ ...form, [key]: val });
@@ -101,7 +116,7 @@ export function TripFormRow({
   return (
     <tr className="bg-white ring-1 ring-inset ring-blue-400">
       {/* Fecha */}
-      <td className={`${cell} min-w-[120px]`}>
+      <td className={cell}>
         <input
           type="date"
           className={inputCls}
@@ -111,7 +126,7 @@ export function TripFormRow({
       </td>
 
       {/* Vehículo */}
-      <td className={`${cell} min-w-[110px]`}>
+      <td className={cell}>
         <select
           className="w-full bg-transparent border-0 outline-none text-sm py-0 cursor-pointer"
           value={form.vehicleType}
@@ -126,34 +141,8 @@ export function TripFormRow({
         </select>
       </td>
 
-      {/* Solicitante */}
-      <td className={`${cell} min-w-[140px]`}>
-        <CellAutocomplete
-          options={requesters}
-          value={form.requesterId}
-          placeholder="Buscar solicitante..."
-          onChange={(id) => set('requesterId', id)}
-          onFindOrCreate={onFindOrCreateRequester}
-        />
-      </td>
-
-      {/* Salida */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.departure ? 'bg-red-50' : ''}`}>
-        <input
-          type="text"
-          className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
-          value={form.departureTime}
-          placeholder="HH:MM"
-          maxLength={5}
-          onChange={(e) => handleTimeChange('departureTime', 'departure', e.target.value)}
-        />
-        {timeErrors.departure && (
-          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.departure}</p>
-        )}
-      </td>
-
       {/* Llegada */}
-      <td className={`${cell} min-w-[100px] ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
+      <td className={`${cell} ${timeErrors.arrival ? 'bg-red-50' : ''}`}>
         <input
           type="text"
           className={`${inputCls} ${timeErrors.arrival ? 'text-red-600' : ''}`}
@@ -167,8 +156,23 @@ export function TripFormRow({
         )}
       </td>
 
+      {/* Salida */}
+      <td className={`${cell} ${timeErrors.departure ? 'bg-red-50' : ''}`}>
+        <input
+          type="text"
+          className={`${inputCls} ${timeErrors.departure ? 'text-red-600' : ''}`}
+          value={form.departureTime}
+          placeholder="HH:MM"
+          maxLength={5}
+          onChange={(e) => handleTimeChange('departureTime', 'departure', e.target.value)}
+        />
+        {timeErrors.departure && (
+          <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{timeErrors.departure}</p>
+        )}
+      </td>
+
       {/* Pasajeros */}
-      <td className={`${cell} min-w-[56px] w-[60px]`}>
+      <td className={cell}>
         <input
           type="number"
           min={0}
@@ -178,34 +182,64 @@ export function TripFormRow({
         />
       </td>
 
-      {/* Ruta */}
-      <td className={`${cell} min-w-[220px]`}>
+      {/* Solicitante */}
+      <td className={cell}>
         <CellAutocomplete
-          options={routes}
-          value={form.routeId}
-          placeholder="Buscar ruta..."
-          onChange={(id) => set('routeId', id)}
-          onFindOrCreate={onFindOrCreateRoute}
-          onEditOption={onEditRoute}
-          onDeleteOption={onDeleteRoute}
+          options={requesters}
+          value={form.requesterId}
+          placeholder="Buscar solicitante..."
+          onChange={(id) => set('requesterId', id)}
+          onClear={() => set('requesterId', null)}
+          onFindOrCreate={onFindOrCreateRequester}
+          onEditOption={onEditRequester}
+          onDeleteOption={onDeleteRequester}
+        />
+      </td>
+
+      {/* Área que solicita */}
+      <td className={cell}>
+        <CellAutocomplete
+          options={subareas}
+          value={form.subareaId}
+          placeholder="Buscar área..."
+          onChange={(id) => set('subareaId', id)}
+          onClear={() => set('subareaId', null)}
+          onFindOrCreate={onFindOrCreateSubarea}
+          onEditOption={onEditSubarea}
+          onDeleteOption={onDeleteSubarea}
         />
       </td>
 
       {/* Motivo */}
-      <td className={`${cell} min-w-[220px]`}>
+      <td className={cell}>
         <CellAutocomplete
           options={reasons}
           value={form.reasonId}
           placeholder="Buscar motivo..."
           onChange={(id) => set('reasonId', id)}
+          onClear={() => set('reasonId', null)}
           onFindOrCreate={onFindOrCreateReason}
           onEditOption={onEditReason}
           onDeleteOption={onDeleteReason}
         />
       </td>
 
+      {/* Ruta */}
+      <td className={cell}>
+        <CellAutocomplete
+          options={routes}
+          value={form.routeId}
+          placeholder="Buscar ruta..."
+          onChange={(id) => set('routeId', id)}
+          onClear={() => set('routeId', null)}
+          onFindOrCreate={onFindOrCreateRoute}
+          onEditOption={onEditRoute}
+          onDeleteOption={onDeleteRoute}
+        />
+      </td>
+
       {/* Costo */}
-      <td className={`${cell} min-w-[90px]`}>
+      <td className={cell}>
         <div className="flex items-center gap-0.5">
           <span className="text-gray-400 text-xs">$</span>
           <input
@@ -220,25 +254,23 @@ export function TripFormRow({
       </td>
 
       {/* Acciones */}
-      <td className={`${cell} min-w-[72px]`}>
+      <td className={cell}>
         <div className="flex items-center gap-1">
-          <button
-            type="button"
+          <IconButton
+            icon={<Save size={15} />}
             onClick={onSave}
             disabled={!!(timeErrors.departure || timeErrors.arrival)}
-            className="p-1 rounded text-green-600 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Guardar"
-          >
-            <Save size={15} />
-          </button>
-          <button
-            type="button"
+            ariaLabel="Guardar"
+            size="xs"
+            variant="info"
+          />
+          <IconButton
+            icon={<X size={15} />}
             onClick={onCancel}
-            className="p-1 rounded text-red-500 hover:bg-red-50"
-            title="Cancelar"
-          >
-            <X size={15} />
-          </button>
+            ariaLabel="Cancelar"
+            size="xs"
+            variant="danger"
+          />
         </div>
       </td>
     </tr>

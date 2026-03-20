@@ -46,15 +46,17 @@ export function useAreas(farmId: number) {
     }
   }, [farmId]);
 
-  const createArea = async (areaData: FormAreaDTO) => {
+  const createArea = async (areaData: FormAreaDTO): Promise<Area> => {
     updateError('create', null);
 
     try {
       const newArea = await window.api.areas.create(areaData);
       setAreas((prevAreas) => [...prevAreas, newArea]);
+      return newArea;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'No se ha podido crear el área';
       updateError('create', errorMessage);
+      throw err;
     }
   };
 
@@ -62,9 +64,15 @@ export function useAreas(farmId: number) {
     updateError('update', null);
 
     try {
-      await window.api.areas.update(area.id, { name: area.name, farmId: area.farm_id });
+      await window.api.areas.update(area.id, {
+        name: area.name,
+        farmId: area.farm_id,
+        managerName: area.manager_name,
+        managerCid: area.manager_cid
+      });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'No se ha podido actualizar el área';
+      const errorMessage =
+        err instanceof Error ? err.message : 'No se ha podido actualizar el área';
       updateError('update', errorMessage);
     }
   };

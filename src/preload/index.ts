@@ -16,9 +16,9 @@ contextBridge.exposeInMainWorld('api', {
   areas: {
     listByFarm: (farmId: number) => ipcRenderer.invoke('areas:listByFarm', farmId),
     getById: (id: number) => ipcRenderer.invoke('areas:getById', id),
-    create: (payload: { name: string; farmId: number }) =>
+    create: (payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }) =>
       ipcRenderer.invoke('areas:create', payload),
-    update: (id: number, payload: { name: string; farmId: number }) =>
+    update: (id: number, payload: { name: string; farmId: number; managerName?: string | null; managerCid?: string | null }) =>
       ipcRenderer.invoke('areas:update', id, payload),
     delete: (id: number) => ipcRenderer.invoke('areas:delete', id)
   },
@@ -44,6 +44,8 @@ contextBridge.exposeInMainWorld('api', {
   workZones: {
     list: () => ipcRenderer.invoke('workZones:list'),
     getById: (id: number) => ipcRenderer.invoke('workZones:getById', id),
+    getAllWorkZonesTrips: (workZoneId: number, farmWorkZoneId: number) => 
+      ipcRenderer.invoke('workZones:getAllWorkZonesTrips', workZoneId, farmWorkZoneId),
     create: (payload: { name: string; startDate: string; endDate: string }) =>
       ipcRenderer.invoke('workZones:create', payload),
     update: (id: number, payload: { name: string; startDate: string; endDate: string }) =>
@@ -110,6 +112,19 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('reasons:findOrCreate', payload)
   },
 
+  // --- SUBAREAS ---
+  subareas: {
+    listByArea: (areaId: number) => ipcRenderer.invoke('subareas:listByArea', areaId),
+    getById: (id: number) => ipcRenderer.invoke('subareas:getById', id),
+    create: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:create', payload),
+    update: (id: number, payload: { name: string }) =>
+      ipcRenderer.invoke('subareas:update', id, payload),
+    delete: (id: number) => ipcRenderer.invoke('subareas:delete', id),
+    findOrCreate: (payload: { name: string; areaId: number }) =>
+      ipcRenderer.invoke('subareas:findOrCreate', payload)
+  },
+
   // --- TRIPS ---
   trips: {
     listAll: (payload: {
@@ -146,6 +161,7 @@ contextBridge.exposeInMainWorld('api', {
       workZoneSheetId: number | null
       routeId: number | null
       reasonId: number | null
+      subareaId?: number | null
     }) => ipcRenderer.invoke('trips:create', payload),
     update: (
       id: number,
@@ -161,10 +177,34 @@ contextBridge.exposeInMainWorld('api', {
         workZoneSheetId?: number
         routeId?: number
         reasonId?: number
+        subareaId?: number | null
       }
     ) => ipcRenderer.invoke('trips:update', { id, ...payload }),
     confirm: (id: number) => ipcRenderer.invoke('trips:confirm', id),
     reopen: (id: number) => ipcRenderer.invoke('trips:reopen', id),
     delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
   }
+})
+
+// --- UPDATER ---
+contextBridge.exposeInMainWorld('updater', {
+  onUpdateAvailable: (callback: (info: unknown) => void) =>
+    ipcRenderer.on('update-available', (_, info) => callback(info)),
+
+  onUpdateDownloaded: (callback: () => void) =>
+    ipcRenderer.on('update-downloaded', () => callback()),
+
+  onDownloadProgress: (callback: (progress: number) => void) =>
+    ipcRenderer.on('download-progress', (_, progress) => callback(progress)),
+
+  onError: (callback: (err: string) => void) =>
+    ipcRenderer.on('update-error', (_, err) => callback(err)),
+
+  downloadUpdate: () => ipcRenderer.send('download-update'),
+  installUpdate: () => ipcRenderer.send('install-update')
+})
+
+// --- APP-META ---
+contextBridge.exposeInMainWorld('app', {
+  getVersion: () => ipcRenderer.invoke('get-version')
 })

@@ -1,4 +1,4 @@
-import { ActionButton } from '@renderer/components';
+import { ActionButton, OutlineButton } from '@renderer/components';
 import { Breadcrumbs } from '@renderer/components/Breadcrumbs';
 import { DeleteConfirmation } from '@renderer/components/DeleteConfirmation';
 import { WorkZoneSheetForm } from '@renderer/components/Form';
@@ -6,12 +6,18 @@ import { Modal } from '@renderer/components/Modal';
 import { useAreas, useModal, useWorkZoneSheets } from '@renderer/hooks';
 import { WorkZoneSheetFormData } from '@renderer/schemas/workZoneSheet.schema';
 import { FarmWorkZone, WorkZone, WorkZoneSheet } from '@renderer/types';
-import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
-import { PlusIcon } from 'lucide-react';
+import {
+  buildExportPayload,
+  exportTripsToExcel,
+  formatDate,
+  PAGE_SUBTITLE_CLASS
+} from '@renderer/utils';
+import { DownloadIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
 import { TripTable } from './TripTable';
+import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -23,7 +29,7 @@ export const WorkZoneSheetsPage = () => {
   const [farmWorkZone, setFarmWorkZone] = useState<FarmWorkZone | null>(null);
   const [activeSheetId, setActiveSheetId] = useState<number | null>(null);
 
-  const { areas } = useAreas(farmWorkZone?.farmId ?? 0);
+  const { areas, createArea, refetch: refetchAreas } = useAreas(farmWorkZone?.farmId ?? 0);
 
   const {
     workZoneSheets,
@@ -80,6 +86,7 @@ export const WorkZoneSheetsPage = () => {
     });
     createModal.close();
     refetch();
+    refetchAreas();
   };
 
   const handleEdit = async (data: WorkZoneSheetFormData) => {
@@ -101,6 +108,15 @@ export const WorkZoneSheetsPage = () => {
     deleteModal.close();
   };
 
+  const handleExcelDownloadClick = async () => {
+    const backendData = await fetchAllWorkZonesFarmRelatedTrips(
+      parsedWorkZoneId,
+      parsedFarmWorkZoneId
+    );
+    const exportPayload = buildExportPayload(backendData);
+    await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZone?.name}`);
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -116,24 +132,32 @@ export const WorkZoneSheetsPage = () => {
           ]}
         />
 
-        <div className="flex items-start justify-between gap-4 mt-4">
-          <div>
-            <h1 className={PAGE_TITLE_CLASS}>{farmWorkZone?.name ?? '...'}</h1>
-            {farmWorkZone && workZone && (
-              <p className={PAGE_SUBTITLE_CLASS}>
-                {farmWorkZone.name} - {workZone.name}
-              </p>
-            )}
-          </div>
+        <div className="flex items-center justify-between mt-4">
+          {workZone && (
+            <p className={PAGE_SUBTITLE_CLASS}>
+              {formatDate(workZone.startDate)} - {formatDate(workZone.endDate)}
+            </p>
+          )}
 
-          <ActionButton
-            variant="primary"
-            size="md"
-            icon={<PlusIcon size={18} />}
-            onClick={() => createModal.open()}
-          >
-            Nueva Hoja
-          </ActionButton>
+          <div className="flex justify-between gap-2">
+            <OutlineButton
+              size="sm"
+              variant="info"
+              icon={<DownloadIcon size={16} />}
+              onClick={handleExcelDownloadClick}
+            >
+              Descargar Excel
+            </OutlineButton>
+
+            <ActionButton
+              variant="primary"
+              size="md"
+              icon={<PlusIcon size={18} />}
+              onClick={() => createModal.open()}
+            >
+              Nueva Hoja
+            </ActionButton>
+          </div>
         </div>
       </div>
 
@@ -185,6 +209,8 @@ export const WorkZoneSheetsPage = () => {
         <WorkZoneSheetForm
           title="Nueva Hoja"
           areas={areas}
+          farmId={farmWorkZone?.farmId}
+          onCreateArea={createArea}
           onCancel={createModal.close}
           onConfirm={handleCreate}
         />

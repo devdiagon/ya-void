@@ -1,5 +1,5 @@
 import { Check, Pencil, Trash2, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface AutocompleteOption {
@@ -20,6 +20,8 @@ interface CellAutocompleteProps {
   onChange: (id: number, name: string) => void;
   /** When provided, shows a "Crear: …" option for unmatched text */
   onFindOrCreate?: (name: string) => Promise<AutocompleteOption | null>;
+  /** Called when the user clears the input and blurs without selecting anything */
+  onClear?: () => void;
   /** When provided, shows "Editar" on right-click of an option */
   onEditOption?: (opt: AutocompleteOption, newName: string) => Promise<void>;
   /** When provided, shows "Eliminar" on right-click of an option */
@@ -33,6 +35,7 @@ export function CellAutocomplete({
   placeholder,
   onChange,
   onFindOrCreate,
+  onClear,
   onEditOption,
   onDeleteOption,
   disabled
@@ -58,6 +61,18 @@ export function CellAutocomplete({
 
   const displayValue = open ? query : selectedName;
 
+  const updateDropdownPosition = () => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 1,
+      left: rect.left,
+      minWidth: Math.max(rect.width, 180),
+      zIndex: 9999
+    });
+  };
+
   // Auto-resize textarea height to fit content
   useEffect(() => {
     const el = textareaRef.current;
@@ -68,24 +83,38 @@ export function CellAutocomplete({
 
   const openDropdown = () => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setDropdownStyle({
-      position: 'fixed',
-      top: rect.bottom + 1,
-      left: rect.left,
-      minWidth: Math.max(rect.width, 180),
-      zIndex: 9999
-    });
+    updateDropdownPosition();
     setOpen(true);
   };
 
-  const handleSelect = (opt: AutocompleteOption) => {
+  // Reposition dropdown whenever the container resizes (e.g. textarea grows to multiple rows)
+  useLayoutEffect(() => {
+    if (!open || !containerRef.current) return;
+    const observer = new ResizeObserver(() => updateDropdownPosition());
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [open]);
+
+  const focusNext = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const focusable = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((f) => !f.closest('[data-dropdown]'));
+    const idx = focusable.indexOf(el);
+    if (idx !== -1 && focusable[idx + 1]) focusable[idx + 1].focus();
+  };
+
+  const handleSelect = (opt: AutocompleteOption, andFocusNext = false) => {
     onChange(opt.id, opt.name);
     setQuery('');
     setOpen(false);
+    if (andFocusNext) setTimeout(focusNext, 0);
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (andFocusNext = false) => {
     if (!onFindOrCreate || !query.trim()) return;
     setBusy(true);
     const result = await onFindOrCreate(query.trim());
@@ -93,6 +122,7 @@ export function CellAutocomplete({
     if (result) onChange(result.id, result.name);
     setQuery('');
     setOpen(false);
+    if (andFocusNext) setTimeout(focusNext, 0);
   };
 
   // Close dropdown on outside click
@@ -100,13 +130,14 @@ export function CellAutocomplete({
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) {
+        if (query === '' && value != null) onClear?.();
         setOpen(false);
         setQuery('');
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  }, [open, query, value, onClear]);
 
   // Close context menu on outside click
   useEffect(() => {
@@ -141,9 +172,11 @@ export function CellAutocomplete({
         placeholder={placeholder}
         value={displayValue}
         className="w-full bg-transparent border-0 outline-none text-sm py-0 placeholder:text-gray-400 disabled:opacity-40 resize-none overflow-hidden leading-snug"
-        onFocus={() => {
-          setQuery('');
+        onFocus={(e) => {
+          setQuery(selectedName);
           openDropdown();
+          // Select all text so the user can immediately replace it
+          e.target.select();
         }}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -153,9 +186,28 @@ export function CellAutocomplete({
           if (e.key === 'Escape') {
             setOpen(false);
             setQuery('');
+            return;
           }
-          // Prevent newline on Enter
-          if (e.key === 'Enter') e.preventDefault();
+          if (e.key === 'Tab') {
+            // Close dropdown and let the browser move focus to the next field
+            setOpen(false);
+            setQuery('');
+            return;
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!query.trim()) return;
+            const exactMatch = options.find(
+              (o) => o.name.toLowerCase() === query.toLowerCase().trim()
+            );
+            if (exactMatch) {
+              handleSelect(exactMatch, true);
+            } else if (filtered.length === 1) {
+              handleSelect(filtered[0], true);
+            } else if (showCreate) {
+              handleCreate(true);
+            }
+          }
         }}
       />
 
@@ -217,7 +269,7 @@ export function CellAutocomplete({
                 <button
                   key={opt.id}
                   type="button"
-                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 truncate"
+                  className="w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 break-words whitespace-normal"
                   onMouseDown={(e) => {
                     if (e.button !== 0) return; // ignore right-click
                     e.preventDefault();

@@ -1,14 +1,16 @@
 import { Area, FormAreaDTO } from './area.type';
+import { ExportWorkZoneSheet } from './export.trip.type';
 import { Farm, FormFarmDTO } from './farm.type';
 import { FarmWorkZone, FormFarmWorkZoneDTO } from './farmWorkZone.type';
 import { FormReasonDTO, Reason } from './reason.type';
 import { FormRequesterDTO, Requester } from './requester.type';
 import { FormRouteDTO, Route } from './route.type';
+import { FormSubareaDTO, Subarea } from './subarea.type';
 import { FormTripDTO, Trip, TripStatus } from './trip.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
 import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
 
-export interface ElectronAPI {
+export interface VoyAppAPI {
   farms: {
     list: () => Promise<Farm[]>;
     getById: (id: number) => Promise<Farm>;
@@ -37,6 +39,10 @@ export interface ElectronAPI {
   workZones: {
     list: () => Promise<WorkZone[]>;
     getById: (id: number) => Promise<WorkZone>;
+    getAllWorkZonesTrips: (
+      workZoneId: number,
+      farmWorkZoneId: number
+    ) => Promise<ExportWorkZoneSheet[]>;
     create: (payload: FormWorkZoneDTO) => Promise<WorkZone>;
     update: (id: number, payload: FormWorkZoneDTO) => Promise<void>;
     delete: (id: number) => Promise<void>;
@@ -71,6 +77,14 @@ export interface ElectronAPI {
     delete: (id: number) => Promise<void>;
     findOrCreate: (payload: { name: string; areaId: number }) => Promise<Reason>;
   };
+  subareas: {
+    listByArea: (areaId: number) => Promise<Subarea[]>;
+    getById: (id: number) => Promise<Subarea>;
+    create: (payload: FormSubareaDTO) => Promise<Subarea>;
+    update: (id: number, payload: { name: string }) => Promise<boolean>;
+    delete: (id: number) => Promise<void>;
+    findOrCreate: (payload: { name: string; areaId: number }) => Promise<Subarea>;
+  };
   trips: {
     listAll: (payload: {
       page: number;
@@ -97,8 +111,21 @@ export interface ElectronAPI {
   };
 }
 
+export interface VoyAppUpdater {
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void;
+  onUpdateDownloaded: (callback: () => void) => void;
+  onDownloadProgress: (callback: (progress: number) => void) => void;
+  onError: (callback: (err: string) => void) => void;
+  downloadUpdate: () => void;
+  installUpdate: () => void;
+}
+
 declare global {
   interface Window {
-    api: ElectronAPI;
+    api: VoyAppAPI;
+    updater: VoyAppUpdater;
+    app: {
+      getVersion: () => Promise<string>;
+    };
   }
 }

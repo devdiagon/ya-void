@@ -5,6 +5,7 @@ export type FarmWorkZoneRow = {
   work_zone_id: number
   farm_id: number
   name: string
+  deleted_at: string | null
 }
 
 export function mapRowToFarmWorkZone(raw: FarmWorkZoneRow): FarmWorkZone {
@@ -12,6 +13,7 @@ export function mapRowToFarmWorkZone(raw: FarmWorkZoneRow): FarmWorkZone {
     id: raw.id,
     workZoneId: raw.work_zone_id,
     farmId: raw.farm_id,
-    name: raw.name
+    name: raw.name,
+    deletedAt: raw.deleted_at ?? null
   }
 }

@@ -6,7 +6,7 @@ import { ActionButton, OutlineButton } from '../Button';
 
 interface AdminAreaFormProps {
   title: string;
-  initialData?: AreaFormData;
+  initialData?: Partial<AreaFormData>;
   handleCancel?: () => void;
   onConfirm: (data: AreaFormData) => void | Promise<void>;
 }
@@ -23,7 +23,7 @@ export const AdminAreaForm = ({
     formState: { errors, isSubmitting }
   } = useForm<AreaFormData>({
     resolver: zodResolver(AreaSchema),
-    defaultValues: initialData || { name: '' }
+    defaultValues: initialData || { name: '', managerName: '', managerCid: '' }
   });
 
   const onFormSubmit = async (data: AreaFormData) => {
@@ -38,13 +38,29 @@ export const AdminAreaForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <h3 className="text-lg font-bold">{title}</h3>
 
-      <div className="pt-4">
+      <div className="flex flex-col gap-4 pt-4 w-full items-stretch">
         <TextField
           fullWidth
           label="Nombre"
           {...register('name')}
           error={!!errors.name}
           helperText={errors.name ? errors.name.message : ''}
+          disabled={isSubmitting}
+        />
+        <TextField
+          fullWidth
+          label="Nombre del encargado"
+          {...register('managerName')}
+          error={!!errors.managerName}
+          helperText={errors.managerName ? errors.managerName.message : ''}
+          disabled={isSubmitting}
+        />
+        <TextField
+          fullWidth
+          label="Cédula del encargado"
+          {...register('managerCid')}
+          error={!!errors.managerCid}
+          helperText={errors.managerCid ? errors.managerCid.message : ''}
           disabled={isSubmitting}
         />
       </div>

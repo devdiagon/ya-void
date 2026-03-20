@@ -1,8 +1,12 @@
 import { AreaRepository } from '../../data/repositories/AreaRepository'
+import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 import { Area } from '../entities/Area'
 
 export class UseArea {
-  constructor(private areaRepository: AreaRepository) {}
+  constructor(
+    private areaRepository: AreaRepository,
+    private subareaRepository: SubareaRepository
+  ) {}
 
   /**
    * Obtiene todas las áreas de una finca específica
@@ -25,7 +29,7 @@ export class UseArea {
   /**
    * Crea una nueva área validando nombre y relación con finca
    */
-  create(name: string, farmId: number): Area {
+  create(name: string, farmId: number, managerName: string | null = null, managerCid: string | null = null): Area {
     if (!name || name.trim() === '') {
       throw new Error('Area name cannot be empty')
     }
@@ -34,18 +38,20 @@ export class UseArea {
       throw new Error('A valid Farm ID is required to create an Area')
     }
 
-    return this.areaRepository.create(name.trim(), farmId)
+    const area = this.areaRepository.create(name.trim(), farmId, managerName, managerCid)
+    this.subareaRepository.create(area.name, area.id)
+    return area
   }
 
   /**
    * Actualiza los datos de un área
    */
-  update(id: number, name: string, farmId: number): void {
+  update(id: number, name: string, farmId: number, managerName: string | null = null, managerCid: string | null = null): void {
     if (!name || name.trim() === '') {
       throw new Error('Area name cannot be empty')
     }
 
-    const success = this.areaRepository.update(id, name.trim(), farmId)
+    const success = this.areaRepository.update(id, name.trim(), farmId, managerName, managerCid)
     if (!success) {
       throw new Error(`Could not update area: Area with ID ${id} not found`)
     }

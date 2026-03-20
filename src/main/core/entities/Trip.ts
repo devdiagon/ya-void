@@ -16,6 +16,8 @@ export interface Trip {
   workZoneSheetId: number | null
   routeId: number | null
   reasonId: number | null
+  subareaId: number | null
   routeSnapshot: string | null
   reasonSnapshot: string | null
+  subareaSnapshot: string | null
 }
