@@ -8,35 +8,36 @@ interface MetricErrors {
 export function useMetrics() {
   const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState<MetricErrors>({
-    fetch: null
-  });
+  const [errors, setErrors] = useState<MetricErrors>({ fetch: null });
 
-  const updateError = (operation: keyof MetricErrors, error: string | null) => {
+  const updateError = useCallback((operation: keyof MetricErrors, error: string | null) => {
     setErrors((prev) => ({ ...prev, [operation]: error }));
-  };
-
-  const clearError = (operation: keyof MetricErrors) => {
-    updateError(operation, null);
-  };
-
-  const fetchMetrics = useCallback(() => {
-    setLoading(true);
-    updateError('fetch', null);
-    try {
-      window.api.metrics.get().then((data) => {
-        setMetrics(data);
-        setLoading(false);
-      });
-    } catch (err) {
-      console.error(err);
-      updateError('fetch', 'No se han podido obtener las métricas');
-      setLoading(false);
-    }
   }, []);
 
+  const clearError = useCallback(
+    (operation: keyof MetricErrors) => {
+      updateError(operation, null);
+    },
+    [updateError]
+  );
+
+  const fetchMetrics = useCallback(async () => {
+    setLoading(true);
+    updateError('fetch', null);
+
+    try {
+      const data = await window.api.metrics.get();
+      setMetrics(data);
+    } catch (err) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : 'No se han podido obtener las métricas';
+      updateError('fetch', message);
+    } finally {
+      setLoading(false);
+    }
+  }, [updateError]);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMetrics();
   }, [fetchMetrics]);
 
