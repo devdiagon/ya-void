@@ -184,6 +184,12 @@ contextBridge.exposeInMainWorld('api', {
     reopen: (id: number) => ipcRenderer.invoke('trips:reopen', id),
     delete: (id: number) => ipcRenderer.invoke('trips:delete', id)
   }
+  ,
+
+  // --- METRICS ---
+  metrics: {
+    get: () => ipcRenderer.invoke('metrics:get')
+  }
 })
 
 // --- UPDATER ---

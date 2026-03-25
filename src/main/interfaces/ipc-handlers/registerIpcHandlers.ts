@@ -11,6 +11,7 @@ import { SubareaRepository } from '../../data/repositories/SubareaRepository'
 import { TripRepository } from '../../data/repositories/TripRepository'
 import { WorkZoneRepository } from '../../data/repositories/WorkZoneRepository'
 import { WorkZoneSheetRepository } from '../../data/repositories/WorkZoneSheetRepository'
+import { MetricsRepository } from '../../data/repositories/MetricsRepository'
 
 // --- Controllers ---
 import { AreaController } from '../../interfaces/controllers/AreaController'
@@ -23,6 +24,7 @@ import { SubareaController } from '../../interfaces/controllers/SubareaControlle
 import { TripController } from '../../interfaces/controllers/TripController'
 import { WorkZoneController } from '../../interfaces/controllers/WorkZoneController'
 import { WorkZoneSheetController } from '../../interfaces/controllers/WorkZoneSheetController'
+import { MetricsController } from '../../interfaces/controllers/MetricsController'
 
 // --- Entities (para tipado en handlers si es necesario) ---
 import { FarmWorkZone } from '../../core/entities/FarmWorkZone'
@@ -41,6 +43,7 @@ export function registerIpcHandlers(): void {
   const reasonRepo = new ReasonRepository()
   const subareaRepo = new SubareaRepository()
   const tripRepo = new TripRepository()
+  const metricsRepo = new MetricsRepository()
 
   // 2. Instanciar Controladores
   const farmCtrl = new FarmController(farmRepo)
@@ -53,6 +56,7 @@ export function registerIpcHandlers(): void {
   const reasonCtrl = new ReasonController(reasonRepo)
   const subareaCtrl = new SubareaController(subareaRepo)
   const tripCtrl = new TripController(tripRepo)
+  const metricsCtrl = new MetricsController(metricsRepo)
 
   // --- META DATA HANDLERS ---
   ipcMain.handle('get-version', () => app.getVersion())
@@ -98,6 +102,9 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('requesters:findOrCreateForArea', (_, payload: { name: string; areaId: number }) =>
     requesterCtrl.findOrCreateForArea(payload)
   )
+
+  // --- METRICS HANDLERS ---
+  ipcMain.handle('metrics:get', () => metricsCtrl.getBusinessMetrics())
 
   // --- WORK ZONES HANDLERS ---
   ipcMain.handle('workZones:list', () => workZoneCtrl.listWorkZones())
