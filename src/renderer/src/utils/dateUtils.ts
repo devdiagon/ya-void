@@ -16,6 +16,18 @@ export const formatDate = (value: string | Date) => {
   });
 };
 
+export const formatDateNoYear = (value: string | Date): string => {
+  const parsedDate = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return String(value);
+  }
+  return parsedDate.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC'
+  });
+};
+
 /* ========================= 
   Format Date from: 'aaaa-mm-dd' to dd/mmm/aaaa 
  ===========================*/

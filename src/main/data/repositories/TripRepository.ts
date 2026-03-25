@@ -31,6 +31,23 @@ export class TripRepository {
   private db = getDb()
 
   /**
+   * Recalcula y actualiza el total de una hoja de zona de trabajo a partir
+   * de la suma de los costos de sus viajes asociados. Ignora ids nulos.
+   */
+  private recalcWorkZoneSheetTotal(workZoneSheetId: number | null | undefined): void {
+    if (workZoneSheetId == null) return
+    const row = this.db
+      .prepare<{ total: number }>(
+        'SELECT COALESCE(SUM(cost), 0) AS total FROM trip WHERE work_zone_sheet_id = ?'
+      )
+      .get(workZoneSheetId)
+    const total = row?.total ?? 0
+    this.db
+      .prepare('UPDATE work_zone_sheet SET total_sheet = ? WHERE id = ?')
+      .run(total, workZoneSheetId)
+  }
+
+  /**
    * Obtiene todos los viajes vinculados a una hoja de zona de trabajo.
    * Ordenados por fecha y hora de salida para presentación cronológica.
    */
@@ -156,28 +173,37 @@ export class TripRepository {
    * lo que venga en data.status — la única vía para llegar a 'ready' es confirm().
    */
   create(data: Omit<Trip, 'id' | 'status' | 'routeSnapshot' | 'reasonSnapshot' | 'subareaSnapshot'>): number {
-    const stmt = this.db.prepare(`
-      INSERT INTO trip (
-        vehicle_type, status, trip_date, departure_time, arrival_time,
-        passenger_count, cost, requester_id, area_id, work_zone_sheet_id,
-        route_id, reason_id, subarea_id, route_snapshot, reason_snapshot, subarea_snapshot
-      ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
-    `)
-    const result = stmt.run(
-      data.vehicleType,
-      data.tripDate,
-      data.departureTime,
-      data.arrivalTime,
-      data.passengerCount,
-      data.cost,
-      data.requesterId,
-      data.areaId,
-      data.workZoneSheetId,
-      data.routeId,
-      data.reasonId,
-      data.subareaId
-    )
-    return result.lastInsertRowid as number
+    const createTx = this.db.transaction(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO trip (
+          vehicle_type, status, trip_date, departure_time, arrival_time,
+          passenger_count, cost, requester_id, area_id, work_zone_sheet_id,
+          route_id, reason_id, subarea_id, route_snapshot, reason_snapshot, subarea_snapshot
+        ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
+      `)
+      const result = stmt.run(
+        data.vehicleType,
+        data.tripDate,
+        data.departureTime,
+        data.arrivalTime,
+        data.passengerCount,
+        data.cost,
+        data.requesterId,
+        data.areaId,
+        data.workZoneSheetId,
+        data.routeId,
+        data.reasonId,
+        data.subareaId
+      )
+
+      if (data.workZoneSheetId != null) {
+        this.recalcWorkZoneSheetTotal(data.workZoneSheetId)
+      }
+
+      return result.lastInsertRowid as number
+    })
+
+    return createTx()
   }
 
   /**
@@ -185,29 +211,47 @@ export class TripRepository {
    * No toca status ni snapshots — esos se gestionan con confirm/reopen.
    */
   update(data: Trip): boolean {
-    const stmt = this.db.prepare(`
-      UPDATE trip SET
-        vehicle_type = ?, trip_date = ?, departure_time = ?,
-        arrival_time = ?, passenger_count = ?, cost = ?, requester_id = ?,
-        area_id = ?, work_zone_sheet_id = ?, route_id = ?, reason_id = ?, subarea_id = ?
-      WHERE id = ?
-    `)
-    const result = stmt.run(
-      data.vehicleType,
-      data.tripDate,
-      data.departureTime,
-      data.arrivalTime,
-      data.passengerCount,
-      data.cost,
-      data.requesterId,
-      data.areaId,
-      data.workZoneSheetId,
-      data.routeId,
-      data.reasonId,
-      data.subareaId,
-      data.id
-    )
-    return result.changes > 0
+    const updateTx = this.db.transaction(() => {
+      const existing = this.findById(data.id)
+      if (!existing) throw new Error(`El viaje con ID ${data.id} no existe.`)
+      if (existing.status === 'ready') {
+        throw new Error('No se puede editar un viaje confirmado. Reábrelo primero.')
+      }
+
+      const stmt = this.db.prepare(`
+        UPDATE trip SET
+          vehicle_type = ?, trip_date = ?, departure_time = ?,
+          arrival_time = ?, passenger_count = ?, cost = ?, requester_id = ?,
+          area_id = ?, work_zone_sheet_id = ?, route_id = ?, reason_id = ?, subarea_id = ?
+        WHERE id = ?
+      `)
+      const result = stmt.run(
+        data.vehicleType,
+        data.tripDate,
+        data.departureTime,
+        data.arrivalTime,
+        data.passengerCount,
+        data.cost,
+        data.requesterId,
+        data.areaId,
+        data.workZoneSheetId,
+        data.routeId,
+        data.reasonId,
+        data.subareaId,
+        data.id
+      )
+
+      if (result.changes > 0) {
+        const sheetIds = new Set<number>()
+        if (existing.workZoneSheetId != null) sheetIds.add(existing.workZoneSheetId)
+        if (data.workZoneSheetId != null) sheetIds.add(data.workZoneSheetId)
+        sheetIds.forEach((id) => this.recalcWorkZoneSheetTotal(id))
+      }
+
+      return result.changes > 0
+    })
+
+    return updateTx()
   }
 
   /**
@@ -236,6 +280,11 @@ export class TripRepository {
         'UPDATE trip SET status = ?, route_snapshot = ?, reason_snapshot = ?, subarea_snapshot = ? WHERE id = ?'
       )
       const result = stmt.run('ready', routeSnapshot, reasonSnapshot, subareaSnapshot, id)
+
+      if (result.changes > 0 && trip.workZoneSheetId != null) {
+        this.recalcWorkZoneSheetTotal(trip.workZoneSheetId)
+      }
+
       return result.changes > 0
     })
 
@@ -247,18 +296,41 @@ export class TripRepository {
    * Los snapshots se recapturarán en el próximo confirm.
    */
   reopen(id: number): boolean {
-    const stmt = this.db.prepare(
-      'UPDATE trip SET status = ?, route_snapshot = NULL, reason_snapshot = NULL, subarea_snapshot = NULL WHERE id = ?'
-    )
-    const result = stmt.run('pending', id)
-    return result.changes > 0
+    const reopenTx = this.db.transaction(() => {
+      const trip = this.findById(id)
+      if (!trip) return false
+
+      const stmt = this.db.prepare(
+        'UPDATE trip SET status = ?, route_snapshot = NULL, reason_snapshot = NULL, subarea_snapshot = NULL WHERE id = ?'
+      )
+      const result = stmt.run('pending', id)
+
+      if (result.changes > 0 && trip.workZoneSheetId != null) {
+        this.recalcWorkZoneSheetTotal(trip.workZoneSheetId)
+      }
+
+      return result.changes > 0
+    })
+
+    return reopenTx() as boolean
   }
 
   /**
    * Elimina un viaje por su ID.
    */
   delete(id: number): void {
-    const stmt = this.db.prepare('DELETE FROM trip WHERE id = ?')
-    stmt.run(id)
+    const deleteTx = this.db.transaction(() => {
+      const trip = this.findById(id)
+      if (!trip) return
+
+      const stmt = this.db.prepare('DELETE FROM trip WHERE id = ?')
+      stmt.run(id)
+
+      if (trip.workZoneSheetId != null) {
+        this.recalcWorkZoneSheetTotal(trip.workZoneSheetId)
+      }
+    })
+
+    deleteTx()
   }
 }
