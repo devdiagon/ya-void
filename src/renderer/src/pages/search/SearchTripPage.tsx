@@ -134,8 +134,6 @@ export function SearchTripPage() {
     [allRequesters]
   );
 
-  const totalCost = useMemo(() => trips.reduce((sum, t) => sum + (t.cost ?? 0), 0), [trips]);
-
   const hasActiveFilters =
     !!query ||
     !!fromDate ||
@@ -439,20 +437,6 @@ export function SearchTripPage() {
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
-                <tr className="bg-gray-50 font-medium text-sm">
-                  <td
-                    colSpan={8}
-                    className="px-3 py-2 border border-gray-200 text-right text-gray-600"
-                  >
-                    Total de Costos (página):
-                  </td>
-                  <td className="px-3 py-2 border border-gray-200 text-right text-gray-800 whitespace-nowrap">
-                    ${totalCost.toFixed(2)}
-                  </td>
-                  <td className="border border-gray-200" />
-                </tr>
-              </tfoot>
             </table>
 
             {/* Pagination controls */}
