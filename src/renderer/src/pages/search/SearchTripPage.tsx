@@ -2,7 +2,7 @@ import { Area, Farm, Requester, Trip, TripStatus, TripVehicleType } from '@rende
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 
 const VEHICLE_OPTIONS: { value: TripVehicleType; label: string }[] = [
   { value: 'Camioneta', label: 'Camioneta' },
@@ -26,6 +26,7 @@ export function SearchTripPage() {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
   const [requesters, setRequesters] = useState<Requester[]>([]);
+  const [allRequesters, setAllRequesters] = useState<Requester[]>([]);
 
   // Filters
   const [query, setQuery] = useState('');
@@ -93,6 +94,11 @@ export function SearchTripPage() {
     window.api.farms.list().then(setFarms).catch(console.error);
   }, []);
 
+  // Load all requesters once on mount for global lookup
+  useEffect(() => {
+    window.api.requesters.listAll().then(setAllRequesters).catch(console.error);
+  }, []);
+
   // Load areas when farm changes
   useEffect(() => {
     setAreaFilter('all');
@@ -119,9 +125,14 @@ export function SearchTripPage() {
     fetchPage();
   }, [fetchPage]);
 
-  const requesterMap = useMemo(() => new Map(requesters.map((r) => [r.id, r.name])), [requesters]);
-
-  const totalCost = useMemo(() => trips.reduce((sum, t) => sum + (t.cost ?? 0), 0), [trips]);
+  const areaRequesterMap = useMemo(
+    () => new Map(requesters.map((r) => [r.id, r.name])),
+    [requesters]
+  );
+  const allRequesterMap = useMemo(
+    () => new Map(allRequesters.map((r) => [r.id, r.name])),
+    [allRequesters]
+  );
 
   const hasActiveFilters =
     !!query ||
@@ -147,11 +158,10 @@ export function SearchTripPage() {
     setPage(1);
   };
 
-  // Build a combined requester lookup: if no area selected, we can't show names
-  // (trips in search may span areas; show id as fallback)
+  // Build a combined requester lookup: prefer area-scoped list, fall back to global list
   const resolveRequesterName = (id: number | null) => {
     if (id == null) return '—';
-    return requesterMap.get(id) ?? `#${id}`;
+    return areaRequesterMap.get(id) ?? allRequesterMap.get(id) ?? '—';
   };
 
   const statusBtn = (label: string, value: StatusFilter) => (
@@ -427,20 +437,6 @@ export function SearchTripPage() {
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
-                <tr className="bg-gray-50 font-medium text-sm">
-                  <td
-                    colSpan={8}
-                    className="px-3 py-2 border border-gray-200 text-right text-gray-600"
-                  >
-                    Total de Costos (página):
-                  </td>
-                  <td className="px-3 py-2 border border-gray-200 text-right text-gray-800 whitespace-nowrap">
-                    ${totalCost.toFixed(2)}
-                  </td>
-                  <td className="border border-gray-200" />
-                </tr>
-              </tfoot>
             </table>
 
             {/* Pagination controls */}

@@ -1,6 +1,7 @@
 export * from './useAreas';
 export * from './useFarms';
 export * from './useFarmWorkZones';
+export * from './useMetrics';
 export * from './useModal';
 export * from './useReasons';
 export * from './useRequesters';
@@ -9,3 +10,4 @@ export * from './useSubareas';
 export * from './useTrips';
 export * from './useWorkZones';
 export * from './useWorkZoneSheets';
+
