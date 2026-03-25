@@ -203,7 +203,7 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   // Row 2 – Owner Name
   ws.mergeCells('A2:L2');
   const c2 = ws.getCell('A2');
-  c2.value = 'Sr. LUIS ORLANDO HERNANDEZ QUISHPE';
+  c2.value = 'Sr. Hernández Quishpe Luis Orlando';
   c2.font = FONT_APTOS_12B;
   c2.alignment = { horizontal: 'center', wrapText: true };
 
@@ -222,7 +222,10 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   c3b.alignment = { horizontal: 'left' };
 
   // Farm
-  ws.getCell('G3').value = `Finca: ${d.meta.farmName}`;
+  ws.getCell('G3').value = `Finca: ${d.meta.farmName
+    .split(' ')
+    .map((w) => w[0])
+    .join('')}`;
   ws.getCell('G3').font = FONT_APTOS_12B;
 
   // Area label
@@ -351,20 +354,23 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   ws.mergeCells(`A${TOTAL_ROW}:I${TOTAL_ROW}`);
   const cTotal = ws.getCell(`A${TOTAL_ROW}`);
   cTotal.value = 'Total';
-  cTotal.font = FONT_CAMBRIA_9;
+  cTotal.font = FONT_CAMBRIA_10B;
+  cTotal.fill = FILL_HEADER;
   cTotal.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
 
   // Col J – SUM formula
   const cSum = ws.getCell(`J${TOTAL_ROW}`);
   cSum.value = { formula: `=SUM(J${DATA_START}:J${DATA_END})` };
-  cSum.font = FONT_CAMBRIA_9;
+  cSum.font = FONT_CAMBRIA_10B;
+  cSum.fill = FILL_HEADER;
   cSum.border = BORDER_THIN;
   cSum.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
 
   // Cols K, L – empty cells with border
   for (const col of ['K', 'L']) {
     ws.getCell(`${col}${TOTAL_ROW}`).border = BORDER_THIN;
-    ws.getCell(`${col}${TOTAL_ROW}`).font = FONT_CAMBRIA_9;
+    ws.getCell(`${col}${TOTAL_ROW}`).font = FONT_CAMBRIA_10B;
+    ws.getCell(`${col}${TOTAL_ROW}`).fill = FILL_HEADER;
   }
 
   // ===================== SIGNATURES ===================== \\
@@ -381,7 +387,7 @@ const applyFormat = (ws: ExcelJS.Worksheet, d: ExportTripWorkSheet): void => {
   // Text below the signature line
   ws.mergeCells(`A${SIG_NAME_ROW}:D${SIG_NAME_ROW}`);
   const c25a = ws.getCell(`A${SIG_NAME_ROW}`);
-  c25a.value = `                    Transportes Andes S.A.`;
+  c25a.value = `                    Proveedor del Servicio.`;
   c25a.font = FONT_CAMBRIA_12B;
   c25a.alignment = { horizontal: 'center' };
 
