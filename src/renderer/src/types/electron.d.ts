@@ -1,12 +1,14 @@
+import { UpdateInfo } from 'electron-updater';
 import { Area, FormAreaDTO } from './area.type';
 import { ExportWorkZoneSheet } from './export.trip.type';
 import { Farm, FormFarmDTO } from './farm.type';
 import { FarmWorkZone, FormFarmWorkZoneDTO } from './farmWorkZone.type';
+import { BusinessMetrics } from './metrics';
 import { FormReasonDTO, Reason } from './reason.type';
 import { FormRequesterDTO, Requester } from './requester.type';
 import { FormRouteDTO, Route } from './route.type';
 import { FormSubareaDTO, Subarea } from './subarea.type';
-import { FormTripDTO, Trip, TripStatus } from './trip.type';
+import { FormTripDTO, Trip, TripStatus, TripVehicleType } from './trip.type';
 import { FormWorkZoneDTO, WorkZone } from './workZone.type';
 import { FormWorkZoneSheetDTO, WorkZoneSheet } from './workZoneSheet.type';
 
@@ -108,6 +110,9 @@ export interface VoyAppAPI {
     confirm: (id: number) => Promise<{ success: true } | { success: false; missing: string[] }>;
     reopen: (id: number) => Promise<boolean>;
     delete: (id: number) => Promise<void>;
+  };
+  metrics: {
+    get: () => Promise<BusinessMetrics>;
   };
 }
 
