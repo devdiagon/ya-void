@@ -1,24 +1,35 @@
+import type { UpdateInfo } from 'builder-util-runtime';
+import { PackageIcon, TriangleAlertIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ActionButton, OutlineButton } from '../Button';
 import { Modal } from './Modal';
-import { PackageIcon, TriangleAlertIcon } from 'lucide-react';
 
 type UpdaterState = 'idle' | 'available' | 'downloading' | 'ready' | 'error';
 
-interface UpdateInfo {
-  version: string;
-  releaseNotes?: string;
+interface Updater {
+  onUpdateAvailable: (cb: (info: UpdateInfo) => void) => void;
+  onDownloadProgress: (cb: (pct: number) => void) => void;
+  onUpdateDownloaded: (cb: () => void) => void;
+  onError: (cb: (err: string) => void) => void;
+  downloadUpdate: () => void;
+  installUpdate: () => void;
+}
+
+declare global {
+  interface Window {
+    updater: Updater;
+  }
 }
 
 export function UpdaterModal() {
   const [state, setState] = useState<UpdaterState>('idle');
   const [info, setInfo] = useState<UpdateInfo | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState('');
+  const [progress, setProgress] = useState<number>(0);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    window.updater.onUpdateAvailable((info) => {
-      setInfo(info);
+    window.updater.onUpdateAvailable((updateInfo) => {
+      setInfo(updateInfo);
       setState('available');
     });
 
@@ -38,6 +49,7 @@ export function UpdaterModal() {
   }, []);
 
   const handleClose = () => setState('idle');
+  const getVersion = () => info?.version ?? '';
 
   return (
     <Modal
@@ -57,8 +69,8 @@ export function UpdaterModal() {
             </h3>
           </div>
           <p className="text-gray-700 mb-8">
-            La versión <span className="font-medium text-green-600">{info?.version}</span> está
-            lista para descargar.
+            La versión <span className="font-medium text-green-600">{getVersion()}</span> está lista
+            para descargar.
           </p>
           <div className="flex gap-2 justify-end">
             <OutlineButton onClick={() => setState('idle')}>Más tarde</OutlineButton>
