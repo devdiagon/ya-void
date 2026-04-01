@@ -92,6 +92,7 @@ export const FarmWorkZonesPage = () => {
 
   const handleExportExcel = async (farmWorkZoneId: number) => {
     const backendData = await fetchAllWorkZonesFarmRelatedTrips(parsedWorkZoneId, farmWorkZoneId);
+    if (backendData.length === 0) return;
     const exportPayload = buildExportPayload(backendData);
     await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZone?.name}`);
   };
