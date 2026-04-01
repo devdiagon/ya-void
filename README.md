@@ -1,10 +1,16 @@
 # VOY!
 
-![Electron](https://img.shields.io/badge/Electron-191970?logo=electron&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+<p align="center">
+	<img src="resources/icon.png" alt="Voy App logo" />
+</p>
+
+<p align="center">
+	<img src="https://img.shields.io/badge/Electron-191970?logo=electron&logoColor=white" alt="Electron" />
+	<img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB" alt="React" />
+	<img src="ttps://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+	<img src="https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+	<img src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white" alt="SQLite" />
+</p>
 
 ## Overview
 
@@ -14,11 +20,29 @@ VOY! is a desktop management application built to organize operational data and 
 
 **Reports:** It allows the registration of each trip organized by farm and respective area. Additionally, each report can be downloaded as an Excel document with Rosaprima's corporate format.
 
+<p align="center">
+	<img src="resources/img/report_prev1.png" alt="report_1" />
+	<img src="resources/img/report_prev2.png" alt="report_2" />
+</p>
+
 **Metrics:** Visualize the performance of trips for each farm, as well as a summary of the most important indicators in the work zones.
+
+<p align="center">
+	<img src="resources/img/metrics_prev1.png" alt="metrics_1" />
+	<img src="resources/img/metrics_prev2.png" alt="metrics_2" />
+</p>
 
 **Search:** Quick filtering to obtain details of a particular type of trip among all records made.
 
+<p align="center">
+	<img src="resources/img/search_prev.png" alt="search_prev" />
+</p>
+
 **Administrate:** Management of registration/editing of data relating to properties, their areas, managers and requesters.
+
+<p align="center">
+	<img src="resources/img/admin_prev.png" alt="admin_prev" />
+</p>
 
 ## Installation (Windows)
 
