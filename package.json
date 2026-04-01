@@ -1,6 +1,6 @@
 {
   "name": "voy",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "App created to manage Rosaprima's farms trips.",
   "main": "./out/main/index.js",
   "author": "gomiiDev & devdiagon",
