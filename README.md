@@ -22,26 +22,26 @@ VOY! is a desktop management application built to organize operational data and 
 
 <p align="center">
 	<img src="resources/img/report_prev1.png" alt="report_1" width="80%" />
-	<img src="resources/img/report_prev2.png" alt="report_2" />
+	<img src="resources/img/report_prev2.png" alt="report_2" width="80%" />
 </p>
 
 **Metrics:** Visualize the performance of trips for each farm, as well as a summary of the most important indicators in the work zones.
 
 <p align="center">
-	<img src="resources/img/metrics_prev1.png" alt="metrics_1" />
-	<img src="resources/img/metrics_prev2.png" alt="metrics_2" />
+	<img src="resources/img/metrics_prev1.png" alt="metrics_1" width="80%" />
+	<img src="resources/img/metrics_prev2.png" alt="metrics_2" width="80%" />
 </p>
 
 **Search:** Quick filtering to obtain details of a particular type of trip among all records made.
 
 <p align="center">
-	<img src="resources/img/search_prev.png" alt="search_prev" />
+	<img src="resources/img/search_prev.png" alt="search_prev" width="80%" />
 </p>
 
 **Administrate:** Management of registration/editing of data relating to properties, their areas, managers and requesters.
 
 <p align="center">
-	<img src="resources/img/admin_prev.png" alt="admin_prev" />
+	<img src="resources/img/admin_prev.png" alt="admin_prev" width="80%" />
 </p>
 
 ## Installation (Windows)
