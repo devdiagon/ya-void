@@ -3,12 +3,12 @@ import { ErrorCard } from '@renderer/components/Card';
 import { useMetrics, useWorkZones } from '@renderer/hooks';
 import { PAGE_SUBTITLE_CLASS, PAGE_TITLE_CLASS } from '@renderer/utils';
 import {
-    BarChart2Icon,
-    BarChart3Icon,
-    LayersIcon,
-    MapPinIcon,
-    RefreshCwIcon,
-    TrendingUpIcon
+  BarChart2Icon,
+  BarChart3Icon,
+  LayersIcon,
+  MapPinIcon,
+  RefreshCwIcon,
+  TrendingUpIcon
 } from 'lucide-react';
 import { ReactNode, useMemo, useState } from 'react';
 

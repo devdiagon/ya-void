@@ -7,10 +7,7 @@ export const RootLayout = (): React.JSX.Element => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed((prev) => !prev)}
-      />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((prev) => !prev)} />
 
       <div className="flex flex-col flex-1 overflow-hidden">
         <Content>
