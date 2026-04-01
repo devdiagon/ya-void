@@ -11,5 +11,5 @@ export const checkActiveWorkZoneSheetsName = (
   workZoneSheets: WorkZoneSheet[],
   newSheetName: string
 ): boolean => {
-  return !workZoneSheets.some((workZoneSheet) => workZoneSheet.name.trim() === newSheetName);
+  return workZoneSheets.some((workZoneSheet) => workZoneSheet.name.trim() === newSheetName);
 };

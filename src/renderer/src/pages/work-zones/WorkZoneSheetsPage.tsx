@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
 import { TripTable } from './TripTable';
 import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
-import { checkActiveWorkZoneSheetsName, resolveName } from '@renderer/utils/workZoneSheetUtils';
+import { resolveName } from '@renderer/utils/workZoneSheetUtils';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -73,7 +73,6 @@ export const WorkZoneSheetsPage = () => {
   const activeSheet = workZoneSheets.find((s) => s.id === effectiveActiveSheetId) ?? null;
 
   const handleCreate = async (data: WorkZoneSheetFormData) => {
-    if (!checkActiveWorkZoneSheetsName(workZoneSheets, resolveName(areas, data))) return;
     await createWorkZoneSheet({
       name: resolveName(areas, data),
       farmWorkZoneId: parsedFarmWorkZoneId,
@@ -87,7 +86,6 @@ export const WorkZoneSheetsPage = () => {
 
   const handleEdit = async (data: WorkZoneSheetFormData) => {
     if (!updateModal.data) return;
-    if (!checkActiveWorkZoneSheetsName(workZoneSheets, resolveName(areas, data))) return;
     await updateWorkZoneSheet({
       id: updateModal.data.id,
       name: resolveName(areas, data),
@@ -206,6 +204,7 @@ export const WorkZoneSheetsPage = () => {
         <WorkZoneSheetForm
           title="Nueva Hoja"
           areas={areas}
+          activeWorkZoneSheets={workZoneSheets}
           farmId={farmWorkZone?.farmId}
           onCreateArea={createArea}
           onCancel={createModal.close}
@@ -219,6 +218,7 @@ export const WorkZoneSheetsPage = () => {
             title="Editar Hoja"
             submitLabel="Guardar Hoja"
             areas={areas}
+            activeWorkZoneSheets={workZoneSheets}
             initialData={{
               name: updateModal.data.name,
               areaId: updateModal.data.areaId
