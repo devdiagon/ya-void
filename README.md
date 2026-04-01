@@ -1,13 +1,13 @@
 # VOY!
 
 <p align="center">
-	<img src="resources/icon.png" alt="Voy App logo" />
+	<img src="resources/icon.png" alt="Voy App logo" width="230" />
 </p>
 
 <p align="center">
 	<img src="https://img.shields.io/badge/Electron-191970?logo=electron&logoColor=white" alt="Electron" />
 	<img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB" alt="React" />
-	<img src="ttps://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+	<img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
 	<img src="https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
 	<img src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white" alt="SQLite" />
 </p>
@@ -21,7 +21,7 @@ VOY! is a desktop management application built to organize operational data and 
 **Reports:** It allows the registration of each trip organized by farm and respective area. Additionally, each report can be downloaded as an Excel document with Rosaprima's corporate format.
 
 <p align="center">
-	<img src="resources/img/report_prev1.png" alt="report_1" />
+	<img src="resources/img/report_prev1.png" alt="report_1" width="80%" />
 	<img src="resources/img/report_prev2.png" alt="report_2" />
 </p>
 
