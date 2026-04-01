@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
 import { TripTable } from './TripTable';
 import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
+import { resolveName } from '@renderer/utils/workZoneSheetUtils';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -71,15 +72,9 @@ export const WorkZoneSheetsPage = () => {
 
   const activeSheet = workZoneSheets.find((s) => s.id === effectiveActiveSheetId) ?? null;
 
-  const resolveName = (data: WorkZoneSheetFormData) => {
-    const trimmed = data.name?.trim();
-    if (trimmed) return trimmed;
-    return areas.find((a) => a.id === data.areaId)?.name ?? '';
-  };
-
   const handleCreate = async (data: WorkZoneSheetFormData) => {
     await createWorkZoneSheet({
-      name: resolveName(data),
+      name: resolveName(areas, data),
       farmWorkZoneId: parsedFarmWorkZoneId,
       areaId: data.areaId,
       totalSheet: 0
@@ -93,7 +88,7 @@ export const WorkZoneSheetsPage = () => {
     if (!updateModal.data) return;
     await updateWorkZoneSheet({
       id: updateModal.data.id,
-      name: resolveName(data),
+      name: resolveName(areas, data),
       farmWorkZoneId: parsedFarmWorkZoneId,
       areaId: data.areaId,
       totalSheet: updateModal.data.totalSheet
@@ -113,6 +108,9 @@ export const WorkZoneSheetsPage = () => {
       parsedWorkZoneId,
       parsedFarmWorkZoneId
     );
+
+    if (backendData.length === 0) return;
+
     const exportPayload = buildExportPayload(backendData);
     await exportTripsToExcel(exportPayload, `Reporte_Transporte_${workZone?.name}`);
   };
@@ -209,6 +207,7 @@ export const WorkZoneSheetsPage = () => {
         <WorkZoneSheetForm
           title="Nueva Hoja"
           areas={areas}
+          activeWorkZoneSheets={workZoneSheets}
           farmId={farmWorkZone?.farmId}
           onCreateArea={createArea}
           onCancel={createModal.close}
@@ -222,6 +221,7 @@ export const WorkZoneSheetsPage = () => {
             title="Editar Hoja"
             submitLabel="Guardar Hoja"
             areas={areas}
+            activeWorkZoneSheets={workZoneSheets}
             initialData={{
               name: updateModal.data.name,
               areaId: updateModal.data.areaId

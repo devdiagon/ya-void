@@ -19,7 +19,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
 
   return (
     <aside
-      className={`shrink-0 bg-gray-900 border-r border-gray-800 h-full overflow-y-auto flex flex-col transition-[width] duration-300 ${
+      className={`shrink-0 bg-gray-900 border-r border-gray-800 h-full flex flex-col transition-[width] duration-300 ${
         collapsed ? 'w-16' : 'w-52 xl:w-56'
       }`}
     >
@@ -30,9 +30,9 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
               type="button"
               onClick={onToggle}
               aria-label={collapsed ? 'Mostrar sidebar' : 'Ocultar sidebar'}
-              className="rounded-md p-1.5 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+              className="rounded-md p-1.5 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors cursor-pointer"
             >
-              {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+              {collapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
             </button>
           </div>
 
@@ -57,9 +57,9 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
         </nav>
       </div>
 
-      {version && (
+      {version && !collapsed && (
         <div className={`border-t border-gray-800 ${collapsed ? 'p-2' : 'p-4'}`}>
-          {!collapsed && <p className="text-xs text-gray-500 text-center">v{version}</p>}
+          <p className="text-xs text-gray-500 text-center">v{version}</p>
         </div>
       )}
     </aside>

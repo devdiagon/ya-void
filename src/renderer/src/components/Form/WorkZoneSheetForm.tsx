@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WorkZoneSheetFormData, WorkZoneSheetSchema } from '@renderer/schemas/workZoneSheet.schema';
-import { Area, FormAreaDTO } from '@renderer/types';
-import { FileTextIcon } from 'lucide-react';
+import { Area, FormAreaDTO, WorkZoneSheet } from '@renderer/types';
+import { CircleXIcon, FileTextIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { ActionButton, OutlineButton } from '../Button';
+import { checkActiveWorkZoneSheetsName, resolveName } from '@renderer/utils';
 
 interface WorkZoneSheetFormProps {
   title: string;
   submitLabel?: string;
   areas: Area[];
+  activeWorkZoneSheets: WorkZoneSheet[];
   farmId?: number;
   initialData?: WorkZoneSheetFormData;
   onCancel: () => void;
@@ -21,6 +23,7 @@ export const WorkZoneSheetForm = ({
   title,
   submitLabel = 'Crear Hoja',
   areas,
+  activeWorkZoneSheets,
   farmId,
   initialData,
   onCancel,
@@ -43,12 +46,24 @@ export const WorkZoneSheetForm = ({
   const [newAreaManager, setNewAreaManager] = useState('');
   const [newAreaCid, setNewAreaCid] = useState('');
   const [newAreaError, setNewAreaError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const selectedAreaId = useWatch({ control, name: 'areaId' });
   const selectedAreaName = areas.find((a) => a.id === selectedAreaId)?.name ?? '';
 
   const onFormSubmit = async (data: WorkZoneSheetFormData) => {
     try {
+      // Check if the area name doesn't exist in the same work zone sheet
+      if (checkActiveWorkZoneSheetsName(activeWorkZoneSheets, resolveName(areas, data))) {
+        setSubmitError(
+          `Ya existe una hoja con el nombre '${resolveName(areas, data)}'. Utilice otro nombre.`
+        );
+        return;
+      }
+
+      // Clear previous error message
+      setSubmitError(null);
+
       if (addNewArea) {
         if (!newAreaName.trim()) {
           setNewAreaError('El nombre del área es obligatorio');
@@ -203,6 +218,21 @@ export const WorkZoneSheetForm = ({
         </div>
       </div>
 
+      {/* Error Feedback */}
+      {submitError && (
+        <div className="flex items-center justify-center p-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-1 max-w-md w-full">
+            <div className="flex items-center text-center gap-2">
+              <div className="p-3 m-6">
+                <CircleXIcon className="text-red-600" size={32} />
+              </div>
+              <p className="text-red-700 text-sm text-left mb-8">{submitError}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
       <div className="flex items-center gap-3 pt-2">
         <ActionButton
           type="submit"

@@ -10,4 +10,3 @@ export * from './subarea.type';
 export * from './trip.type';
 export * from './workZone.type';
 export * from './workZoneSheet.type';
-
