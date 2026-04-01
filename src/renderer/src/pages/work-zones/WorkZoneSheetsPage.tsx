@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom';
 import { SheetTabs } from './SheetTabs';
 import { TripTable } from './TripTable';
 import { fetchAllWorkZonesFarmRelatedTrips } from '@renderer/hooks/useExportTrip';
+import { checkActiveWorkZoneSheetsName, resolveName } from '@renderer/utils/workZoneSheetUtils';
 
 export const WorkZoneSheetsPage = () => {
   const { workZoneId, farmWorkZoneId } = useParams();
@@ -71,15 +72,10 @@ export const WorkZoneSheetsPage = () => {
 
   const activeSheet = workZoneSheets.find((s) => s.id === effectiveActiveSheetId) ?? null;
 
-  const resolveName = (data: WorkZoneSheetFormData) => {
-    const trimmed = data.name?.trim();
-    if (trimmed) return trimmed;
-    return areas.find((a) => a.id === data.areaId)?.name ?? '';
-  };
-
   const handleCreate = async (data: WorkZoneSheetFormData) => {
+    if (!checkActiveWorkZoneSheetsName(workZoneSheets, resolveName(areas, data))) return;
     await createWorkZoneSheet({
-      name: resolveName(data),
+      name: resolveName(areas, data),
       farmWorkZoneId: parsedFarmWorkZoneId,
       areaId: data.areaId,
       totalSheet: 0
@@ -91,9 +87,10 @@ export const WorkZoneSheetsPage = () => {
 
   const handleEdit = async (data: WorkZoneSheetFormData) => {
     if (!updateModal.data) return;
+    if (!checkActiveWorkZoneSheetsName(workZoneSheets, resolveName(areas, data))) return;
     await updateWorkZoneSheet({
       id: updateModal.data.id,
-      name: resolveName(data),
+      name: resolveName(areas, data),
       farmWorkZoneId: parsedFarmWorkZoneId,
       areaId: data.areaId,
       totalSheet: updateModal.data.totalSheet
