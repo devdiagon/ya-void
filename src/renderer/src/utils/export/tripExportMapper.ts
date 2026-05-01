@@ -1,5 +1,5 @@
 import { ExportTripWorkSheet, ExportWorkZoneSheet } from '@renderer/types';
-import { calcTimeDifference, formatDate, formatDateNoYear, formatShortDate } from '../dateUtils';
+import { calcTimeDifference, formatDate, formatDateNoYear } from '../dateUtils';
 
 // From ExportWorkZoneSheet[] (backend) ------> ExportTripWorkSheet (frontend export use) with formatted date
 export const buildExportPayload = (data: ExportWorkZoneSheet[]): ExportTripWorkSheet[] => {
@@ -12,7 +12,7 @@ export const buildExportPayload = (data: ExportWorkZoneSheet[]): ExportTripWorkS
       workSheetName: sheet.workSheet.name
     },
     rows: sheet.trips.map((trip) => ({
-      tripDate: formatShortDate(trip.tripDate),
+      tripDate: trip.tripDate,
       departureTime: trip.departureTime,
       arrivalTime: trip.arrivalTime,
       waitingTime: calcTimeDifference(trip.arrivalTime, trip.departureTime),
